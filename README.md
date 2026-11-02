@@ -1,4 +1,23 @@
 # 🚀 edgetunnel 2.1
+
+本定制版维护于 **[sssstwee/edgetunnel](https://github.com/sssstwee/edgetunnel)**，基于 [cmliu/edgetunnel](https://github.com/cmliu/edgetunnel)，保留原作者署名与 LICENSE。
+
+已同步 2026-11-02 的线上代码：传输修复、Clash 规则修补及套餐用量面板。Workers 部署入口为 `usage-entry.mjs`，它复用 `_worker.js` 核心和 `usage.mjs` 用量模块。
+
+```sh
+git clone https://github.com/sssstwee/edgetunnel.git
+cd edgetunnel
+cp wrangler.toml wrangler.local.toml
+# 在 wrangler.local.toml 中填写 Worker 名称和 KV 绑定；已有本地配置可直接复用。
+npx wrangler deploy --config wrangler.local.toml
+```
+
+现有部署的域名、变量及密钥继续在 Cloudflare 和本地 `wrangler.local.toml` 中维护；本地配置不提交。用量模块复用 KV 的 `cf.json`，统计令牌需拥有当前账户的 Analytics Read 和 Billing Read 权限。
+
+验证命令：`node --test usage.test.mjs`。后续改动提交到本仓库；`upstream` 用于手动同步原作者更新，Upstream Sync 工作流仅保留手动触发。
+
+以下保留上游项目说明。上游的单文件和 Pages 部署教程不包含本定制版的用量模块。
+
 ![后台页面](./img.png)
 
 [![Stars](https://img.shields.io/github/stars/cmliu/edgetunnel?style=flat-square&logo=github)](https://github.com/cmliu/edgetunnel/stargazers)
