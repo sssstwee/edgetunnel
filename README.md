@@ -7,6 +7,7 @@
 ```sh
 git clone https://github.com/sssstwee/edgetunnel.git
 cd edgetunnel
+npm install
 cp wrangler.toml wrangler.local.toml
 # 在 wrangler.local.toml 中填写 Worker 名称和 KV 绑定；已有本地配置可直接复用。
 npx wrangler deploy --config wrangler.local.toml
@@ -14,7 +15,9 @@ npx wrangler deploy --config wrangler.local.toml
 
 现有部署的域名、变量及密钥继续在 Cloudflare 和本地 `wrangler.local.toml` 中维护；本地配置不提交。用量模块复用 KV 的 `cf.json`，统计令牌需拥有当前账户的 Analytics Read 和 Billing Read 权限。
 
-验证命令：`node --test usage.test.mjs`。后续改动提交到本仓库；`upstream` 用于手动同步原作者更新，Upstream Sync 工作流仅保留手动触发。
+Clash / Mihomo 完整订阅参考 Voyra 的稳定回退方式，设置 `🚀 默认代理`、`🟣 Claude 专用` 和 `🟢 ChatGPT 专用`，成员取自 EdgeTunnel 当前下发的节点。Claude 和 ChatGPT 分别使用 MetaCubeX Anthropic、blackmatrix7 OpenAI 社区规则集及专用 DNS，并优先拒绝 UDP，防止不支持 UDP 的节点导致 QUIC 回落直连。其他分流复用 Loyalsoldier、MetaCubeX 和 blackmatrix7 社区规则，每日更新；节点凭据、传输参数和仅节点订阅保持原样。EdgeTunnel 的回退组不能保证固定公网出口。
+
+验证命令：`npm test`。后续改动提交到本仓库；`upstream` 用于手动同步原作者更新，Upstream Sync 工作流仅保留手动触发。
 
 以下保留上游项目说明。上游的单文件和 Pages 部署教程不包含本定制版的用量模块。
 

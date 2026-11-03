@@ -1,4 +1,6 @@
-﻿const Version = '2026-10-08 22:23:27';
+﻿import { applyClashRouting } from './routing.mjs';
+
+const Version = '2026-10-08 22:23:27';
 let config_JSON, 缓存SOCKS5白名单 = null, 调试日志打印 = false;
 let SOCKS5白名单 = ['*tapecontent.net', '*cloudatacdn.com', '*loadshare.org', '*cdn-centaurus.com', 'scholar.google.com'];
 const Pages静态页面 = 'https://edt-pages.github.io', EDT_版本号 = Number(String(Version).replace(/\D+/g, ''));
@@ -4979,94 +4981,6 @@ function applyClashApiDirectRules(yaml) {
   lines.splice(start + 1, end - start - 1, ...hosts.map((host) => `  - DOMAIN,${host},DIRECT`), ...existing);
   return lines.join("\n");
 }
-function applyClashAiHotfix(yaml) {
-  const aiName = "🤖 AI 专用";
-  const suffixes = ["anthropic.com", "claude.ai", "claude.com", "clau.de", "claudemcpclient.com", "claudemcpcontent.com", "claudeusercontent.com", "sentry.io", "statsigapi.net", "intercom.io", "intercomcdn.com", "chatgpt.com", "openai.com", "oaistatic.com", "oaiusercontent.com", "muse.ai", "metaaivm.com", "meta.ai", "metaaiusercontent.com", "ecto1usercontent.com", "facebook.com", "fbcdn.net", "instagram.com", "cdninstagram.com"];
-  const exactDomains = ["servd-anthropic-website.b-cdn.net", "anthropic.com.cdn.cloudflare.net", "anthropic.auth0.com", "anthropic-com.ghost.io", "browser-intake-us5-datadoghq.com", "cdn.usefathom.com", "connect.facebook.net", "meta-agents-apps.workers.dev"];
-  const keywords = ["datadog", "sift"];
-  const preferred = ["CF02｜日常备用", "CF01｜日常主用", "CF03｜美国回退", "CF04｜三网候选"];
-  const managedKeys = /* @__PURE__ */ new Set([...suffixes.map((domain) => `DOMAIN-SUFFIX,${domain}`), ...exactDomains.map((domain) => `DOMAIN,${domain}`), ...keywords.map((keyword) => `DOMAIN-KEYWORD,${keyword}`), "IP-CIDR,160.79.104.0/21", "IP-ASN,399358", "IP-CIDR6,2607:6bc0::/32"]);
-  let lines = yaml.replace(/\r\n/g, "\n").split("\n");
-  const topEnd = (start) => {
-    for (let index = start + 1; index < lines.length; index++) if (/^[^\s#]/.test(lines[index])) return index;
-    return lines.length;
-  };
-  const ipv6Index = lines.findIndex((line) => /^ipv6:\s*/.test(line));
-  if (ipv6Index >= 0) lines[ipv6Index] = "ipv6: false";
-  else {
-    const anchor = lines.findIndex((line) => /^(?:mixed-port|port|mode):\s*/.test(line));
-    lines.splice(anchor >= 0 ? anchor + 1 : 0, 0, "ipv6: false");
-  }
-  const proxiesIndex = lines.findIndex((line) => /^proxies:\s*$/.test(line));
-  const available = /* @__PURE__ */ new Set();
-  if (proxiesIndex >= 0) {
-    const proxiesEnd = topEnd(proxiesIndex);
-    for (let index = proxiesIndex + 1; index < proxiesEnd; index++) {
-      const match = lines[index].match(/^\s*-\s*\{\s*name:\s*(?:"([^"]+)"|'([^']+)'|([^,}]+))/);
-      if (match) {
-        const name = (match[1] || match[2] || match[3]).trim();
-        if (preferred.includes(name)) {
-          available.add(name);
-          if (/\budp:\s*true\b/.test(lines[index])) lines[index] = lines[index].replace(/\budp:\s*true\b/, "udp: false");
-          else if (!/\budp:\s*(?:true|false)\b/.test(lines[index])) lines[index] = lines[index].replace(/\}(\s*(?:#.*)?)$/, ", udp: false}$1");
-        }
-        continue;
-      }
-      const blockName = lines[index].match(/^\s*-\s*name:\s*["']?(.+?)["']?\s*$/);
-      if (!blockName || !preferred.includes(blockName[1])) continue;
-      available.add(blockName[1]);
-      let end = index + 1;
-      while (end < proxiesEnd && !/^\s*-\s*(?:name:|\{)/.test(lines[end])) end++;
-      let udpLine = -1;
-      for (let child = index + 1; child < end; child++) if (/^\s+udp:\s*/.test(lines[child])) udpLine = child;
-      if (udpLine >= 0) lines[udpLine] = lines[udpLine].replace(/udp:\s*(?:true|false)/, "udp: false");
-      else lines.splice(end, 0, "    udp: false");
-    }
-  }
-  const members = preferred.filter((name) => available.has(name));
-  if (!members.length) return lines.join("\n");
-  let groupsIndex = lines.findIndex((line) => /^proxy-groups:\s*$/.test(line));
-  if (groupsIndex >= 0) {
-    const groupsEnd = topEnd(groupsIndex);
-    for (let index = groupsIndex + 1; index < groupsEnd; index++) {
-      if (!/^\s{2}-\s+name:\s*["']?🤖 AI 专用["']?\s*$/.test(lines[index])) continue;
-      let end = index + 1;
-      while (end < groupsEnd && !/^\s{2}-\s+name:/.test(lines[end])) end++;
-      lines.splice(index, end - index);
-      break;
-    }
-    groupsIndex = lines.findIndex((line) => /^proxy-groups:\s*$/.test(line));
-    lines.splice(groupsIndex + 1, 0, `  - name: ${aiName}`, "    type: select", "    proxies:", ...members.map((name) => `      - ${name}`));
-  }
-  const rulesIndex = lines.findIndex((line) => /^rules:\s*$/.test(line));
-  if (rulesIndex >= 0) {
-    const rulesEnd = topEnd(rulesIndex);
-    const isManagedRule = (rule) => {
-      const plain = rule.trim().replace(/^-\s*/, "");
-      if (plain.startsWith("AND,")) {
-        const inner = plain.match(/\((DOMAIN(?:-SUFFIX|-KEYWORD)?,[^)]+)\)/);
-        return Boolean(inner && managedKeys.has(inner[1]));
-      }
-      const parts = plain.split(",");
-      return managedKeys.has(`${parts[0]},${parts[1]}`);
-    };
-    const existing = lines.slice(rulesIndex + 1, rulesEnd).filter((line) => !isManagedRule(line));
-    const udpRejectRules = [...suffixes.map((domain) => `  - AND,((NETWORK,UDP),(DOMAIN-SUFFIX,${domain})),REJECT`), ...exactDomains.map((domain) => `  - AND,((NETWORK,UDP),(DOMAIN,${domain})),REJECT`), ...keywords.map((keyword) => `  - AND,((NETWORK,UDP),(DOMAIN-KEYWORD,${keyword})),REJECT`)];
-    const tcpAiRules = [...suffixes.map((domain) => `  - DOMAIN-SUFFIX,${domain},${aiName}`), ...exactDomains.map((domain) => `  - DOMAIN,${domain},${aiName}`), ...keywords.map((keyword) => `  - DOMAIN-KEYWORD,${keyword},${aiName}`), `  - IP-CIDR,160.79.104.0/21,${aiName},no-resolve`, `  - IP-ASN,399358,${aiName},no-resolve`, "  - IP-CIDR6,2607:6bc0::/32,REJECT,no-resolve"];
-    lines.splice(rulesIndex + 1, rulesEnd - rulesIndex - 1, ...udpRejectRules, ...tcpAiRules, ...existing);
-  }
-  const dnsIndex = lines.findIndex((line) => /^dns:\s*$/.test(line));
-  if (dnsIndex >= 0) {
-    const dnsEnd = topEnd(dnsIndex);
-    const dnsNames = ["anthropic.com", "claude.ai", "claude.com", "clau.de", "claudemcpclient.com", "claudemcpcontent.com", "claudeusercontent.com", "chatgpt.com", "openai.com", "oaistatic.com", "oaiusercontent.com", "muse.ai", "metaaivm.com", "meta.ai", "metaaiusercontent.com", "ecto1usercontent.com", "facebook.com", "fbcdn.net", "instagram.com", "cdninstagram.com"];
-    const policyLines = dnsNames.flatMap((name) => [`    "${name}": [https://1.1.1.1/dns-query, https://8.8.8.8/dns-query]`, `    "+.${name}": [https://1.1.1.1/dns-query, https://8.8.8.8/dns-query]`]);
-    const policyIndex = lines.findIndex((line, index) => index > dnsIndex && index < dnsEnd && /^\s{2}nameserver-policy:\s*$/.test(line));
-    if (policyIndex >= 0) lines.splice(policyIndex + 1, 0, ...policyLines);
-    else lines.splice(dnsEnd, 0, "  nameserver-policy:", ...policyLines);
-  }
-  return lines.join("\n");
-}
-
 function Clash订阅配置文件热补丁(Clash_原始订阅内容, config_JSON = {}) {
 	const uuid = config_JSON?.UUID || null;
 	const ECH启用 = Boolean(config_JSON?.ECH);
@@ -5221,7 +5135,7 @@ function Clash订阅配置文件热补丁(Clash_原始订阅内容, config_JSON 
 		clash_yaml = 插入NameserverPolicy(clash_yaml, hostsEntries);
 	}
 
-	if (!需要处理ECH && !需要处理gRPC) return applyClashApiDirectRules(applyClashAiHotfix(clash_yaml));
+	if (!需要处理ECH && !需要处理gRPC) return applyClashApiDirectRules(applyClashRouting(clash_yaml, HOSTS));
 
 	const lines = clash_yaml.split('\n');
 	const processedLines = [];
@@ -5281,7 +5195,7 @@ function Clash订阅配置文件热补丁(Clash_原始订阅内容, config_JSON 
 		}
 	}
 
-	return applyClashApiDirectRules(applyClashAiHotfix(processedLines.join('\n')));
+	return applyClashApiDirectRules(applyClashRouting(processedLines.join('\n'), HOSTS));
 }
 
 async function Singbox订阅配置文件热补丁(SingBox_原始订阅内容, config_JSON = {}) {
