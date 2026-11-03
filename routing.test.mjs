@@ -17,14 +17,14 @@ test('AI dependencies remain isolated while ordinary traffic uses latency select
   const yaml = await applyClashRouting(stringify(source));
   const config = parse(yaml);
   assert.deepEqual(config.proxies, source.proxies);
-  assert.deepEqual(config['proxy-groups'].map((group) => group.name), ['🚀 默认代理', '🟣 Claude 专用', '🟢 ChatGPT 专用']);
+  assert.deepEqual(config['proxy-groups'].map((group) => group.name), ['默认代理', 'Claude 专用', 'ChatGPT 专用']);
   for (const group of config['proxy-groups']) {
-    assert.equal(group.type, group.name === '🚀 默认代理' ? 'url-test' : 'fallback');
+    assert.equal(group.type, group.name === '默认代理' ? 'url-test' : 'fallback');
     assert.deepEqual(group.proxies, ['美国01', 'CF联通优选2']);
   }
   assert.equal(config['proxy-groups'][0].tolerance, 50);
   assert.equal(config.rules[0], 'AND,((NETWORK,UDP),(RULE-SET,anthropic-bootstrap)),REJECT');
-  assert.equal(config.rules[1], 'RULE-SET,anthropic-bootstrap,🟣 Claude 专用,no-resolve');
+  assert.equal(config.rules[1], 'RULE-SET,anthropic-bootstrap,Claude 专用,no-resolve');
   assert.ok(!config.rules.includes('DOMAIN-SUFFIX,claude.ai,DIRECT'));
   assert.equal(config['rule-providers'].applications.behavior, 'classical');
   assert.equal(config['rule-providers'].openai.behavior, 'domain');
@@ -32,12 +32,12 @@ test('AI dependencies remain isolated while ordinary traffic uses latency select
   assert.ok(config['rule-providers']['openai-bootstrap'].payload.includes('+.oaistatsig.com'));
   assert.ok(config['rule-providers']['openai-bootstrap'].payload.includes('+.featuregates.org'));
   assert.deepEqual(config['rule-providers']['openai-voice'].payload, ['203.0.113.7/32']);
-  assert.ok(config.rules.indexOf('RULE-SET,anthropic-bootstrap,🟣 Claude 专用,no-resolve') < config.rules.indexOf('RULE-SET,openai,🟢 ChatGPT 专用,no-resolve'));
-  assert.ok(config.rules.indexOf('RULE-SET,openai,🟢 ChatGPT 专用,no-resolve') < config.rules.indexOf('RULE-SET,reject,REJECT'));
+  assert.ok(config.rules.indexOf('RULE-SET,anthropic-bootstrap,Claude 专用,no-resolve') < config.rules.indexOf('RULE-SET,openai,ChatGPT 专用,no-resolve'));
+  assert.ok(config.rules.indexOf('RULE-SET,openai,ChatGPT 专用,no-resolve') < config.rules.indexOf('RULE-SET,reject,REJECT'));
   assert.equal(config.dns['nameserver-policy']['example.com'], source.dns['nameserver-policy']['example.com']);
   assert.equal(config.dns['nameserver-policy']['rule-set:dns-private'], undefined);
   assert.equal(config.dns['nameserver-policy']['+.claude.ai'], undefined);
-  for (const [key, group] of [['rule-set:anthropic-bootstrap,anthropic', '🟣 Claude 专用'], ['rule-set:openai-bootstrap,openai', '🟢 ChatGPT 专用']]) {
+  for (const [key, group] of [['rule-set:anthropic-bootstrap,anthropic', 'Claude 专用'], ['rule-set:openai-bootstrap,openai', 'ChatGPT 专用']]) {
     const servers = config.dns['nameserver-policy'][key];
     assert.equal(servers.length, 2);
     assert.ok(servers.every((server) => server.endsWith('#' + group)));

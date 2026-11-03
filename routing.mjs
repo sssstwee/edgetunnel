@@ -1,9 +1,10 @@
 import { parse, stringify } from 'yaml';
 import data from './ai-routing-data.json' with { type: 'json' };
 
-const DEFAULT = '🚀 默认代理';
-const CLAUDE = '🟣 Claude 专用';
-const CHATGPT = '🟢 ChatGPT 专用';
+const DEFAULT = '默认代理';
+const CLAUDE = 'Claude 专用';
+const CHATGPT = 'ChatGPT 专用';
+const ICON_BASE = 'https://raw.githubusercontent.com/zuluion/Qure/0d484e5fb24f1c1bb52372bfb057d3a001aaa648/IconSet/Color';
 const proxyDNS = (group) => [`https://1.1.1.1/dns-query#${group}`, `https://dns.google/dns-query#${group}`];
 const REMOTE_DNS = proxyDNS(DEFAULT);
 const DIRECT_DNS = ['https://dns.alidns.com/dns-query', 'https://doh.pub/dns-query'];
@@ -79,9 +80,9 @@ export async function applyClashRouting(yaml, bootstrapHosts = []) {
   config.mode = 'rule';
   config.ipv6 = false;
   config['proxy-groups'] = [
-    { name: DEFAULT, type: 'url-test', proxies: [...members], url: 'https://www.gstatic.com/generate_204', interval: 60, tolerance: 50, lazy: false, timeout: 4000, 'expected-status': '204', 'max-failed-times': 2 },
-    { name: CLAUDE, type: 'fallback', proxies: [...members], url: 'https://api.anthropic.com/v1/models', interval: 90, lazy: false, timeout: 3000, 'expected-status': '405' },
-    { name: CHATGPT, type: 'fallback', proxies: [...members], url: 'https://api.openai.com/v1/models', interval: 90, lazy: false, timeout: 4000, 'expected-status': '401' },
+    { name: DEFAULT, icon: `${ICON_BASE}/Proxy.png`, type: 'url-test', proxies: [...members], url: 'https://www.gstatic.com/generate_204', interval: 60, tolerance: 50, lazy: false, timeout: 4000, 'expected-status': '204', 'max-failed-times': 2 },
+    { name: CLAUDE, icon: `${ICON_BASE}/Claude.png`, type: 'fallback', proxies: [...members], url: 'https://api.anthropic.com/v1/models', interval: 90, lazy: false, timeout: 3000, 'expected-status': '405' },
+    { name: CHATGPT, icon: `${ICON_BASE}/ChatGPT.png`, type: 'fallback', proxies: [...members], url: 'https://api.openai.com/v1/models', interval: 90, lazy: false, timeout: 4000, 'expected-status': '401' },
   ];
   config['rule-providers'] = ruleProviders(await currentVoicePrefixes());
   const serviceRules = (providers, group) => providers.flatMap((name) => [
