@@ -196,6 +196,32 @@
           "kind": "notice"
         }
       ]
+    },
+    {
+      "repository": "cmliu/cmliu",
+      "ref": "main",
+      "files": [
+        {
+          "source": "CF-CIDR.txt",
+          "path": "cidr/cf.txt",
+          "kind": "cidr"
+        },
+        {
+          "source": "CF-CIDR/ct.txt",
+          "path": "cidr/ct.txt",
+          "kind": "cidr"
+        },
+        {
+          "source": "CF-CIDR/cu.txt",
+          "path": "cidr/cu.txt",
+          "kind": "cidr"
+        },
+        {
+          "source": "CF-CIDR/cmcc.txt",
+          "path": "cidr/cmcc.txt",
+          "kind": "cidr"
+        }
+      ]
     }
   ],
   "remote": [

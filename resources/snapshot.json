@@ -236,6 +236,38 @@
       "bytes": 18092
     },
     {
+      "path": "cidr/cf.txt",
+      "kind": "cidr",
+      "url": "https://raw.githubusercontent.com/cmliu/cmliu/be6adc209afa1556eea2f34b6675b874a0419699/CF-CIDR.txt",
+      "sourceCommit": "be6adc209afa1556eea2f34b6675b874a0419699",
+      "sha256": "cee116272a57b4acbee834f26d8e375bdeb601dcb2bf531dc88baae1e653b32c",
+      "bytes": 1129
+    },
+    {
+      "path": "cidr/ct.txt",
+      "kind": "cidr",
+      "url": "https://raw.githubusercontent.com/cmliu/cmliu/be6adc209afa1556eea2f34b6675b874a0419699/CF-CIDR/ct.txt",
+      "sourceCommit": "be6adc209afa1556eea2f34b6675b874a0419699",
+      "sha256": "44be8d75b33ae48c37b265640427accb25cd7eb9fa31655649fe8d140184db3a",
+      "bytes": 402
+    },
+    {
+      "path": "cidr/cu.txt",
+      "kind": "cidr",
+      "url": "https://raw.githubusercontent.com/cmliu/cmliu/be6adc209afa1556eea2f34b6675b874a0419699/CF-CIDR/cu.txt",
+      "sourceCommit": "be6adc209afa1556eea2f34b6675b874a0419699",
+      "sha256": "3a443d91bf60100d57766d604da583a8711c7eb3aa49a704b4c3427563eeee63",
+      "bytes": 395
+    },
+    {
+      "path": "cidr/cmcc.txt",
+      "kind": "cidr",
+      "url": "https://raw.githubusercontent.com/cmliu/cmliu/be6adc209afa1556eea2f34b6675b874a0419699/CF-CIDR/cmcc.txt",
+      "sourceCommit": "be6adc209afa1556eea2f34b6675b874a0419699",
+      "sha256": "61dc01a2e1f1bfe8bd193c1590e52672b776a90fada34bca0de4a43cd55e02ae",
+      "bytes": 603
+    },
+    {
       "path": "data/chatgpt-voice.json",
       "kind": "voice",
       "url": "https://openai.com/chatgpt-voice.json",

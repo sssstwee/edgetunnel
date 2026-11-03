@@ -4,3 +4,4 @@ resources/rules/** -text -whitespace
 resources/icons/** -text -whitespace
 resources/data/** -text -whitespace
 resources/licenses/** -text -whitespace
+resources/cidr/** -text -whitespace

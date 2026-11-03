@@ -6,6 +6,7 @@ EdgeTunnel 和 Voyra 的公共静态依赖集中存放在本目录。分组、DN
 | --- | --- | --- |
 | `rules/*.yaml` | 19 个 Mihomo 规则集，原文件保持不变 | Loyalsoldier/clash-rules（GPL-3.0）、MetaCubeX/meta-rules-dat（GPL-3.0）、blackmatrix7/ios_rule_script（GPL-2.0） |
 | `icons/*.png` | 默认代理、Claude、ChatGPT 图标 | [zuluion/Qure](https://github.com/zuluion/Qure)，基于 Koolson/Qure；固定提交，转载注明出处、禁止商业用途，原说明见 `licenses/Qure.README.md` |
+| `cidr/*.txt` | 4 份 CF / 电信 / 联通 / 移动随机优选网段清单，原文件保持不变 | [cmliu/cmliu](https://github.com/cmliu/cmliu)，来源提交与摘要见 `snapshot.json`；上游未提供根许可证，不将其声明为本项目原创 |
 | `data/chatgpt-voice.json` | OpenAI 语音 IP 网段 | [OpenAI 官方 JSON](https://openai.com/chatgpt-voice.json)，原样镜像，不将上游数据声明为本项目所有 |
 | `licenses/` | 上游许可证、原始说明和来源 | 各文件按原作者条款使用，不因镜像而改为仓库的默认许可证 |
 | `sources.json` | 上游仓库、分支 / 固定提交、文件路径 | 同步输入，新增资源在这里登记 |
@@ -13,7 +14,7 @@ EdgeTunnel 和 Voyra 的公共静态依赖集中存放在本目录。分组、DN
 
 四个 Geo 数据文件 `geoip.dat`、`geosite.dat`、`geoip.metadb` 和 `GeoLite2-ASN.mmdb` 保留 MetaCubeX/meta-rules-dat 发布的原始字节，放到本仓库 [Releases](https://github.com/sssstwee/edgetunnel/releases/latest)；不把大二进制反复写入 Git 历史。Release 附带 SHA256SUMS、来源快照和上游声明。派生数据的来源列表保留在 `licenses/MetaCubeX-meta-rules-dat.README.md`；GeoLite2 数据由 MaxMind 创建，见 [MaxMind](https://www.maxmind.com)，原数据和商标权利仍归其作者。
 
-运行中的订阅只引用 `sssstwee` 自有仓库的规则、图标、Voice JSON 和 Geo 数据。DNS 解析器、AI 服务 API 和测速 URL 是在线服务，继续使用原服务端点。私密节点参数、鉴权和订阅 URL 不进入公共仓库。
+运行中的订阅只引用 `sssstwee` 自有仓库的规则、图标、Voice JSON、随机优选 CIDR 和 Geo 数据。DNS 解析器、AI 服务 API 和测速 URL 是在线服务，继续使用原服务端点。私密节点参数、鉴权和订阅 URL 不进入公共仓库。
 
 ## 更新
 
