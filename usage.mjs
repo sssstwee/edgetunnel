@@ -87,6 +87,11 @@ export async function readUsage(credentials, dailyUsage = {}) {
 
 // Serialized into the existing admin page; it only refreshes this usage module.
 export function installUsagePanel() {
+  // The upstream page can include scripts after its closing body tag.
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', installUsagePanel, { once: true });
+    return;
+  }
   const module = document.getElementById('cfUsageModule');
   if (!module) return;
   const text = (id, value) => { const element = document.getElementById(id); if (element) element.textContent = value; };
@@ -138,8 +143,7 @@ export function installUsagePanel() {
       render({ plan: 'unknown', planName: '套餐与用量暂不可用', planError: '更新失败，请检查登录状态或稍后重试。' });
     } finally { pending = false; }
   }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', refresh, { once: true });
-  else void refresh();
+  void refresh();
   setInterval(refresh, 60000);
   document.addEventListener('visibilitychange', () => { if (!document.hidden) void refresh(); });
 }
@@ -172,7 +176,7 @@ export function createUsageWorker(original) {
         return Response.json(usageOnly ? usage : body, { headers });
       }
       if (admin && type.includes('text/html')) {
-        const script = `<script>(${installUsagePanel.toString()})();</script>`;
+        const script = `<script data-cfasync="false">(${installUsagePanel.toString()})();</script>`;
         const transformed = new HTMLRewriter().on('body', { element(element) { element.append(script, { html: true }); } }).transform(response);
         transformed.headers.set('cache-control', 'no-store');
         transformed.headers.delete('etag');

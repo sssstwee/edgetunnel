@@ -7,6 +7,7 @@
 ```sh
 git clone https://github.com/sssstwee/edgetunnel.git
 cd edgetunnel
+npm install
 cp wrangler.toml wrangler.local.toml
 # 在 wrangler.local.toml 中填写 Worker 名称和 KV 绑定；已有本地配置可直接复用。
 npx wrangler deploy --config wrangler.local.toml
@@ -14,7 +15,11 @@ npx wrangler deploy --config wrangler.local.toml
 
 现有部署的域名、变量及密钥继续在 Cloudflare 和本地 `wrangler.local.toml` 中维护；本地配置不提交。用量模块复用 KV 的 `cf.json`，统计令牌需拥有当前账户的 Analytics Read 和 Billing Read 权限。
 
-验证命令：`node --test usage.test.mjs`。后续改动提交到本仓库；`upstream` 用于手动同步原作者更新，Upstream Sync 工作流仅保留手动触发。
+Clash / Mihomo 完整订阅的分组、图标、AI 分流和 DNS 统一维护在 [托管模板](https://github.com/sssstwee/xiaomao-ai-proxy/tree/main/backend/edgetunnel-subscription) 的 `clash-base.yaml`；后台 `acl4ssr.ini` 引用该模板。VPS 转换出口统一合并完整模板，Worker 不另写分组和业务规则，避免更新时丢失或与托管模板冲突。默认组使用 url-test，Claude 和 ChatGPT 各自使用 fallback；节点凭据和传输参数继续由当前订阅生成。
+
+`routing.mjs` 仅保留节点域名解析的启动保护，并读取 OpenAI 官方语音网段更新模板内联快照（超时 5 秒、最大 256KiB、边缘缓存 1 小时）。读取失败保留模板快照；仅节点订阅不注入任何配置。Voyra 定时同步同一模板并保留 VPS 原生 AI 出口。规则和 DNS 的维护说明、验证及回退方式均见托管模板目录。
+
+验证命令：`npm test`。后续改动提交到本仓库；`upstream` 用于手动同步原作者更新，Upstream Sync 工作流仅保留手动触发。
 
 以下保留上游项目说明。上游的单文件和 Pages 部署教程不包含本定制版的用量模块。
 
