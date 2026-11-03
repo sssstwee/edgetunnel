@@ -4,12 +4,14 @@
 
 已同步 2026-11-02 的线上代码：传输修复、Clash 规则修补及套餐用量面板。Workers 部署入口为 `usage-entry.mjs`，它复用 `_worker.js` 核心和 `usage.mjs` 用量模块。
 
+首次部署先按 [私有转换服务说明](native-converter/README.md) 建立转换 Worker 和专用 KV，再在主 Worker 配置中填写对应的 `CONVERTER` 服务绑定。已有部署更新时保留原变量、密钥和 KV，补齐该绑定。
+
 ```sh
 git clone https://github.com/sssstwee/edgetunnel.git
 cd edgetunnel
 npm install
 cp wrangler.toml wrangler.local.toml
-# 在 wrangler.local.toml 中填写 Worker 名称和 KV 绑定；已有本地配置可直接复用。
+# 在 wrangler.local.toml 中填写 Worker 名称、原 KV 与 CONVERTER 服务绑定。
 npx wrangler deploy --config wrangler.local.toml
 ```
 
