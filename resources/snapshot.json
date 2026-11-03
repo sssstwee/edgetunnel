@@ -273,6 +273,22 @@
       "url": "https://openai.com/chatgpt-voice.json",
       "sha256": "d2923918cc4cd6bf382f379b1601af871fbff66d8fefb81d4457f2ccba1ec959",
       "bytes": 14530
+    },
+    {
+      "path": "icons/Round_Robin.png",
+      "kind": "png",
+      "url": "https://raw.githubusercontent.com/zuluion/Qure/0d484e5fb24f1c1bb52372bfb057d3a001aaa648/IconSet/Color/Round_Robin.png",
+      "sourceCommit": "0d484e5fb24f1c1bb52372bfb057d3a001aaa648",
+      "sha256": "d121825943baed64273c01b85c91b80c07d5bf6b5099013d40cb37381ff6a7ec",
+      "bytes": 11505
+    },
+    {
+      "path": "icons/Auto.png",
+      "kind": "png",
+      "url": "https://raw.githubusercontent.com/zuluion/Qure/0d484e5fb24f1c1bb52372bfb057d3a001aaa648/IconSet/Color/Auto.png",
+      "sourceCommit": "0d484e5fb24f1c1bb52372bfb057d3a001aaa648",
+      "sha256": "ca2161622dcc61e6e72f1906c0970ab604d19d7da513cc7fc243561b9543f171",
+      "bytes": 7081
     }
   ],
   "geodata": {

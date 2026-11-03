@@ -5,7 +5,7 @@ EdgeTunnel 和 Voyra 的公共静态依赖集中存放在本目录。分组、DN
 | 目录 / 文件 | 内容 | 来源与条款 |
 | --- | --- | --- |
 | `rules/*.yaml` | 19 个 Mihomo 规则集，原文件保持不变 | Loyalsoldier/clash-rules（GPL-3.0）、MetaCubeX/meta-rules-dat（GPL-3.0）、blackmatrix7/ios_rule_script（GPL-2.0） |
-| `icons/*.png` | 默认代理、Claude、ChatGPT 图标 | [zuluion/Qure](https://github.com/zuluion/Qure)，基于 Koolson/Qure；固定提交，转载注明出处、禁止商业用途，原说明见 `licenses/Qure.README.md` |
+| `icons/*.png` | 默认代理、负载均衡、自动选择、Claude、ChatGPT 图标 | [zuluion/Qure](https://github.com/zuluion/Qure)，基于 Koolson/Qure；固定提交，转载注明出处、禁止商业用途，原说明见 `licenses/Qure.README.md` |
 | `cidr/*.txt` | 4 份 CF / 电信 / 联通 / 移动随机优选网段清单，原文件保持不变 | [cmliu/cmliu](https://github.com/cmliu/cmliu)，来源提交与摘要见 `snapshot.json`；上游未提供根许可证，不将其声明为本项目原创 |
 | `data/chatgpt-voice.json` | OpenAI 语音 IP 网段 | [OpenAI 官方 JSON](https://openai.com/chatgpt-voice.json)，原样镜像，不将上游数据声明为本项目所有 |
 | `licenses/` | 上游许可证、原始说明和来源 | 各文件按原作者条款使用，不因镜像而改为仓库的默认许可证 |
