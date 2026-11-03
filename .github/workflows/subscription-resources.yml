@@ -1,0 +1,44 @@
+name: Subscription resources
+
+on:
+  schedule:
+    - cron: '17 19 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: subscription-resources
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    if: github.repository == 'sssstwee/edgetunnel'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: main
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+      - run: npm install --omit=dev --ignore-scripts
+      - name: Download and validate upstream snapshots
+        run: node resources/sync.mjs
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - name: Verify and publish complete Geo data release
+        run: node resources/sync.mjs --publish-geodata
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - name: Commit public resource snapshots
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add resources
+          if ! git diff --cached --quiet; then
+            git commit -m 'chore: refresh subscription resources'
+            git push origin HEAD:main
+          fi

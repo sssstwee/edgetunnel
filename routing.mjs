@@ -1,6 +1,6 @@
 import { parse, stringify } from 'yaml';
 
-const VOICE_SOURCE = 'https://openai.com/chatgpt-voice.json';
+const VOICE_SOURCE = 'https://raw.githubusercontent.com/sssstwee/edgetunnel/main/resources/data/chatgpt-voice.json';
 
 function voicePrefixes(document) {
   const prefixes = document?.prefixes?.flatMap((prefix) => [prefix.ipv4Prefix, prefix.ipv6Prefix]).filter(Boolean);

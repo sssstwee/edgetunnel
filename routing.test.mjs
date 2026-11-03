@@ -16,7 +16,10 @@ const source = () => ({
 });
 
 test('hosted groups, icons, rules and DNS survive the Worker without policy replacement', async (t) => {
-  t.mock.method(globalThis, 'fetch', async () => Response.json({ prefixes: [{ ipv4Prefix: '203.0.113.7/32' }] }));
+  t.mock.method(globalThis, 'fetch', async (url) => {
+    assert.equal(url, 'https://raw.githubusercontent.com/sssstwee/edgetunnel/main/resources/data/chatgpt-voice.json');
+    return Response.json({ prefixes: [{ ipv4Prefix: '203.0.113.7/32' }] });
+  });
   const input = source();
   const yaml = await applyClashRouting(stringify(input), ['ech.example']);
   const output = parse(yaml);
