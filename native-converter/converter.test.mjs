@@ -78,4 +78,3 @@ test('invalid or unavailable templates keep the last-good KV snapshot', async t 
   assert.deepEqual(await hostedPolicy(configUrl, cache), fixture());
   await assert.rejects(hostedPolicy(configUrl, kv()), /unavailable/);
 });
-

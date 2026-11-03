@@ -536,6 +536,7 @@ export default {
 						} else if (usesBuiltinConverter(config_JSON.订阅转换配置.SUBAPI, url.origin)) {
 							try {
 								订阅内容 = await convertSubscription(await 生成原始订阅(true), 订阅类型, config_JSON.订阅转换配置, env.CONVERTER, config_JSON.跳过证书验证);
+								responseHeaders["X-Subscription-Converter"] = "cloudflare-service";
 								if (url.searchParams.has('surge') || ua.includes('surge')) 订阅内容 = Surge订阅配置文件热补丁(订阅内容, url.protocol + '//' + url.host + '/sub?token=' + 订阅TOKEN + '&surge', config_JSON);
 							} catch (error) {
 								安全控制台.error(error);
