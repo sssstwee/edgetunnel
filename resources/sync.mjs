@@ -27,6 +27,7 @@ function validate(file, data) {
     if (!payload?.length || payload.length > 10000) throw new Error('Invalid voice prefix count');
     payload.forEach(validatePrefix);
   }
+  if (file.kind === 'cidr') data.toString().trim().split(/\s+/).forEach(validatePrefix);
 }
 
 function validatePrefix(prefix) {
