@@ -134,13 +134,14 @@ async function publish(snapshot) {
     const notes = join(cache, 'notes.md');
     await writeFile(notes, `Subscription Geo data snapshot.\n\nUpstream: ${snapshot.geodata.source}\n\nOriginal files, upstream digests and notices are preserved. See the attached snapshot.json, SHA256SUMS and license files.\n\nResource maintenance: https://github.com/${repo}/tree/main/resources\n`);
     gh('release', 'create', tag, '--repo', repo, '--target', 'main', '--draft', '--title', tag, '--notes-file', notes);
-    release = api(`repos/${repo}/releases/tags/${tag}`);
+    release = api(`repos/${repo}/releases?per_page=100`).find(release => release.tag_name === tag);
+    if (!release) throw new Error('Created draft release is not visible');
   }
   if (release.draft) {
     await writeFile(join(cache, 'SHA256SUMS'), files.map(file => `${file.sha256}  ${file.name}\n`).join(''));
     const attachments = [...files.map(file => join(cache, file.name)), join(cache, 'SHA256SUMS'), join(root, 'snapshot.json'), join(root, 'README.md'), ...snapshot.files.filter(file => file.kind === 'notice').map(file => join(root, file.path))];
     gh('release', 'upload', tag, ...attachments, '--repo', repo, '--clobber');
-    release = api(`repos/${repo}/releases/tags/${tag}`);
+    release = api(`repos/${repo}/releases/${release.id}`);
   }
   for (const file of files) {
     const asset = release.assets.find(asset => asset.name === file.name);
