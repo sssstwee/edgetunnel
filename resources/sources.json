@@ -1,0 +1,218 @@
+{
+  "repository": "sssstwee/edgetunnel",
+  "sources": [
+    {
+      "repository": "Loyalsoldier/clash-rules",
+      "ref": "release",
+      "files": [
+        {
+          "source": "reject.txt",
+          "path": "rules/reject.yaml",
+          "kind": "rule",
+          "behavior": "domain"
+        },
+        {
+          "source": "icloud.txt",
+          "path": "rules/icloud.yaml",
+          "kind": "rule",
+          "behavior": "domain"
+        },
+        {
+          "source": "apple.txt",
+          "path": "rules/apple.yaml",
+          "kind": "rule",
+          "behavior": "domain"
+        },
+        {
+          "source": "google.txt",
+          "path": "rules/google.yaml",
+          "kind": "rule",
+          "behavior": "domain"
+        },
+        {
+          "source": "proxy.txt",
+          "path": "rules/proxy.yaml",
+          "kind": "rule",
+          "behavior": "domain"
+        },
+        {
+          "source": "direct.txt",
+          "path": "rules/direct.yaml",
+          "kind": "rule",
+          "behavior": "domain"
+        },
+        {
+          "source": "private.txt",
+          "path": "rules/private.yaml",
+          "kind": "rule",
+          "behavior": "domain"
+        },
+        {
+          "source": "gfw.txt",
+          "path": "rules/gfw.yaml",
+          "kind": "rule",
+          "behavior": "domain"
+        },
+        {
+          "source": "tld-not-cn.txt",
+          "path": "rules/tld-not-cn.yaml",
+          "kind": "rule",
+          "behavior": "domain"
+        },
+        {
+          "source": "telegramcidr.txt",
+          "path": "rules/telegramcidr.yaml",
+          "kind": "rule",
+          "behavior": "ipcidr"
+        },
+        {
+          "source": "cncidr.txt",
+          "path": "rules/cncidr.yaml",
+          "kind": "rule",
+          "behavior": "ipcidr"
+        },
+        {
+          "source": "lancidr.txt",
+          "path": "rules/lancidr.yaml",
+          "kind": "rule",
+          "behavior": "ipcidr"
+        },
+        {
+          "source": "applications.txt",
+          "path": "rules/applications.yaml",
+          "kind": "rule",
+          "behavior": "classical"
+        }
+      ]
+    },
+    {
+      "repository": "MetaCubeX/meta-rules-dat",
+      "ref": "meta",
+      "files": [
+        {
+          "source": "geo/geosite/line.yaml",
+          "path": "rules/line.yaml",
+          "kind": "rule",
+          "behavior": "domain"
+        },
+        {
+          "source": "geo/geosite/category-ai-!cn.yaml",
+          "path": "rules/ai.yaml",
+          "kind": "rule",
+          "behavior": "domain"
+        },
+        {
+          "source": "geo/geosite/category-ai-cn.yaml",
+          "path": "rules/ai-cn.yaml",
+          "kind": "rule",
+          "behavior": "domain"
+        },
+        {
+          "source": "geo/geosite/anthropic.yaml",
+          "path": "rules/anthropic.yaml",
+          "kind": "rule",
+          "behavior": "domain"
+        },
+        {
+          "source": "geo/geosite/openai.yaml",
+          "path": "rules/openai.yaml",
+          "kind": "rule",
+          "behavior": "domain"
+        }
+      ]
+    },
+    {
+      "repository": "blackmatrix7/ios_rule_script",
+      "ref": "master",
+      "files": [
+        {
+          "source": "rule/Clash/Line/Line.yaml",
+          "path": "rules/line-ip.yaml",
+          "kind": "rule",
+          "behavior": "classical"
+        }
+      ]
+    },
+    {
+      "repository": "zuluion/Qure",
+      "ref": "0d484e5fb24f1c1bb52372bfb057d3a001aaa648",
+      "files": [
+        {
+          "source": "IconSet/Color/Proxy.png",
+          "path": "icons/Proxy.png",
+          "kind": "png"
+        },
+        {
+          "source": "IconSet/Color/Claude.png",
+          "path": "icons/Claude.png",
+          "kind": "png"
+        },
+        {
+          "source": "IconSet/Color/ChatGPT.png",
+          "path": "icons/ChatGPT.png",
+          "kind": "png"
+        },
+        {
+          "source": "README.md",
+          "path": "licenses/Qure.README.md",
+          "kind": "notice"
+        }
+      ]
+    },
+    {
+      "repository": "Loyalsoldier/clash-rules",
+      "ref": "master",
+      "files": [
+        {
+          "source": "LICENSE",
+          "path": "licenses/Loyalsoldier-clash-rules.LICENSE",
+          "kind": "notice"
+        }
+      ]
+    },
+    {
+      "repository": "MetaCubeX/meta-rules-dat",
+      "ref": "master",
+      "files": [
+        {
+          "source": "LICENSE",
+          "path": "licenses/MetaCubeX-meta-rules-dat.LICENSE",
+          "kind": "notice"
+        },
+        {
+          "source": "README.md",
+          "path": "licenses/MetaCubeX-meta-rules-dat.README.md",
+          "kind": "notice"
+        }
+      ]
+    },
+    {
+      "repository": "blackmatrix7/ios_rule_script",
+      "ref": "master",
+      "files": [
+        {
+          "source": "LICENSE",
+          "path": "licenses/blackmatrix7-ios_rule_script.LICENSE",
+          "kind": "notice"
+        }
+      ]
+    }
+  ],
+  "remote": [
+    {
+      "url": "https://openai.com/chatgpt-voice.json",
+      "path": "data/chatgpt-voice.json",
+      "kind": "voice"
+    }
+  ],
+  "geodata": {
+    "repository": "MetaCubeX/meta-rules-dat",
+    "tag": "latest",
+    "files": [
+      "geoip.dat",
+      "geosite.dat",
+      "geoip.metadb",
+      "GeoLite2-ASN.mmdb"
+    ]
+  }
+}

@@ -1,0 +1,6 @@
+
+# Preserve the bytes and checksums of upstream subscription resources.
+resources/rules/** -text -whitespace
+resources/icons/** -text -whitespace
+resources/data/** -text -whitespace
+resources/licenses/** -text -whitespace

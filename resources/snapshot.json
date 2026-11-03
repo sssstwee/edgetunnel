@@ -1,0 +1,280 @@
+{
+  "files": [
+    {
+      "path": "rules/reject.yaml",
+      "kind": "rule",
+      "behavior": "domain",
+      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/683fdadefbc70dcf58f235a9d4977c9adf1a1bfd/reject.txt",
+      "sourceCommit": "683fdadefbc70dcf58f235a9d4977c9adf1a1bfd",
+      "sha256": "a708c244e359ae8cf11a69a9e26f2b6f8b99b8d71e35bd40b7453cf093c6f4dc",
+      "bytes": 5704768
+    },
+    {
+      "path": "rules/icloud.yaml",
+      "kind": "rule",
+      "behavior": "domain",
+      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/683fdadefbc70dcf58f235a9d4977c9adf1a1bfd/icloud.txt",
+      "sourceCommit": "683fdadefbc70dcf58f235a9d4977c9adf1a1bfd",
+      "sha256": "f68eeee69a44d20a0e0f893cada4c42cef336d04e92aaa90b88d384e89009ed8",
+      "bytes": 1123
+    },
+    {
+      "path": "rules/apple.yaml",
+      "kind": "rule",
+      "behavior": "domain",
+      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/683fdadefbc70dcf58f235a9d4977c9adf1a1bfd/apple.txt",
+      "sourceCommit": "683fdadefbc70dcf58f235a9d4977c9adf1a1bfd",
+      "sha256": "a47d516880dcf65f51d3b40e6a71c33253e0774bdc4a7ec0a0d0a09a4dd522a2",
+      "bytes": 5424
+    },
+    {
+      "path": "rules/google.yaml",
+      "kind": "rule",
+      "behavior": "domain",
+      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/683fdadefbc70dcf58f235a9d4977c9adf1a1bfd/google.txt",
+      "sourceCommit": "683fdadefbc70dcf58f235a9d4977c9adf1a1bfd",
+      "sha256": "21a04f287800943b3fdfdef1f843173086171d9a0b5c9c33c3f73e1ec77d4c9e",
+      "bytes": 3368
+    },
+    {
+      "path": "rules/proxy.yaml",
+      "kind": "rule",
+      "behavior": "domain",
+      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/683fdadefbc70dcf58f235a9d4977c9adf1a1bfd/proxy.txt",
+      "sourceCommit": "683fdadefbc70dcf58f235a9d4977c9adf1a1bfd",
+      "sha256": "4aabeed0323290885a4e6741be8f1856aeac0d1e4537e2cb5eaf01f10e6efadf",
+      "bytes": 622877
+    },
+    {
+      "path": "rules/direct.yaml",
+      "kind": "rule",
+      "behavior": "domain",
+      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/683fdadefbc70dcf58f235a9d4977c9adf1a1bfd/direct.txt",
+      "sourceCommit": "683fdadefbc70dcf58f235a9d4977c9adf1a1bfd",
+      "sha256": "2ff0b806e1ba3f302ea14f2297230eb46bfb279412748db5c31cf6593013a5f3",
+      "bytes": 2276776
+    },
+    {
+      "path": "rules/private.yaml",
+      "kind": "rule",
+      "behavior": "domain",
+      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/683fdadefbc70dcf58f235a9d4977c9adf1a1bfd/private.txt",
+      "sourceCommit": "683fdadefbc70dcf58f235a9d4977c9adf1a1bfd",
+      "sha256": "49972ad557345dd1abe94a62892f06cbc5b4cef12bf8d7ac5beca454b5de9088",
+      "bytes": 3543
+    },
+    {
+      "path": "rules/gfw.yaml",
+      "kind": "rule",
+      "behavior": "domain",
+      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/683fdadefbc70dcf58f235a9d4977c9adf1a1bfd/gfw.txt",
+      "sourceCommit": "683fdadefbc70dcf58f235a9d4977c9adf1a1bfd",
+      "sha256": "d413f8e23fd9935bc076da0f653a98ef8ba01e366f085d13e8505bd351be362c",
+      "bytes": 95420
+    },
+    {
+      "path": "rules/tld-not-cn.yaml",
+      "kind": "rule",
+      "behavior": "domain",
+      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/683fdadefbc70dcf58f235a9d4977c9adf1a1bfd/tld-not-cn.txt",
+      "sourceCommit": "683fdadefbc70dcf58f235a9d4977c9adf1a1bfd",
+      "sha256": "67ada67716332c39e0afea361dd4b2ad66f55d0a92d3d1b90a7a1d4d47283f62",
+      "bytes": 11820
+    },
+    {
+      "path": "rules/telegramcidr.yaml",
+      "kind": "rule",
+      "behavior": "ipcidr",
+      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/683fdadefbc70dcf58f235a9d4977c9adf1a1bfd/telegramcidr.txt",
+      "sourceCommit": "683fdadefbc70dcf58f235a9d4977c9adf1a1bfd",
+      "sha256": "328fca88c675763111c7f7585ec504e5c21ab9afb7a8ce6df33b7ac01b8a3ee0",
+      "bytes": 274
+    },
+    {
+      "path": "rules/cncidr.yaml",
+      "kind": "rule",
+      "behavior": "ipcidr",
+      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/683fdadefbc70dcf58f235a9d4977c9adf1a1bfd/cncidr.txt",
+      "sourceCommit": "683fdadefbc70dcf58f235a9d4977c9adf1a1bfd",
+      "sha256": "f245c3272352dd8b1a55114bac37d2b0767d9194d65d60a8e167ebcc8ee6943e",
+      "bytes": 212064
+    },
+    {
+      "path": "rules/lancidr.yaml",
+      "kind": "rule",
+      "behavior": "ipcidr",
+      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/683fdadefbc70dcf58f235a9d4977c9adf1a1bfd/lancidr.txt",
+      "sourceCommit": "683fdadefbc70dcf58f235a9d4977c9adf1a1bfd",
+      "sha256": "a5e833af11e66049c1b1e06dbb47aa3e02df2cea7fcdebf46b59fefb6087525a",
+      "bytes": 532
+    },
+    {
+      "path": "rules/applications.yaml",
+      "kind": "rule",
+      "behavior": "classical",
+      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/683fdadefbc70dcf58f235a9d4977c9adf1a1bfd/applications.txt",
+      "sourceCommit": "683fdadefbc70dcf58f235a9d4977c9adf1a1bfd",
+      "sha256": "33bc8f07bacf74082fcb5f361eded1f6f9d3abcedcbe37ada2eb2ab4ae031732",
+      "bytes": 2821
+    },
+    {
+      "path": "rules/line.yaml",
+      "kind": "rule",
+      "behavior": "domain",
+      "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/ea0125e318b019267a12ff8294689e2f997991a9/geo/geosite/line.yaml",
+      "sourceCommit": "ea0125e318b019267a12ff8294689e2f997991a9",
+      "sha256": "bc555ae0d41072e7ceb0eab7f4d9e0f2b31b046a34430932e083dbdcd445fe0f",
+      "bytes": 445
+    },
+    {
+      "path": "rules/ai.yaml",
+      "kind": "rule",
+      "behavior": "domain",
+      "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/ea0125e318b019267a12ff8294689e2f997991a9/geo/geosite/category-ai-!cn.yaml",
+      "sourceCommit": "ea0125e318b019267a12ff8294689e2f997991a9",
+      "sha256": "1e7b206983722c321249eb40a907680cc2d668206f6d5805d96fe7b92307a076",
+      "bytes": 5381
+    },
+    {
+      "path": "rules/ai-cn.yaml",
+      "kind": "rule",
+      "behavior": "domain",
+      "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/ea0125e318b019267a12ff8294689e2f997991a9/geo/geosite/category-ai-cn.yaml",
+      "sourceCommit": "ea0125e318b019267a12ff8294689e2f997991a9",
+      "sha256": "6b86c16ff3c48bf8e941f120c245bb7548eade55250430eb2853ea7be6e3f762",
+      "bytes": 2523
+    },
+    {
+      "path": "rules/anthropic.yaml",
+      "kind": "rule",
+      "behavior": "domain",
+      "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/ea0125e318b019267a12ff8294689e2f997991a9/geo/geosite/anthropic.yaml",
+      "sourceCommit": "ea0125e318b019267a12ff8294689e2f997991a9",
+      "sha256": "b076801f5903f02d8976ebf82a2e7a7868e772a0e4dbaa12a7154f2d756a760a",
+      "bytes": 449
+    },
+    {
+      "path": "rules/openai.yaml",
+      "kind": "rule",
+      "behavior": "domain",
+      "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/ea0125e318b019267a12ff8294689e2f997991a9/geo/geosite/openai.yaml",
+      "sourceCommit": "ea0125e318b019267a12ff8294689e2f997991a9",
+      "sha256": "6aede2e962e4101b061a851f5615a5db3376a4c198b3b91177b36317e9faeffb",
+      "bytes": 716
+    },
+    {
+      "path": "rules/line-ip.yaml",
+      "kind": "rule",
+      "behavior": "classical",
+      "url": "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/0b6897dc17e0c513d25449c935a9694818e32f0c/rule/Clash/Line/Line.yaml",
+      "sourceCommit": "0b6897dc17e0c513d25449c935a9694818e32f0c",
+      "sha256": "23af95c3f877d0754cd663ba3d4179aae821dc693be3b37cf7e98a02d0cb46b4",
+      "bytes": 867
+    },
+    {
+      "path": "icons/Proxy.png",
+      "kind": "png",
+      "url": "https://raw.githubusercontent.com/zuluion/Qure/0d484e5fb24f1c1bb52372bfb057d3a001aaa648/IconSet/Color/Proxy.png",
+      "sourceCommit": "0d484e5fb24f1c1bb52372bfb057d3a001aaa648",
+      "sha256": "56f5e40b72a4279c12e3577f996a2fa003c9adafc86a66ed9a38c1ec60aa6bc4",
+      "bytes": 12999
+    },
+    {
+      "path": "icons/Claude.png",
+      "kind": "png",
+      "url": "https://raw.githubusercontent.com/zuluion/Qure/0d484e5fb24f1c1bb52372bfb057d3a001aaa648/IconSet/Color/Claude.png",
+      "sourceCommit": "0d484e5fb24f1c1bb52372bfb057d3a001aaa648",
+      "sha256": "517d489dc6083a530a36e1db774efa673d92a14f0010d5d5e0b87c33226695b8",
+      "bytes": 222921
+    },
+    {
+      "path": "icons/ChatGPT.png",
+      "kind": "png",
+      "url": "https://raw.githubusercontent.com/zuluion/Qure/0d484e5fb24f1c1bb52372bfb057d3a001aaa648/IconSet/Color/ChatGPT.png",
+      "sourceCommit": "0d484e5fb24f1c1bb52372bfb057d3a001aaa648",
+      "sha256": "2779f53f26cda315cc5624de87c51e51e6598210674875dce5271ef2a2d91691",
+      "bytes": 20153
+    },
+    {
+      "path": "licenses/Qure.README.md",
+      "kind": "notice",
+      "url": "https://raw.githubusercontent.com/zuluion/Qure/0d484e5fb24f1c1bb52372bfb057d3a001aaa648/README.md",
+      "sourceCommit": "0d484e5fb24f1c1bb52372bfb057d3a001aaa648",
+      "sha256": "ddfdc7321ba031b73c848e4d9be8920e9f69c842127a76214457aedbff7abd78",
+      "bytes": 9291
+    },
+    {
+      "path": "licenses/Loyalsoldier-clash-rules.LICENSE",
+      "kind": "notice",
+      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/ab21f1c70d263c683990a0aed446ad3bf09a2961/LICENSE",
+      "sourceCommit": "ab21f1c70d263c683990a0aed446ad3bf09a2961",
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+      "bytes": 35149
+    },
+    {
+      "path": "licenses/MetaCubeX-meta-rules-dat.LICENSE",
+      "kind": "notice",
+      "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/4178770badecb1b349fbcd62c737e0d7a2079729/LICENSE",
+      "sourceCommit": "4178770badecb1b349fbcd62c737e0d7a2079729",
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+      "bytes": 35149
+    },
+    {
+      "path": "licenses/MetaCubeX-meta-rules-dat.README.md",
+      "kind": "notice",
+      "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/4178770badecb1b349fbcd62c737e0d7a2079729/README.md",
+      "sourceCommit": "4178770badecb1b349fbcd62c737e0d7a2079729",
+      "sha256": "f8331ea1270bab8df1be58c6bd36064eacb80b4c98d1a243266617d5b544dd4a",
+      "bytes": 11360
+    },
+    {
+      "path": "licenses/blackmatrix7-ios_rule_script.LICENSE",
+      "kind": "notice",
+      "url": "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/0b6897dc17e0c513d25449c935a9694818e32f0c/LICENSE",
+      "sourceCommit": "0b6897dc17e0c513d25449c935a9694818e32f0c",
+      "sha256": "8177f97513213526df2cf6184d8ff986c675afb514d4e68a404010521b880643",
+      "bytes": 18092
+    },
+    {
+      "path": "data/chatgpt-voice.json",
+      "kind": "voice",
+      "url": "https://openai.com/chatgpt-voice.json",
+      "sha256": "d2923918cc4cd6bf382f379b1601af871fbff66d8fefb81d4457f2ccba1ec959",
+      "bytes": 14530
+    }
+  ],
+  "geodata": {
+    "source": "https://github.com/MetaCubeX/meta-rules-dat/releases/tag/latest",
+    "publishedAt": "2026-11-03T03:35:02Z",
+    "files": [
+      {
+        "name": "geoip.dat",
+        "url": "https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip.dat",
+        "sha256": "06c1d50d0013af57ffe78c5af93f0dc6aa998890f3ee231393816f9117810c4a",
+        "bytes": 16546071,
+        "upstreamAssetId": 704135310
+      },
+      {
+        "name": "geosite.dat",
+        "url": "https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geosite.dat",
+        "sha256": "3fee9b84efce1ef142974a18b48b9b12d2cf8ccb8017dd4ec16e3906bcb7da69",
+        "bytes": 4356022,
+        "upstreamAssetId": 704135399
+      },
+      {
+        "name": "geoip.metadb",
+        "url": "https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip.metadb",
+        "sha256": "f74ad728d3d3e1a7ca51886a147a18d82406733f3bc0db8cf9117f66de437239",
+        "bytes": 8424898,
+        "upstreamAssetId": 704135343
+      },
+      {
+        "name": "GeoLite2-ASN.mmdb",
+        "url": "https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/GeoLite2-ASN.mmdb",
+        "sha256": "3169b9ea7dad762f6837b95408dadc1173f47be33be2d83b6c90e67a57a7eb2e",
+        "bytes": 9000080,
+        "upstreamAssetId": 704135237
+      }
+    ]
+  }
+}
