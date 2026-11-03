@@ -153,6 +153,16 @@
           "kind": "png"
         },
         {
+          "source": "IconSet/Color/Round_Robin.png",
+          "path": "icons/Round_Robin.png",
+          "kind": "png"
+        },
+        {
+          "source": "IconSet/Color/Auto.png",
+          "path": "icons/Auto.png",
+          "kind": "png"
+        },
+        {
           "source": "README.md",
           "path": "licenses/Qure.README.md",
           "kind": "notice"
