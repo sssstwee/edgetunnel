@@ -563,7 +563,7 @@ export default {
 							订阅内容 = await Singbox订阅配置文件热补丁(订阅内容, config_JSON);
 							responseHeaders["content-type"] = 'application/json; charset=utf-8';
 						} else if (订阅类型 === 'clash') {
-							订阅内容 = Clash订阅配置文件热补丁(订阅内容, config_JSON);
+							订阅内容 = await Clash订阅配置文件热补丁(订阅内容, config_JSON);
 							responseHeaders["content-type"] = 'application/x-yaml; charset=utf-8';
 						}
 						return new Response(订阅内容, { status: 200, headers: responseHeaders });
@@ -4981,7 +4981,7 @@ function applyClashApiDirectRules(yaml) {
   lines.splice(start + 1, end - start - 1, ...hosts.map((host) => `  - DOMAIN,${host},DIRECT`), ...existing);
   return lines.join("\n");
 }
-function Clash订阅配置文件热补丁(Clash_原始订阅内容, config_JSON = {}) {
+async function Clash订阅配置文件热补丁(Clash_原始订阅内容, config_JSON = {}) {
 	const uuid = config_JSON?.UUID || null;
 	const ECH启用 = Boolean(config_JSON?.ECH);
 	const HOSTS = Array.isArray(config_JSON?.HOSTS) ? [...config_JSON.HOSTS] : [];
@@ -5135,7 +5135,7 @@ function Clash订阅配置文件热补丁(Clash_原始订阅内容, config_JSON 
 		clash_yaml = 插入NameserverPolicy(clash_yaml, hostsEntries);
 	}
 
-	if (!需要处理ECH && !需要处理gRPC) return applyClashApiDirectRules(applyClashRouting(clash_yaml, HOSTS));
+	if (!需要处理ECH && !需要处理gRPC) return applyClashApiDirectRules(await applyClashRouting(clash_yaml, HOSTS));
 
 	const lines = clash_yaml.split('\n');
 	const processedLines = [];
@@ -5195,7 +5195,7 @@ function Clash订阅配置文件热补丁(Clash_原始订阅内容, config_JSON 
 		}
 	}
 
-	return applyClashApiDirectRules(applyClashRouting(processedLines.join('\n'), HOSTS));
+	return applyClashApiDirectRules(await applyClashRouting(processedLines.join('\n'), HOSTS));
 }
 
 async function Singbox订阅配置文件热补丁(SingBox_原始订阅内容, config_JSON = {}) {

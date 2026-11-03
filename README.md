@@ -15,7 +15,11 @@ npx wrangler deploy --config wrangler.local.toml
 
 现有部署的域名、变量及密钥继续在 Cloudflare 和本地 `wrangler.local.toml` 中维护；本地配置不提交。用量模块复用 KV 的 `cf.json`，统计令牌需拥有当前账户的 Analytics Read 和 Billing Read 权限。
 
-Clash / Mihomo 完整订阅参考 Voyra 的稳定回退方式，设置 `🚀 默认代理`、`🟣 Claude 专用` 和 `🟢 ChatGPT 专用`，成员取自 EdgeTunnel 当前下发的节点。Claude 和 ChatGPT 分别使用 MetaCubeX Anthropic、blackmatrix7 OpenAI 社区规则集及专用 DNS，并优先拒绝 UDP，防止不支持 UDP 的节点导致 QUIC 回落直连。其他分流复用 Loyalsoldier、MetaCubeX 和 blackmatrix7 社区规则，每日更新；节点凭据、传输参数和仅节点订阅保持原样。EdgeTunnel 的回退组不能保证固定公网出口。
+Clash / Mihomo 完整订阅设置 `🚀 默认代理`（`url-test`，每 60 秒探测，50ms 切换容差）、`🟣 Claude 专用` 和 `🟢 ChatGPT 专用`（两者继续使用稳定的 `fallback`），成员取自 EdgeTunnel 当前下发的节点。两个 AI 组保持独立的服务探活、DNS 和 UDP 防直连规则。
+
+AI 规则复用每日更新的 MetaCubeX Anthropic / OpenAI，在 `ai-routing-data.json` 保留官方网络要求及社区域名基础名单，防止规则集首次下载失败时遗漏主站、认证、CDN 和功能开关域名。blackmatrix7 OpenAI 域名保留为兼容快照，旧名单中覆盖整个 Vultr 的 ASN 和两个旧 IP 不再使用。Claude 的专属 Auth0 域名优先于 OpenAI 的共享 Auth0 规则。两个 AI 组的 DNS 均通过各自代理连接 Cloudflare 与 Google DoH，避免单一 DNS 故障。补充 Anthropic 官方入站 IP 和 Artifacts 库资源；共用资源仍走默认代理。可选 Fathom 统计仍按广告规则过滤。
+
+生成完整订阅时读取 OpenAI 官方 `chatgpt-voice.json`（边缘缓存 1 小时、请求超时 5 秒、最大 256KiB），为直接使用 IP 的语音连接生成规则；读取失败使用已核对的本地快照。EdgeTunnel 不支持一般 UDP，AI UDP 被拒绝后依赖客户端回落 TCP；本规则不保证所有语音客户端均支持回落。其他社区规则每日更新；节点凭据、传输参数和仅节点订阅保持原样。EdgeTunnel 的回退组不能保证固定公网出口。
 
 验证命令：`npm test`。后续改动提交到本仓库；`upstream` 用于手动同步原作者更新，Upstream Sync 工作流仅保留手动触发。
 
