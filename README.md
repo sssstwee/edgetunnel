@@ -15,9 +15,13 @@ npx wrangler deploy --config wrangler.local.toml
 
 现有部署的域名、变量及密钥继续在 Cloudflare 和本地 `wrangler.local.toml` 中维护；本地配置不提交。用量模块复用 KV 的 `cf.json`，统计令牌需拥有当前账户的 Analytics Read 和 Billing Read 权限。
 
-Clash / Mihomo 完整订阅的分组、图标、AI 分流和 DNS 统一维护在 [托管模板](https://github.com/sssstwee/xiaomao-ai-proxy/tree/main/backend/edgetunnel-subscription) 的 `clash-base.yaml`；后台 `acl4ssr.ini` 引用该模板。VPS 转换出口统一合并完整模板，Worker 不另写分组和业务规则，避免更新时丢失或与托管模板冲突。默认组使用 url-test，Claude 和 ChatGPT 各自使用 fallback；节点凭据和传输参数继续由当前订阅生成。
+Clash / Mihomo 完整订阅的分组、图标、AI 分流和 DNS 统一维护在 [托管模板](https://github.com/sssstwee/xiaomao-ai-proxy/tree/main/backend/edgetunnel-subscription) 的 `clash-base.yaml`；后台 `acl4ssr.ini` 引用该模板。`converter.mjs` 通过私有 `CONVERTER` 服务绑定调用独立的 [Cloudflare 转换 Worker](native-converter/README.md)，后者复用 [@subconverter/core](https://github.com/jinganix/subconverter) 0.4.0 完成节点格式转换，再按完整托管模板生成订阅；分组和业务规则仍只在托管模板维护。默认组使用 url-test，Claude 和 ChatGPT 各自使用 fallback；节点凭据和传输参数继续由当前订阅生成。
 
-`routing.mjs` 仅保留节点域名解析的启动保护，并读取 OpenAI 官方语音网段更新模板内联快照（超时 5 秒、最大 256KiB、边缘缓存 1 小时）。读取失败保留模板快照；仅节点订阅不注入任何配置。Voyra 定时同步同一模板并保留 VPS 原生 AI 出口。规则和 DNS 的维护说明、验证及回退方式均见托管模板目录。
+`routing.mjs` 仅保留节点域名解析的启动保护，并读取自有仓库镜像的 OpenAI 语音网段更新模板内联快照（超时 5 秒、最大 256KiB、边缘缓存 1 小时）。读取失败保留模板快照；仅节点订阅不注入任何配置。Voyra 定时同步同一模板并保留 VPS 原生 AI 出口。规则和 DNS 的维护说明、验证及回退方式均见托管模板目录。
+
+后台订阅转换后端填写当前 Worker 自身的 HTTPS 域名时，使用内置转换；新建配置默认如此，不向外部转换服务发送节点。`SUBCONFIG` 继续填写原自有 `acl4ssr.ini`。模板每 300 秒检查更新，以转换服务的专用 KV 保存最后可用版本；上游不可用时使用旧模板。仅节点输出可独立于托管模板工作，原有 TLS/ECH 补丁继续执行。显式配置其他转换后端时仍可使用旧转换路径，便于回退。
+
+CF 主订阅已不依赖 Voyra VPS 的 Caddy / subconverter / policy-server。现有 CF 节点继续使用原回源 IP，停用 Voyra 不会自动移除这些节点。Voyra 自身的 Xray / AnyTLS / HY2 / WARP 节点和旧订阅入口仍独立依赖 VPS，保留原样至用户决定停用。完整依赖清单与验证方式见 [VPS 依赖说明](VPS-DEPENDENCIES.md)。
 
 验证命令：`npm test`。后续改动提交到本仓库；`upstream` 用于手动同步原作者更新，Upstream Sync 工作流仅保留手动触发。
 

@@ -5,6 +5,10 @@ keep_vars = true
 # The admin panel serializes installUsagePanel into the browser; avoid esbuild-only helpers.
 keep_names = false
 
+[[services]]
+binding = "CONVERTER"
+service = "edgetunnel-converter"
+
 #[[kv_namespaces]]
 #binding = "KV"			#KV绑定名默认不可修改
 #id = ""				#KV数据库id
