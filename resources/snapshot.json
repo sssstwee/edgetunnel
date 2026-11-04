@@ -212,6 +212,14 @@
       "bytes": 7081
     },
     {
+      "path": "icons/QUIC.png",
+      "kind": "png",
+      "url": "https://raw.githubusercontent.com/zuluion/Qure/0d484e5fb24f1c1bb52372bfb057d3a001aaa648/IconSet/Color/Rocket.png",
+      "sourceCommit": "0d484e5fb24f1c1bb52372bfb057d3a001aaa648",
+      "sha256": "06e96ce6ed7ac99bcf135b33f306f82f6210a3afd7820776948871ba0c757860",
+      "bytes": 10769
+    },
+    {
       "path": "licenses/Qure.README.md",
       "kind": "notice",
       "url": "https://raw.githubusercontent.com/zuluion/Qure/0d484e5fb24f1c1bb52372bfb057d3a001aaa648/README.md",
