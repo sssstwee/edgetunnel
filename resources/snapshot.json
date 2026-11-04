@@ -4,17 +4,17 @@
       "path": "rules/reject.yaml",
       "kind": "rule",
       "behavior": "domain",
-      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/683fdadefbc70dcf58f235a9d4977c9adf1a1bfd/reject.txt",
-      "sourceCommit": "683fdadefbc70dcf58f235a9d4977c9adf1a1bfd",
-      "sha256": "a708c244e359ae8cf11a69a9e26f2b6f8b99b8d71e35bd40b7453cf093c6f4dc",
-      "bytes": 5704768
+      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/66f8e867637d5ddc1e53ea9c3207e71431a2e22b/reject.txt",
+      "sourceCommit": "66f8e867637d5ddc1e53ea9c3207e71431a2e22b",
+      "sha256": "73e525a0a3120a786e4436fb398479b202d1b018f91ea106ecd94bb8356053b0",
+      "bytes": 5711492
     },
     {
       "path": "rules/icloud.yaml",
       "kind": "rule",
       "behavior": "domain",
-      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/683fdadefbc70dcf58f235a9d4977c9adf1a1bfd/icloud.txt",
-      "sourceCommit": "683fdadefbc70dcf58f235a9d4977c9adf1a1bfd",
+      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/66f8e867637d5ddc1e53ea9c3207e71431a2e22b/icloud.txt",
+      "sourceCommit": "66f8e867637d5ddc1e53ea9c3207e71431a2e22b",
       "sha256": "f68eeee69a44d20a0e0f893cada4c42cef336d04e92aaa90b88d384e89009ed8",
       "bytes": 1123
     },
@@ -22,8 +22,8 @@
       "path": "rules/apple.yaml",
       "kind": "rule",
       "behavior": "domain",
-      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/683fdadefbc70dcf58f235a9d4977c9adf1a1bfd/apple.txt",
-      "sourceCommit": "683fdadefbc70dcf58f235a9d4977c9adf1a1bfd",
+      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/66f8e867637d5ddc1e53ea9c3207e71431a2e22b/apple.txt",
+      "sourceCommit": "66f8e867637d5ddc1e53ea9c3207e71431a2e22b",
       "sha256": "a47d516880dcf65f51d3b40e6a71c33253e0774bdc4a7ec0a0d0a09a4dd522a2",
       "bytes": 5424
     },
@@ -31,8 +31,8 @@
       "path": "rules/google.yaml",
       "kind": "rule",
       "behavior": "domain",
-      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/683fdadefbc70dcf58f235a9d4977c9adf1a1bfd/google.txt",
-      "sourceCommit": "683fdadefbc70dcf58f235a9d4977c9adf1a1bfd",
+      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/66f8e867637d5ddc1e53ea9c3207e71431a2e22b/google.txt",
+      "sourceCommit": "66f8e867637d5ddc1e53ea9c3207e71431a2e22b",
       "sha256": "21a04f287800943b3fdfdef1f843173086171d9a0b5c9c33c3f73e1ec77d4c9e",
       "bytes": 3368
     },
@@ -40,17 +40,17 @@
       "path": "rules/proxy.yaml",
       "kind": "rule",
       "behavior": "domain",
-      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/683fdadefbc70dcf58f235a9d4977c9adf1a1bfd/proxy.txt",
-      "sourceCommit": "683fdadefbc70dcf58f235a9d4977c9adf1a1bfd",
-      "sha256": "4aabeed0323290885a4e6741be8f1856aeac0d1e4537e2cb5eaf01f10e6efadf",
-      "bytes": 622877
+      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/66f8e867637d5ddc1e53ea9c3207e71431a2e22b/proxy.txt",
+      "sourceCommit": "66f8e867637d5ddc1e53ea9c3207e71431a2e22b",
+      "sha256": "7fce84d147b2774dc4f1abfe3ccb28bbca3c74cff2d2674b0335210d91606b41",
+      "bytes": 622917
     },
     {
       "path": "rules/direct.yaml",
       "kind": "rule",
       "behavior": "domain",
-      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/683fdadefbc70dcf58f235a9d4977c9adf1a1bfd/direct.txt",
-      "sourceCommit": "683fdadefbc70dcf58f235a9d4977c9adf1a1bfd",
+      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/66f8e867637d5ddc1e53ea9c3207e71431a2e22b/direct.txt",
+      "sourceCommit": "66f8e867637d5ddc1e53ea9c3207e71431a2e22b",
       "sha256": "2ff0b806e1ba3f302ea14f2297230eb46bfb279412748db5c31cf6593013a5f3",
       "bytes": 2276776
     },
@@ -58,8 +58,8 @@
       "path": "rules/private.yaml",
       "kind": "rule",
       "behavior": "domain",
-      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/683fdadefbc70dcf58f235a9d4977c9adf1a1bfd/private.txt",
-      "sourceCommit": "683fdadefbc70dcf58f235a9d4977c9adf1a1bfd",
+      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/66f8e867637d5ddc1e53ea9c3207e71431a2e22b/private.txt",
+      "sourceCommit": "66f8e867637d5ddc1e53ea9c3207e71431a2e22b",
       "sha256": "49972ad557345dd1abe94a62892f06cbc5b4cef12bf8d7ac5beca454b5de9088",
       "bytes": 3543
     },
@@ -67,17 +67,17 @@
       "path": "rules/gfw.yaml",
       "kind": "rule",
       "behavior": "domain",
-      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/683fdadefbc70dcf58f235a9d4977c9adf1a1bfd/gfw.txt",
-      "sourceCommit": "683fdadefbc70dcf58f235a9d4977c9adf1a1bfd",
-      "sha256": "d413f8e23fd9935bc076da0f653a98ef8ba01e366f085d13e8505bd351be362c",
-      "bytes": 95420
+      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/66f8e867637d5ddc1e53ea9c3207e71431a2e22b/gfw.txt",
+      "sourceCommit": "66f8e867637d5ddc1e53ea9c3207e71431a2e22b",
+      "sha256": "3163a5fa53aedf10425414d08039f332543801567db75182407f1c330be57c98",
+      "bytes": 95440
     },
     {
       "path": "rules/tld-not-cn.yaml",
       "kind": "rule",
       "behavior": "domain",
-      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/683fdadefbc70dcf58f235a9d4977c9adf1a1bfd/tld-not-cn.txt",
-      "sourceCommit": "683fdadefbc70dcf58f235a9d4977c9adf1a1bfd",
+      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/66f8e867637d5ddc1e53ea9c3207e71431a2e22b/tld-not-cn.txt",
+      "sourceCommit": "66f8e867637d5ddc1e53ea9c3207e71431a2e22b",
       "sha256": "67ada67716332c39e0afea361dd4b2ad66f55d0a92d3d1b90a7a1d4d47283f62",
       "bytes": 11820
     },
@@ -85,8 +85,8 @@
       "path": "rules/telegramcidr.yaml",
       "kind": "rule",
       "behavior": "ipcidr",
-      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/683fdadefbc70dcf58f235a9d4977c9adf1a1bfd/telegramcidr.txt",
-      "sourceCommit": "683fdadefbc70dcf58f235a9d4977c9adf1a1bfd",
+      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/66f8e867637d5ddc1e53ea9c3207e71431a2e22b/telegramcidr.txt",
+      "sourceCommit": "66f8e867637d5ddc1e53ea9c3207e71431a2e22b",
       "sha256": "328fca88c675763111c7f7585ec504e5c21ab9afb7a8ce6df33b7ac01b8a3ee0",
       "bytes": 274
     },
@@ -94,8 +94,8 @@
       "path": "rules/cncidr.yaml",
       "kind": "rule",
       "behavior": "ipcidr",
-      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/683fdadefbc70dcf58f235a9d4977c9adf1a1bfd/cncidr.txt",
-      "sourceCommit": "683fdadefbc70dcf58f235a9d4977c9adf1a1bfd",
+      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/66f8e867637d5ddc1e53ea9c3207e71431a2e22b/cncidr.txt",
+      "sourceCommit": "66f8e867637d5ddc1e53ea9c3207e71431a2e22b",
       "sha256": "f245c3272352dd8b1a55114bac37d2b0767d9194d65d60a8e167ebcc8ee6943e",
       "bytes": 212064
     },
@@ -103,8 +103,8 @@
       "path": "rules/lancidr.yaml",
       "kind": "rule",
       "behavior": "ipcidr",
-      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/683fdadefbc70dcf58f235a9d4977c9adf1a1bfd/lancidr.txt",
-      "sourceCommit": "683fdadefbc70dcf58f235a9d4977c9adf1a1bfd",
+      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/66f8e867637d5ddc1e53ea9c3207e71431a2e22b/lancidr.txt",
+      "sourceCommit": "66f8e867637d5ddc1e53ea9c3207e71431a2e22b",
       "sha256": "a5e833af11e66049c1b1e06dbb47aa3e02df2cea7fcdebf46b59fefb6087525a",
       "bytes": 532
     },
@@ -112,8 +112,8 @@
       "path": "rules/applications.yaml",
       "kind": "rule",
       "behavior": "classical",
-      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/683fdadefbc70dcf58f235a9d4977c9adf1a1bfd/applications.txt",
-      "sourceCommit": "683fdadefbc70dcf58f235a9d4977c9adf1a1bfd",
+      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/66f8e867637d5ddc1e53ea9c3207e71431a2e22b/applications.txt",
+      "sourceCommit": "66f8e867637d5ddc1e53ea9c3207e71431a2e22b",
       "sha256": "33bc8f07bacf74082fcb5f361eded1f6f9d3abcedcbe37ada2eb2ab4ae031732",
       "bytes": 2821
     },
@@ -196,6 +196,22 @@
       "bytes": 20153
     },
     {
+      "path": "icons/Round_Robin.png",
+      "kind": "png",
+      "url": "https://raw.githubusercontent.com/zuluion/Qure/0d484e5fb24f1c1bb52372bfb057d3a001aaa648/IconSet/Color/Round_Robin.png",
+      "sourceCommit": "0d484e5fb24f1c1bb52372bfb057d3a001aaa648",
+      "sha256": "d121825943baed64273c01b85c91b80c07d5bf6b5099013d40cb37381ff6a7ec",
+      "bytes": 11505
+    },
+    {
+      "path": "icons/Auto.png",
+      "kind": "png",
+      "url": "https://raw.githubusercontent.com/zuluion/Qure/0d484e5fb24f1c1bb52372bfb057d3a001aaa648/IconSet/Color/Auto.png",
+      "sourceCommit": "0d484e5fb24f1c1bb52372bfb057d3a001aaa648",
+      "sha256": "ca2161622dcc61e6e72f1906c0970ab604d19d7da513cc7fc243561b9543f171",
+      "bytes": 7081
+    },
+    {
       "path": "licenses/Qure.README.md",
       "kind": "notice",
       "url": "https://raw.githubusercontent.com/zuluion/Qure/0d484e5fb24f1c1bb52372bfb057d3a001aaa648/README.md",
@@ -206,8 +222,8 @@
     {
       "path": "licenses/Loyalsoldier-clash-rules.LICENSE",
       "kind": "notice",
-      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/ab21f1c70d263c683990a0aed446ad3bf09a2961/LICENSE",
-      "sourceCommit": "ab21f1c70d263c683990a0aed446ad3bf09a2961",
+      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/a3e81203072fad94597cae674260f3f19d55ee10/LICENSE",
+      "sourceCommit": "a3e81203072fad94597cae674260f3f19d55ee10",
       "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
       "bytes": 35149
     },
@@ -238,32 +254,32 @@
     {
       "path": "cidr/cf.txt",
       "kind": "cidr",
-      "url": "https://raw.githubusercontent.com/cmliu/cmliu/be6adc209afa1556eea2f34b6675b874a0419699/CF-CIDR.txt",
-      "sourceCommit": "be6adc209afa1556eea2f34b6675b874a0419699",
+      "url": "https://raw.githubusercontent.com/cmliu/cmliu/3aa80e0f712f88de41b01e6398d77c6835a04f29/CF-CIDR.txt",
+      "sourceCommit": "3aa80e0f712f88de41b01e6398d77c6835a04f29",
       "sha256": "cee116272a57b4acbee834f26d8e375bdeb601dcb2bf531dc88baae1e653b32c",
       "bytes": 1129
     },
     {
       "path": "cidr/ct.txt",
       "kind": "cidr",
-      "url": "https://raw.githubusercontent.com/cmliu/cmliu/be6adc209afa1556eea2f34b6675b874a0419699/CF-CIDR/ct.txt",
-      "sourceCommit": "be6adc209afa1556eea2f34b6675b874a0419699",
+      "url": "https://raw.githubusercontent.com/cmliu/cmliu/3aa80e0f712f88de41b01e6398d77c6835a04f29/CF-CIDR/ct.txt",
+      "sourceCommit": "3aa80e0f712f88de41b01e6398d77c6835a04f29",
       "sha256": "44be8d75b33ae48c37b265640427accb25cd7eb9fa31655649fe8d140184db3a",
       "bytes": 402
     },
     {
       "path": "cidr/cu.txt",
       "kind": "cidr",
-      "url": "https://raw.githubusercontent.com/cmliu/cmliu/be6adc209afa1556eea2f34b6675b874a0419699/CF-CIDR/cu.txt",
-      "sourceCommit": "be6adc209afa1556eea2f34b6675b874a0419699",
+      "url": "https://raw.githubusercontent.com/cmliu/cmliu/3aa80e0f712f88de41b01e6398d77c6835a04f29/CF-CIDR/cu.txt",
+      "sourceCommit": "3aa80e0f712f88de41b01e6398d77c6835a04f29",
       "sha256": "3a443d91bf60100d57766d604da583a8711c7eb3aa49a704b4c3427563eeee63",
       "bytes": 395
     },
     {
       "path": "cidr/cmcc.txt",
       "kind": "cidr",
-      "url": "https://raw.githubusercontent.com/cmliu/cmliu/be6adc209afa1556eea2f34b6675b874a0419699/CF-CIDR/cmcc.txt",
-      "sourceCommit": "be6adc209afa1556eea2f34b6675b874a0419699",
+      "url": "https://raw.githubusercontent.com/cmliu/cmliu/3aa80e0f712f88de41b01e6398d77c6835a04f29/CF-CIDR/cmcc.txt",
+      "sourceCommit": "3aa80e0f712f88de41b01e6398d77c6835a04f29",
       "sha256": "61dc01a2e1f1bfe8bd193c1590e52672b776a90fada34bca0de4a43cd55e02ae",
       "bytes": 603
     },
@@ -273,22 +289,6 @@
       "url": "https://openai.com/chatgpt-voice.json",
       "sha256": "d2923918cc4cd6bf382f379b1601af871fbff66d8fefb81d4457f2ccba1ec959",
       "bytes": 14530
-    },
-    {
-      "path": "icons/Round_Robin.png",
-      "kind": "png",
-      "url": "https://raw.githubusercontent.com/zuluion/Qure/0d484e5fb24f1c1bb52372bfb057d3a001aaa648/IconSet/Color/Round_Robin.png",
-      "sourceCommit": "0d484e5fb24f1c1bb52372bfb057d3a001aaa648",
-      "sha256": "d121825943baed64273c01b85c91b80c07d5bf6b5099013d40cb37381ff6a7ec",
-      "bytes": 11505
-    },
-    {
-      "path": "icons/Auto.png",
-      "kind": "png",
-      "url": "https://raw.githubusercontent.com/zuluion/Qure/0d484e5fb24f1c1bb52372bfb057d3a001aaa648/IconSet/Color/Auto.png",
-      "sourceCommit": "0d484e5fb24f1c1bb52372bfb057d3a001aaa648",
-      "sha256": "ca2161622dcc61e6e72f1906c0970ab604d19d7da513cc7fc243561b9543f171",
-      "bytes": 7081
     }
   ],
   "geodata": {
