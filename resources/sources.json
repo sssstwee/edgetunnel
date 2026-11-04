@@ -163,6 +163,11 @@
           "kind": "png"
         },
         {
+          "source": "IconSet/Color/Rocket.png",
+          "path": "icons/QUIC.png",
+          "kind": "png"
+        },
+        {
           "source": "README.md",
           "path": "licenses/Qure.README.md",
           "kind": "notice"
