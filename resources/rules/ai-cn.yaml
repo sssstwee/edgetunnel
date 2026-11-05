@@ -2,7 +2,7 @@ payload:
     - cueme-api.quark.cn
     - ai.zhaomi.cn
     - +.zhiexa.com
-    - +.building.fun
+    - +.doubaoapps.com
     - +.liblib.tv
     - +.rwkv.cn
     - +.rwkv.com
@@ -20,7 +20,7 @@ payload:
     - +.linka2a.net
     - +.dumate.cn
     - +.miaoda.cn
-    - +.xiaomimimo.com
+    - +.deepseeksvc.com
     - +.mcpworld.com
     - +.tiangong.cn
     - +.bigmodel.cn
@@ -30,17 +30,17 @@ payload:
     - +.zhipucn.com
     - +.kimi.com
     - +.moonshot.cn
-    - +.xiaoaiassist.com
-    - +.miaibox.com
-    - +.yoma.cn
+    - +.deepseek.com
+    - +.diandianlife.top
+    - +.askdiandian.com
     - +.hailuoai.com
     - +.minimaxi.com
     - +.xingyeai.com
     - +.codebuddy.cn
     - +.workbuddy.cn
-    - +.trae.guru
-    - +.trae.cn
-    - +.tcwqqdy.guru
+    - +.xiaomimimo.com
+    - +.xiaoaiassist.com
+    - +.miaibox.com
     - +.baichuan-ai.com
     - +.cueme.cn
     - +.n.cn
@@ -67,10 +67,6 @@ payload:
     - +.favonis.cloud
     - +.favonis.com
     - +.favonis.space
-    - +.askdiandian.com
-    - +.diandianlife.top
-    - +.deepseek.com
-    - +.deepseeksvc.com
     - +.butterfly-static.cn
     - +.butterflyai.cn
     - +.coze-dns-01.com
@@ -89,11 +85,11 @@ payload:
     - +.cozetest2.cn
     - +.cozetest3.cn
     - +.dbbuilding.fun
-    - +.liblib.cloud
+    - +.building.fun
     - +.instreet.com
     - +.doubao-dev.com
     - +.doubao.com
-    - +.doubaoapps.com
+    - +.liblib.cloud
     - +.doubaocdn.com
     - +.hi-butterfly.cn
     - +.maoxiangai.com
@@ -110,12 +106,16 @@ payload:
     - +.mcdemo.show
     - +.mchost.guru
     - +.mcprev.cn
+    - +.tcwqqdy.guru
+    - +.trae.cn
+    - +.trae.guru
+    - +.yoma.cn
+    - +.marscode.com.cn
+    - +.trae.com.cn
     - +.yuanqi.tencent.com
     - +.yuanbao.tencent.com
     - +.hunyuan.tencent.com
     - +.xinghuo.xfyun.cn
-    - +.marscode.com.cn
-    - +.trae.com.cn
     - +.yiyan.baidu.com
     - +.tongyi.aliyun.com
     - +.qianwen.aliyun.com
