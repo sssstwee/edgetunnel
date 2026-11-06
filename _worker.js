@@ -47,9 +47,10 @@ const 汇聚订阅_UA = 'v2rayN/edge' + 'tunnel (https://github.com/' + 特征�
 ///////////////////////////////////////////////////////主程序入口///////////////////////////////////////////////
 export default {
 	async fetch(request, env, ctx) {
+		const upgradeHeader = (request.headers.get('Upgrade') || '').toLowerCase(), contentType = (request.headers.get('content-type') || '').toLowerCase();
 		let config_JSON, 严格反代目标;
 		try {
-			严格反代目标 = parseStrictProxyTarget(request.url);
+			严格反代目标 = parseStrictProxyTarget(request.url, request.method === 'POST' && upgradeHeader !== 'websocket' && contentType.startsWith('application/grpc'));
 		} catch {
 			return new Response('Invalid strict proxy path', { status: 400 });
 		}
@@ -62,7 +63,6 @@ export default {
 		}
 		const url = new URL(请求URL文本);
 		const UA = request.headers.get('User-Agent') || 'null';
-		const upgradeHeader = (request.headers.get('Upgrade') || '').toLowerCase(), contentType = (request.headers.get('content-type') || '').toLowerCase();
 		const 管理员密码 = env.ADMIN || env.admin || env.PASSWORD || env.password || env.pswd || env.TOKEN || env.KEY || env.UUID || env.uuid;
 		const 加密秘钥 = env.KEY || '勿动此默认密钥，有需求请自行通过添加变量KEY进行修改';
 		const userIDMD5 = await MD5MD5(管理员密码 + 加密秘钥);

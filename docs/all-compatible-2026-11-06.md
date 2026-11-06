@@ -19,7 +19,7 @@
 - Clash Verge 界面重新触发分组测速，十六条均显示延迟；主内核按 Google 探测 URL 的 `extra.alive` 为 16/16。
 - 当前主内核的 Google 首页连续六次请求、搜索及 YouTube 首页均成功；两家 API 的连接采样分别命中 Claude / ChatGPT 专用组，样本未见 DIRECT。
 
-提交前本地验证：Node 回归 66/66 通过，Wrangler dry-run 通过。该验证没有再次部署 Worker，也没有改变线上名单。
+提交前本地验证：Node 回归 72/72 通过，Wrangler dry-run 通过。该验证没有再次部署 Worker，也没有改变线上名单。
 
 ## 范围说明
 
@@ -30,3 +30,5 @@
 旧维护脚本面向严格洛杉矶及历史双池模式，不应直接用于当前发布；未安装或启用定时维护。
 
 本地证据位于被忽略的 `tmp/`：`all-compatible-publication-2026-11-06.json`、`all-compatible-client-2026-11-06.json`、`all-compatible-live-health-2026-11-06.json`、`route-compatibility-compatible-2026-11-06.json`。名单备份键仅保存在本地发布报告；不记录订阅地址或节点凭据。
+
+合并前补齐真实 gRPC 服务方法路径：严格入口接受 gRPC 请求的 `/Tun`、`/TunMulti` 后缀，WebSocket / XHTTP 仍拒绝这些额外后缀；新增回归先复现四项失败，修复后完整 72 项通过。该修复仅入库，没有发布到现有 Worker。

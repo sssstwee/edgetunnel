@@ -248,6 +248,31 @@ test('ordinary proxy hostnames containing the reserved word retain direct-first 
   assert.deepEqual(upstream.dials, [{ hostname: 'business.example', port: 443 }]);
 });
 
+for (const method of ['Tun', 'TunMulti']) {
+  for (const [protocol, makePacket] of [['vless', vless], ['trojan', trojan]]) {
+    test(`grpc ${protocol} service method paths /${method} retain the strict target`, async t => {
+      const pairs = runtime(t);
+      const upstream = connector(t);
+      const { response } = await connectTunnel(t, pairs, upstream, 'grpc', makePacket(), `${strictPath}/${method}`);
+      assert.equal(response.status, 200);
+      assert.deepEqual(upstream.dials, [{ hostname: '192.0.2.55', port: 443 }]);
+      assert.deepEqual(upstream.sockets[0].writes, [payload]);
+    });
+  }
+}
+
+for (const transport of ['ws', 'xhttp']) {
+  test(`${transport} does not accept gRPC method suffixes on strict paths`, async t => {
+    const pairs = runtime(t);
+    const upstream = connector(t);
+    for (const method of ['Tun', 'TunMulti']) {
+      const { response } = await connectTunnel(t, pairs, upstream, transport, vless(), `${strictPath}/${method}`);
+      assert.equal(response.status, 400);
+    }
+    assert.deepEqual(upstream.dials, []);
+  });
+}
+
 test('concurrent strict requests retain independent targets', async t => {
   const pairs = runtime(t);
   const first = connector(t), second = connector(t);
@@ -279,6 +304,8 @@ const invalidPaths = [
   '/%%5c70roxyip-only=192.0.2.55:443', '/%7%5c0roxyip-only=192.0.2.55:443',
   '/proxyip%2%5cdonly=192.0.2.55:443',
   strictPath + '%ZZ', strictPath + '%C0%AF', strictPath + '?ed=%ZZ',
+  strictPath + '/Tun/extra', strictPath + '/TunMulti/Tun', strictPath + '/Unknown',
+  strictPath + '%2FTun', strictPath + '/Tun?proxyip=192.0.2.56:443',
   '/ordinary?proxyip-only=192.0.2.55:443',
 ];
 
