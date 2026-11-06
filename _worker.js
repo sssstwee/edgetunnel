@@ -1,5 +1,6 @@
 ﻿import { applyClashRouting } from './routing.mjs';
 import { convertSubscription, usesBuiltinConverter } from './converter.mjs';
+import { parseStrictProxyTarget } from './strict-proxy.mjs';
 
 const Version = '2026-10-08 22:23:27';
 let 缓存SOCKS5白名单 = null, 调试日志打印 = false;
@@ -46,7 +47,13 @@ const 汇聚订阅_UA = 'v2rayN/edge' + 'tunnel (https://github.com/' + 特征�
 ///////////////////////////////////////////////////////主程序入口///////////////////////////////////////////////
 export default {
 	async fetch(request, env, ctx) {
-		let config_JSON;
+		const upgradeHeader = (request.headers.get('Upgrade') || '').toLowerCase(), contentType = (request.headers.get('content-type') || '').toLowerCase();
+		let config_JSON, 严格反代目标;
+		try {
+			严格反代目标 = parseStrictProxyTarget(request.url, request.method === 'POST' && upgradeHeader !== 'websocket' && contentType.startsWith('application/grpc'));
+		} catch {
+			return new Response('Invalid strict proxy path', { status: 400 });
+		}
 		let 请求URL文本 = request.url.replace(/%5[Cc]/g, '').replace(/\\/g, '');
 		const 请求URL锚点索引 = 请求URL文本.indexOf('#');
 		const 请求URL主体部分 = 请求URL锚点索引 === -1 ? 请求URL文本 : 请求URL文本.slice(0, 请求URL锚点索引);
@@ -56,7 +63,6 @@ export default {
 		}
 		const url = new URL(请求URL文本);
 		const UA = request.headers.get('User-Agent') || 'null';
-		const upgradeHeader = (request.headers.get('Upgrade') || '').toLowerCase(), contentType = (request.headers.get('content-type') || '').toLowerCase();
 		const 管理员密码 = env.ADMIN || env.admin || env.PASSWORD || env.password || env.pswd || env.TOKEN || env.KEY || env.UUID || env.uuid;
 		const 加密秘钥 = env.KEY || '勿动此默认密钥，有需求请自行通过添加变量KEY进行修改';
 		const userIDMD5 = await MD5MD5(管理员密码 + 加密秘钥);
@@ -98,12 +104,12 @@ export default {
 			}
 		} else if (管理员密码 && upgradeHeader === 'websocket') {// WebSocket代理
 			const 反代上下文 = await 反代参数获取(url, userID, 默认反代IP, 默认反代兜底);
-			Object.assign(反代上下文, { TCP并发拨号数, 反代并发拨号数, 预加载竞速拨号, 连接超时毫秒: Math.min(10000, Math.max(250, Number(env.TCP_CONNECT_TIMEOUT) || 1000)) });
+			Object.assign(反代上下文, { 严格反代目标, TCP并发拨号数, 反代并发拨号数, 预加载竞速拨号, 连接超时毫秒: Math.min(10000, Math.max(250, Number(env.TCP_CONNECT_TIMEOUT) || 1000)) });
 			log(`[WebSocket] 命中请求: ${url.pathname}${url.search}`);
 			return await 处理WS请求(request, userID, url, 反代上下文, ctx);
 		} else if (管理员密码 && !访问路径.startsWith('admin/') && 访问路径 !== 'login' && request.method === 'POST') {// gRPC/叉HTTP代理
 			const 反代上下文 = await 反代参数获取(url, userID, 默认反代IP, 默认反代兜底);
-			Object.assign(反代上下文, { TCP并发拨号数, 反代并发拨号数, 预加载竞速拨号, 连接超时毫秒: Math.min(10000, Math.max(250, Number(env.TCP_CONNECT_TIMEOUT) || 1000)) });
+			Object.assign(反代上下文, { 严格反代目标, TCP并发拨号数, 反代并发拨号数, 预加载竞速拨号, 连接超时毫秒: Math.min(10000, Math.max(250, Number(env.TCP_CONNECT_TIMEOUT) || 1000)) });
 			const 命中叉HTTP特征 = !!request.headers.get(本机标识头) || !!url.searchParams.get(本机标识键);
 			if (!命中叉HTTP特征 && contentType.startsWith('application/grpc')) {
 				log(`[gRPC] 命中请求: ${url.pathname}${url.search}`);
@@ -424,6 +430,12 @@ export default {
 
 						if (!ua.includes('mozilla')) responseHeaders["Content-Disposition"] = `attachment; filename*=utf-8''${encodeURIComponent(config_JSON.优选订阅生成.SUBNAME)}`;
 						const 协议类型 = ((url.searchParams.has('surge') || ua.includes('surge')) && config_JSON.协议类型 !== 'ss') ? 'tro' + 'jan' : config_JSON.协议类型;
+						let 本地优选列表 = null;
+						if (!url.searchParams.has('sub') && config_JSON.优选订阅生成.local && !config_JSON.优选订阅生成.本地IP库.随机IP) {
+							const 本地优选内容 = await env.KV.get('ADD.txt');
+							本地优选列表 = (await 整理成数组(本地优选内容 || '')).map(item => item.trim()).filter(Boolean);
+							if (本地优选列表.length === 0) return new Response('ADD.txt 本地优选名单为空，请先配置可用节点。', { status: 503, headers: responseHeaders });
+						}
 						let 订阅内容 = '';
 						const 生成原始订阅 = async (作为转换输入 = false) => {
 							const TLS分片参数 = config_JSON.TLS分片 == 'Shadowrocket' ? `&fragment=${encodeURIComponent('1,40-60,30-50,tlshello')}` : config_JSON.TLS分片 == 'Happ' ? `&fragment=${encodeURIComponent('3,1,tlshello')}` : '';
@@ -432,9 +444,7 @@ export default {
 							if (!url.searchParams.has('sub') && config_JSON.优选订阅生成.local) { // 本地生成订阅
 								const 完整优选列表 = config_JSON.优选订阅生成.本地IP库.随机IP ? (
 									await 生成随机IP(request, config_JSON.优选订阅生成.本地IP库.随机数量, config_JSON.优选订阅生成.本地IP库.指定端口)
-								)[0] : await env.KV.get('ADD.txt') ? await 整理成数组(await env.KV.get('ADD.txt')) : (
-									await 生成随机IP(request, config_JSON.优选订阅生成.本地IP库.随机数量, config_JSON.优选订阅生成.本地IP库.指定端口)
-								)[0];
+								)[0] : 本地优选列表;
 								const 优选API = [], 优选IP = [], 其他节点 = [];
 								for (const 元素 of 完整优选列表) {
 									if (元素.toLowerCase().startsWith('sub://')) {
@@ -691,7 +701,11 @@ async function 处理叉HTTP请求(request, yourUUID, 反代上下文 = {}) {
 		try { reader.releaseLock() } catch (e) { }
 		return new Response('Invalid request', { status: 400 });
 	}
-	if (isSpeedTestSite(首包.hostname, 首包.port) && 反代上下文.代理类型 === null) {
+	if (首包.isUDP && 反代上下文.严格反代目标) {
+		try { reader.releaseLock() } catch (e) { }
+		return new Response('UDP is not supported on strict proxy paths', { status: 400 });
+	}
+	if (isSpeedTestSite(首包.hostname, 首包.port) && !反代上下文.严格反代目标 && 反代上下文.代理类型 === null) {
 		try { reader.releaseLock() } catch (e) { }
 		return new Response(构造本地204响应(首包.respHeader), {
 			status: 200,
@@ -1275,8 +1289,9 @@ async function 处理gRPC请求(request, yourUUID, 反代上下文 = {}) {
 								const 解析结果 = 解析木马请求(首包bytes, yourUUID);
 								if (解析结果?.hasError) throw new Error(解析结果.message || 'Invalid trojan request');
 								const { port, hostname, rawClientData, isUDP } = 解析结果;
+								if (isUDP && 反代上下文.严格反代目标) throw new Error('UDP is not supported on strict proxy paths');
 								log(`[gRPC] 木马首包: ${hostname}:${port} | UDP: ${isUDP ? '是' : '否'}`);
-								if (isSpeedTestSite(hostname, port) && 反代上下文.代理类型 === null) {
+								if (isSpeedTestSite(hostname, port) && !反代上下文.严格反代目标 && 反代上下文.代理类型 === null) {
 									grpcBridge.send(构造本地204响应());
 									return;
 								}
@@ -1294,9 +1309,10 @@ async function 处理gRPC请求(request, yourUUID, 反代上下文 = {}) {
 								const 解析结果 = 解析魏烈思请求(首包bytes, yourUUID);
 								if (解析结果?.hasError) throw new Error(解析结果.message || 'Invalid 魏烈思 request');
 								const { port, hostname, version, isUDP, rawClientData } = 解析结果;
+								if (isUDP && 反代上下文.严格反代目标) throw new Error('UDP is not supported on strict proxy paths');
 								log(`[gRPC] 魏烈思首包: ${hostname}:${port} | UDP: ${isUDP ? '是' : '否'}`);
 								const respHeader = new Uint8Array([version, 0]);
-								if (isSpeedTestSite(hostname, port) && 反代上下文.代理类型 === null) {
+								if (isSpeedTestSite(hostname, port) && !反代上下文.严格反代目标 && 反代上下文.代理类型 === null) {
 									grpcBridge.send(构造本地204响应(respHeader));
 									return;
 								}
@@ -1721,7 +1737,7 @@ async function 处理WS请求(request, yourUUID, url, 反代上下文 = {}, ctx 
 			const port = (明文数据[cursor] << 8) | 明文数据[cursor + 1];
 			cursor += 2;
 			const rawClientData = 明文数据.subarray(cursor);
-			if (isSpeedTestSite(hostname, port) && 反代上下文.代理类型 === null) {
+			if (isSpeedTestSite(hostname, port) && !反代上下文.严格反代目标 && 反代上下文.代理类型 === null) {
 				await 启用WS本地测速模式(上下文.回包Socket, null, rawClientData);
 				return;
 			}
@@ -1769,7 +1785,8 @@ async function 处理WS请求(request, yourUUID, url, 反代上下文 = {}, ctx 
 			const 解析结果 = 解析木马请求(chunk, yourUUID);
 			if (解析结果?.hasError) throw new Error(解析结果.message || 'Invalid trojan request');
 			const { port, hostname, rawClientData, isUDP } = 解析结果;
-			if (isSpeedTestSite(hostname, port) && 反代上下文.代理类型 === null) {
+			if (isUDP && 反代上下文.严格反代目标) throw new Error('UDP is not supported on strict proxy paths');
+			if (isSpeedTestSite(hostname, port) && !反代上下文.严格反代目标 && 反代上下文.代理类型 === null) {
 				await 启用WS本地测速模式(serverSock, null, rawClientData);
 				return;
 			}
@@ -1789,8 +1806,9 @@ async function 处理WS请求(request, yourUUID, url, 反代上下文 = {}, ctx 
 			const 解析结果 = 解析魏烈思请求(bytes, yourUUID);
 			if (解析结果?.hasError) throw new Error(解析结果.message || 'Invalid 魏烈思 request');
 			const { port, hostname, version, isUDP, rawClientData } = 解析结果;
+			if (isUDP && 反代上下文.严格反代目标) throw new Error('UDP is not supported on strict proxy paths');
 			const respHeader = new Uint8Array([version, 0]);
-			if (isSpeedTestSite(hostname, port) && 反代上下文.代理类型 === null) {
+			if (isSpeedTestSite(hostname, port) && !反代上下文.严格反代目标 && 反代上下文.代理类型 === null) {
 				await 启用WS本地测速模式(serverSock, respHeader, rawClientData);
 				return;
 			}
@@ -2280,6 +2298,7 @@ async function SSAEAD解密(cryptoKey, nonceCounter, ciphertext) {
 
 async function forwardataTCP(host, portNum, rawData, ws, respHeader, remoteConnWrapper, yourUUID, request = null, 反代上下文 = {}, 允许木马反代 = false, 木马反代首包数据 = null, 仅建立连接 = false) {
 	const { TCP并发拨号数 = 2, 反代并发拨号数 = 1, 预加载竞速拨号 = false } = 反代上下文;
+	const ctx严格反代目标 = 反代上下文.严格反代目标;
 	const ctx反代IP = 反代上下文.反代IP || '';
 	const ctx代理类型 = 反代上下文.代理类型 !== undefined ? 反代上下文.代理类型 : null;
 	const ctx代理全局 = 反代上下文.代理全局 !== undefined ? 反代上下文.代理全局 : false;
@@ -2500,7 +2519,9 @@ async function forwardataTCP(host, portNum, rawData, ws, respHeader, remoteConnW
 		const 当前连接任务 = (async () => {
 			let newSocket = null;
 			try {
-				if (使用木马反代) {
+				if (ctx严格反代目标) {
+					newSocket = await connectProxyIP(host, portNum, 本次首包数据, [[ctx严格反代目标.hostname, ctx严格反代目标.port]], false);
+				} else if (使用木马反代) {
 					log(`[木马反代] 代理到: ${host}:${portNum}`);
 					newSocket = await 连接木马反代(本次首包数据, TCP连接, 木马反代目标);
 				} else if (ctx代理类型 === 'socks5') {
@@ -2561,7 +2582,7 @@ async function forwardataTCP(host, portNum, rawData, ws, respHeader, remoteConnW
 		return connecttoPry(!已通过代理发送首包);
 	};
 
-	if (ctx代理类型 && (ctx代理全局 || SOCKS5白名单.some(p => new RegExp(`^${p.replace(/\*/g, '.*')}$`, 'i').test(host)))) {
+	if (ctx严格反代目标 || (ctx代理类型 && (ctx代理全局 || SOCKS5白名单.some(p => new RegExp(`^${p.replace(/\*/g, '.*')}$`, 'i').test(host))))) {
 		log(`[TCP转发] 启用 SOCKS5/HTTP/HTTPS/TURN/SSTP 全局代理`);
 		try {
 			await connecttoPry();

@@ -25,6 +25,8 @@ Clash / Mihomo 完整订阅的分组、图标、AI 分流和 DNS 统一维护在
 
 CF 主订阅已不依赖 Voyra VPS 的 Caddy / subconverter / policy-server。现有 CF 节点继续使用原回源 IP，停用 Voyra 不会自动移除这些节点。Voyra 自身的 Xray / AnyTLS / HY2 / WARP 节点和旧订阅入口仍独立依赖 VPS，保留原样至用户决定停用。完整依赖清单与验证方式见 [VPS 依赖说明](VPS-DEPENDENCIES.md)。
 
+2026-11-06 当前 EdgeTunnel 部署使用十六条 `/proxyip=` 兼容入口，Claude、ChatGPT 保持各自独立 fallback，UDP/443 REJECT 保留。严格 `/proxyip-only=` 是可选能力，不是当前节点名单：多数已测回源无法通过该路径访问 Google。节点凭据与线上名单仅保存在私有 KV，不提交到仓库。发布与验证见[全部兼容入口记录](docs/all-compatible-2026-11-06.md)；[节点池文档](docs/los-angeles-node-pool.md)中的历史维护工具尚不适用于当前模式，未启用定时任务。
+
 验证命令：`npm test`。后续改动提交到本仓库；`upstream` 用于手动同步原作者更新，Upstream Sync 工作流仅保留手动触发。
 
 以下保留上游项目说明。上游的单文件和 Pages 部署教程不包含本定制版的用量模块。

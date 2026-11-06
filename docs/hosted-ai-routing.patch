@@ -1,0 +1,105 @@
+diff --git a/backend/edgetunnel-subscription/clash-base.yaml b/backend/edgetunnel-subscription/clash-base.yaml
+index 39a8044..b4691a5 100644
+--- a/backend/edgetunnel-subscription/clash-base.yaml
++++ b/backend/edgetunnel-subscription/clash-base.yaml
+@@ -73,14 +73,14 @@ rules:
+   - AND,((NETWORK,UDP),(RULE-SET,openai-voice)),REJECT
+   - RULE-SET,openai-voice,ChatGPT 专用,no-resolve
+   - AND,((NETWORK,UDP),(RULE-SET,artifact-resources)),REJECT
+-  - RULE-SET,artifact-resources,默认代理,no-resolve
++  - RULE-SET,artifact-resources,Claude 专用,no-resolve
+   - RULE-SET,private,DIRECT
+   - RULE-SET,lancidr,DIRECT,no-resolve
+   - RULE-SET,line,默认代理
+   - RULE-SET,line-ip,默认代理,no-resolve
+   - RULE-SET,applications,DIRECT
+   - RULE-SET,ai-cn,DIRECT
+-  - RULE-SET,ai,默认代理
++  - RULE-SET,ai,故障转移
+   - RULE-SET,reject,REJECT
+   - RULE-SET,tld-not-cn,默认代理
+   - RULE-SET,gfw,默认代理
+@@ -795,9 +795,15 @@ dns:
+     rule-set:openai-bootstrap,openai:
+       - https://cloudflare-dns.com/dns-query#ChatGPT 专用
+       - https://dns.google/dns-query#ChatGPT 专用
+-    rule-set:line,ai,artifact-resources:
++    rule-set:line:
+       - https://cloudflare-dns.com/dns-query#默认代理
+       - https://dns.google/dns-query#默认代理
++    rule-set:ai:
++      - https://cloudflare-dns.com/dns-query#故障转移
++      - https://dns.google/dns-query#故障转移
++    rule-set:artifact-resources:
++      - https://cloudflare-dns.com/dns-query#Claude 专用
++      - https://dns.google/dns-query#Claude 专用
+     rule-set:ai-cn,direct,icloud,apple:
+       - https://dns.alidns.com/dns-query
+       - https://doh.pub/dns-query
+diff --git a/backend/edgetunnel-subscription/test_policy.py b/backend/edgetunnel-subscription/test_policy.py
+index 09760b8..f458e4f 100644
+--- a/backend/edgetunnel-subscription/test_policy.py
++++ b/backend/edgetunnel-subscription/test_policy.py
+@@ -127,6 +127,49 @@ class PolicyTest(unittest.TestCase):
+         self.assertIn('AND,((NETWORK,UDP),(RULE-SET,anthropic-bootstrap)),REJECT', rules)
+         self.assertIn('AND,((NETWORK,UDP),(RULE-SET,openai-bootstrap)),REJECT', rules)
+
++    def test_ai_routes_and_dns_cannot_reach_load_balance(self):
++        expected = {
++            'anthropic-bootstrap': 'Claude 专用',
++            'anthropic': 'Claude 专用',
++            'anthropic-ip': 'Claude 专用',
++            'openai-bootstrap': 'ChatGPT 专用',
++            'openai': 'ChatGPT 专用',
++            'openai-voice': 'ChatGPT 专用',
++            'ai': '故障转移',
++            'artifact-resources': 'Claude 专用',
++        }
++        for config in [self.template, SYNC.render(self.current, self.template, ['voyra-hy2-direct'])]:
++            groups = {group['name']: group for group in config['proxy-groups']}
++
++            def reaches_balance(name, seen=None):
++                seen = set() if seen is None else seen
++                if name in seen:
++                    return False
++                seen.add(name)
++                group = groups.get(name, {})
++                return group.get('type') == 'load-balance' or any(
++                    reaches_balance(member, seen) for member in group.get('proxies', [])
++                )
++
++            for rule in config['rules']:
++                parts = rule.split(',')
++                if parts[0] == 'RULE-SET' and parts[1] in expected:
++                    self.assertEqual(parts[2], expected[parts[1]])
++                    self.assertFalse(reaches_balance(parts[2]), rule)
++            for rule in config.get('sub-rules', {}).get('voyra-quic', []):
++                parts = rule.split(',')
++                if parts[0] == 'RULE-SET' and parts[1] in expected:
++                    self.assertIn(parts[2], ['REJECT', 'voyra-hy2-direct'])
++                    self.assertFalse(reaches_balance(parts[2]), rule)
++            for key, servers in config['dns']['nameserver-policy'].items():
++                if not key.startswith('rule-set:'):
++                    continue
++                for provider in key.removeprefix('rule-set:').split(','):
++                    if provider in expected:
++                        self.assertTrue(all(server.endswith('#' + expected[provider]) for server in servers), key)
++                        self.assertTrue(all(not reaches_balance(server.rsplit('#', 1)[-1]) for server in servers), key)
++            self.assertEqual(groups['默认代理']['proxies'], ['故障转移', '负载均衡', '自动选择'])
++
+     def test_node_list_indent_remains_compatible_with_edgetunnel_transport_patch(self):
+         config = SYNC.render(self.current, self.template)
+         content = SYNC.serialize(config)
+diff --git a/backend/edgetunnel-subscription/README.md b/backend/edgetunnel-subscription/README.md
+index 8aa6e96..d8df6e2 100644
+--- a/backend/edgetunnel-subscription/README.md
++++ b/backend/edgetunnel-subscription/README.md
+@@ -6,6 +6,8 @@
+
+ Claude / OpenAI 分别使用 MetaCubeX 的每日更新域名规则，并内联已审查的主站、认证、CDN、功能开关和资源域名作为首次启动保障。Claude 专属 Auth0 先于 OpenAI 共用认证；同时保留 Anthropic 官方入站 IP、OpenAI 语音网段和 Artifacts 资源。Voice 网段来自 [OpenAI 官方 JSON](https://openai.com/chatgpt-voice.json)，同步脚本及定制 Worker 刷新时读取自有仓库的 JSON 镜像，失败保留模板快照。
+
++Claude、OpenAI 的核心域名与 DNS 分别进入各自的独立 fallback。通用海外 AI 的规则与 DNS 使用“故障转移”，即使“默认代理”选择负载均衡也不会轮询 AI 连接。Artifacts 的公共字体和脚本主机及其 DNS 使用“Claude 专用”；这些 CDN 为多个应用共享，其他应用访问同一主机也采用该路径。普通流量仍可手动选择负载均衡，fallback 在健康变化时仍可能切换节点，已有长连接不会自动迁移。
++
+ AI DNS 分别经对应代理组使用 Cloudflare 与 Google DoH；国内和私有域名走直连 DNS。Cloudflare DoH 使用 `cloudflare-dns.com` 域名保留 TLS SNI。`proxy-server-nameserver` 单独解析节点域名，避免循环依赖。顶层和 DNS 均关闭 IPv6；全局拒绝 UDP 443 以保留移动网络 QUIC 回落，AI UDP 防直连规则同样保留。模板面向 Mihomo；不保证所有语音客户端都支持 TCP 回落。
+
+ EdgeTunnel 后台继续使用原 SUBAPI 和以下 SUBCONFIG，无需更换地址：
