@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>dev.edgetunnel.la-pool</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>@NODE@</string>
+    <string>@ROOT@/tools/maintain-la-nodes.mjs</string>
+    <string>--database</string><string>@ROOT@/tmp/la-maintenance/GeoLite2-City.mmdb</string>
+    <string>--refresh-database</string>
+    <string>--publish</string>
+    <string>--target</string><string>16</string>
+    <string>--report</string><string>@ROOT@/tmp/la-maintenance/latest.json</string>
+  </array>
+  <key>WorkingDirectory</key><string>@ROOT@</string>
+  <key>EnvironmentVariables</key>
+  <dict><key>PATH</key><string>@NODE_DIR@:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string></dict>
+  <key>StartInterval</key><integer>1800</integer>
+  <key>RunAtLoad</key><false/>
+  <key>ProcessType</key><string>Background</string>
+  <key>LowPriorityIO</key><true/>
+  <key>StandardOutPath</key><string>@ROOT@/tmp/la-maintenance/maintenance.log</string>
+  <key>StandardErrorPath</key><string>@ROOT@/tmp/la-maintenance/maintenance-error.log</string>
+</dict>
+</plist>

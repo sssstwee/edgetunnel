@@ -44,12 +44,17 @@ function environment(host, uuid, nodeOnly = false) {
   };
 }
 
-async function subscription(env) {
-  const request = new Request(`https://${env.HOST}/sub?target=clash&token=${token(env.HOST, env.UUID)}`, { headers: { 'User-Agent': 'ClashMeta/1.19.32' } });
+async function subscriptionResponse(env, target = 'clash') {
+  const request = new Request(`https://${env.HOST}/sub?target=${target}&token=${token(env.HOST, env.UUID)}`, { headers: { 'User-Agent': 'ClashMeta/1.19.32' } });
   Object.defineProperty(request, 'cf', { value: { colo: 'SJC', country: 'US' } });
   const tasks = [];
   const response = await worker.fetch(request, env, { waitUntil: promise => tasks.push(promise) });
   await Promise.all(tasks);
+  return response;
+}
+
+async function subscription(env) {
+  const response = await subscriptionResponse(env);
   assert.equal(response.status, 200);
   return parse(await response.text());
 }
@@ -84,4 +89,51 @@ test('Worker node-only subscription preserves ECH without any template request',
   for (const key of ['proxy-groups', 'rules', 'rule-providers']) assert.equal(config[key], undefined);
   assert.equal(config.proxies[0]['ech-opts'].enable, true);
   assert.equal(fetch.mock.callCount(), 0);
+});
+
+test('local explicit node list is read once per subscription request', async t => {
+  setup(t);
+  const env = environment('edge.example', '00000000-0000-4000-8000-000000000001', true);
+  const get = env.KV.get;
+  let reads = 0;
+  env.KV.get = async (key, type) => {
+    if (key === 'ADD.txt') reads++;
+    return get(key, type);
+  };
+  const config = await subscription(env);
+  assert.equal(config.proxies.length, 1);
+  assert.equal(reads, 1);
+});
+
+for (const content of [null, '', ' \r\n\t ', ',\n,']) {
+  for (const target of ['mixed', 'clash']) {
+    test(`random=false rejects ${JSON.stringify(content)} ADD.txt for ${target} without generating or converting nodes`, async t => {
+      setup(t);
+      const env = environment('edge.example', '00000000-0000-4000-8000-000000000001', true);
+      const get = env.KV.get;
+      let reads = 0;
+      env.KV.get = async (key, type) => {
+        if (key === 'ADD.txt') { reads++; return content; }
+        return get(key, type);
+      };
+      const fetch = t.mock.method(globalThis, 'fetch', async () => { throw new Error('must not fetch random candidates or templates'); });
+      const converter = t.mock.method(env.CONVERTER, 'fetch', async () => { throw new Error('must not convert an empty list'); });
+      const response = await subscriptionResponse(env, target);
+      assert.equal(response.status, 503);
+      assert.match(await response.text(), /ADD\.txt/);
+      assert.equal(reads, 1);
+      assert.equal(fetch.mock.callCount(), 0);
+      assert.equal(converter.mock.callCount(), 0);
+    });
+  }
+}
+
+test('full strict VLESS URI in ADD.txt retains the endpoint and early-data query after Worker conversion', async t => {
+  setup(t);
+  const env = environment('edge.example', '00000000-0000-4000-8000-000000000001', true);
+  const path = '/proxyip-only=192.0.2.55:443?ed=2560';
+  await env.KV.put('ADD.txt', `vless://${env.UUID}@198.51.100.1:443?security=tls&type=ws&host=${env.HOST}&sni=${env.HOST}&path=${encodeURIComponent(encodeURIComponent(path))}#LA01`);
+  const config = await subscription(env);
+  assert.equal(config.proxies.length, 1);
+  assert.equal(config.proxies[0]['ws-opts'].path, path);
 });
