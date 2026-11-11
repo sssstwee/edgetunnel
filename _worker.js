@@ -5230,7 +5230,7 @@ async function Clash订阅配置文件热补丁(Clash_原始订阅内容, config
 		}
 	}
 
-	return applyClashApiDirectRules(await applyClashRouting(processedLines.join('\n'), HOSTS));
+	return applyClashApiDirectRules(await applyClashRouting(processedLines.join('\n'), HOSTS, ECH启用 ? ECH_DNS : null));
 }
 
 async function Singbox订阅配置文件热补丁(SingBox_原始订阅内容, config_JSON = {}) {

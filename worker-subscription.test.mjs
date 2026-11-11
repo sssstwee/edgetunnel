@@ -68,6 +68,7 @@ test('authenticated Worker subscription is converted internally and retains its 
   assert.equal(config.proxies[0].servername, env.HOST);
   assert.equal(config.proxies[0]['ws-opts'].headers.Host, env.HOST);
   assert.equal(config.proxies[0]['ech-opts'].enable, true);
+  assert.deepEqual(config.dns['proxy-server-nameserver-policy']['ech.example'], ['https://dns.example/dns-query']);
   assert.equal(config['proxy-groups'][0].type, 'url-test');
 });
 

@@ -36,7 +36,7 @@ async function currentVoicePrefixes(baseline) {
   }
 }
 
-export async function applyClashRouting(yaml, bootstrapHosts = []) {
+export async function applyClashRouting(yaml, bootstrapHosts = [], echDns = null) {
   const config = parse(yaml);
   if (!Array.isArray(config?.['proxy-groups']) || !Array.isArray(config.rules) || !config.proxies?.length) return yaml;
   // Hosted templates own groups, icons, routing and DNS; do not replace their policy.
@@ -48,6 +48,14 @@ export async function applyClashRouting(yaml, bootstrapHosts = []) {
     const direct = config.dns['proxy-server-nameserver'];
     if (direct) for (const host of hosts) {
       if (!/^[\d.:]+$/.test(host)) policy[host] ??= direct;
+    }
+    if (echDns && direct?.length) {
+      const echPolicy = config.dns['proxy-server-nameserver-policy'] ??= {};
+      for (const proxy of config.proxies) {
+        if (!proxy['ech-opts']?.enable) continue;
+        const host = proxy['ech-opts']['query-server-name'] || proxy.servername || proxy.sni || proxy.server;
+        if (host) echPolicy[host] = [echDns];
+      }
     }
   }
   return stringify(config, { lineWidth: 0 });
