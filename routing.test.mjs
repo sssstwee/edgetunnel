@@ -41,6 +41,34 @@ test('node-only subscriptions remain usable without template injection or networ
   assert.equal(fetch.mock.callCount(), 0);
 });
 
+test('the selected ECH resolver reaches the dedicated proxy DNS policy without changing other routing', async () => {
+  const input = source();
+  delete input['rule-providers'];
+  input.proxies[0]['ech-opts']['query-server-name'] = 'cloudflare-ech.com';
+  input.proxies.push({ name: 'plain', type: 'vless', server: 'plain.example', port: 443 });
+  input.dns['proxy-server-nameserver-policy'] = { 'other.example': ['https://dns.google/dns-query'] };
+  const resolver = 'https://odvr.nic.cz/dns-query';
+  const yaml = await applyClashRouting(stringify(input), [], resolver);
+  const output = parse(yaml);
+  assert.deepEqual(output.dns['proxy-server-nameserver-policy'], {
+    'other.example': ['https://dns.google/dns-query'],
+    'cloudflare-ech.com': [resolver],
+  });
+  assert.deepEqual(output.dns['proxy-server-nameserver'], input.dns['proxy-server-nameserver']);
+  assert.deepEqual(output.proxies, input.proxies);
+  assert.deepEqual(output['proxy-groups'], input['proxy-groups']);
+  assert.deepEqual(output.rules, input.rules);
+  assert.equal(await applyClashRouting(yaml, [], resolver), yaml);
+});
+
+test('ECH does not add a dedicated DNS policy when no dedicated proxy resolver exists', async () => {
+  const input = source();
+  delete input['rule-providers'];
+  delete input.dns['proxy-server-nameserver'];
+  const output = parse(await applyClashRouting(stringify(input), [], 'https://odvr.nic.cz/dns-query'));
+  assert.equal(output.dns['proxy-server-nameserver-policy'], undefined);
+});
+
 test('failed, malformed and oversized voice sources retain the hosted template baseline', async (t) => {
   const input = stringify(source());
   const fetch = t.mock.method(globalThis, 'fetch', async () => new Response('', { status: 503 }));
