@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import test from 'node:test';
-import { parse } from 'yaml';
+import { parse, stringify } from 'yaml';
 import worker from './jms-config/worker.mjs';
 import { buildConfig } from './jms-config/policy.mjs';
 
@@ -49,4 +49,23 @@ test('unauthenticated requests cannot retrieve configuration or trigger upstream
   const response = await worker.fetch(new Request('https://example.test/clash/wrong.yaml'), { PROFILE_TOKEN: 'a'.repeat(48) });
   assert.equal(response.status, 404);
   assert.equal(await response.text(), 'Not found');
+});
+
+test('protected subscription combines fresh JMS nodes with the remote policy', async t => {
+  const upstream = { ...nodes(), rules: ['MATCH,DIRECT'], 'secret-upstream-field': 'omit-this' };
+  t.mock.method(globalThis, 'fetch', async input => new Response(
+    new URL(input).hostname === 'jmssub.net' ? stringify(upstream) : stringify(policy()),
+  ));
+  const token = 'a'.repeat(48);
+  const response = await worker.fetch(new Request(`https://example.test/clash/${token}.yaml`), {
+    PROFILE_TOKEN: token, JMS_SUB_URL: 'https://jmssub.net/members/getsub.php?service=test',
+    POLICY_URL: 'https://example.test/policy.yaml',
+  });
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get('Cache-Control'), 'private, no-store');
+  const config = parse(await response.text());
+  assert.deepEqual(config['proxy-groups'].map(g => g.name), ['JMS', 'JMS Auto', 'AI-US']);
+  assert.deepEqual(config.rules.slice(-2), ['MATCH,JMS', 'MATCH,REJECT']);
+  assert.equal(config['secret-upstream-field'], undefined);
+  assert.equal(config.proxies.length, 6);
 });

@@ -21,7 +21,7 @@ export default {
         throw new Error('Invalid upstream subscription');
       }
       const [upstream, template] = await Promise.all([
-        fetch(source, { headers: { 'User-Agent': 'Clash Verge/Mihomo' }, signal: AbortSignal.timeout(15000), redirect: 'error' }),
+        fetch(source.href, { headers: { 'User-Agent': 'Clash Verge/Mihomo' }, signal: AbortSignal.timeout(15000), redirect: 'manual' }),
         hostedPolicy(env.POLICY_URL),
       ]);
       const config = buildConfig(parse(await readText(upstream, 128 * 1024)), template);
@@ -38,8 +38,10 @@ export default {
       if (usage && usage.length < 1024) headers['subscription-userinfo'] = usage;
       return new Response(request.method === 'HEAD' ? null : stringify(config, { lineWidth: 0 }), { headers });
     } catch (error) {
-      console.error({ event: 'jms_config_unavailable', type: error?.name || 'Error' });
-      return new Response('Subscription configuration unavailable', { status: 503, headers: { 'Cache-Control': 'no-store' } });
+      const known = ['Invalid upstream subscription', 'Subscription resource unavailable', 'Invalid hosted policy', 'No JMS nodes', 'Missing verified node policy', 'No verified US nodes; keep the previous subscription'];
+      const reason = known.includes(error?.message) ? error.message : error?.name || 'Error';
+      console.error({ event: 'jms_config_unavailable', reason });
+      return new Response('Subscription configuration unavailable', { status: 503, headers: { 'Cache-Control': 'no-store', 'X-Config-Error': reason } });
     }
   },
 };
