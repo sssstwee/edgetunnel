@@ -459,6 +459,9 @@ dns:
     +.trae.com.cn:
     - https://dns.alidns.com/dns-query#DIRECT
     - https://doh.pub/dns-query#DIRECT
+    rule-set:jms-meta-bootstrap:
+    - https://1.1.1.1/dns-query#AI-US
+    - https://8.8.8.8/dns-query#AI-US
   use-hosts: true
   use-system-hosts: true
 jms-us-nodes:
@@ -1195,6 +1198,19 @@ rule-providers:
     - oauthaccountmanager.googleapis.com
     - ssl.gstatic.com
     - lh3.googleusercontent.com
+  jms-meta-bootstrap:
+    type: inline
+    behavior: domain
+    payload:
+    - +.meta.ai
+    - +.metaaivm.com
+    - +.metaaiusercontent.com
+    - +.meta.com
+    - +.fbcdn.net
+    - +.facebook.net
+    - graph.facebook.com
+    - gateway.facebook.com
+    - www.facebook.com
 rules:
 - RULE-SET,jms-cn-ai-extra,DIRECT
 - RULE-SET,jms-ai-cn,DIRECT
@@ -1214,6 +1230,8 @@ rules:
 - RULE-SET,jms-gemini-bootstrap,REJECT
 - RULE-SET,jms-gemini,AI-US
 - RULE-SET,jms-gemini,REJECT
+- RULE-SET,jms-meta-bootstrap,AI-US
+- RULE-SET,jms-meta-bootstrap,REJECT
 - RULE-SET,jms-ai,AI-US
 - RULE-SET,jms-ai,REJECT
 - RULE-SET,jms-ai-resources,AI-US

@@ -15,7 +15,7 @@
     ]
   },
   "vars": {
-    "POLICY_URL": "https://raw.githubusercontent.com/sssstwee/edgetunnel/main/jms-config/clash-base.yaml?v=single-ai"
+    "POLICY_URL": "https://raw.githubusercontent.com/sssstwee/edgetunnel/main/jms-config/clash-base.yaml?v=single-ai-meta"
   },
   "observability": {
     "enabled": true,
