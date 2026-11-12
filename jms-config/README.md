@@ -6,11 +6,11 @@ Clash Verge 只需导入一个受令牌保护的地址。Worker 在服务端合�
 
 - 国内 AI（包括 Kimi/Moonshot 的海外域名）优先直连，其他国内域名及局域网直连。
 - Google、YouTube 及其他国外普通访问使用 `JMS` / `JMS Auto`，不限国家。
-- Claude、ChatGPT、Gemini 使用各自独立的美国 `fallback`；其他海外 AI 使用 `AI-US`。
+- Claude、ChatGPT、Gemini、Meta 和其他海外 AI 统一使用美国 `fallback` 组 `AI-US`。
 - 美国白名单依次为 s3、s2、s801，依据 2026-11-12 的 Google 地区接口与独立出口检测。节点编号不保证服务商未来不更换出口，变更后应复核白名单。
 - 每条代理规则后跟同条件的 `REJECT`，最终 `MATCH,JMS` 后也有 `MATCH,REJECT`。节点不支持 UDP 时不会因规则耗尽而直连；节点运行时失效会在代理内失败。
 - 六个 JMS 节点均已通过独立实例的 UDP DNS 转发测试；VLESS 显式启用 `udp` 和 `packet-encoding: xudp`。此测试不代表已验证任意网站的 HTTP/3 或账号内语音业务。
-- 国内及节点 DNS 使用国内解析器；海外 AI 的加密 DNS 显式绑定相应美国组，其余国外 DNS 绑定 `JMS`。使用明确的 DNS 代理后缀，因此 `respect-rules` 保持关闭，避免启动时规则加载与节点 DNS 互相依赖。
+- 国内及节点 DNS 使用国内解析器；海外 AI 的加密 DNS 显式绑定 `AI-US`，其余国外 DNS 绑定 `JMS`。使用明确的 DNS 代理后缀，因此 `respect-rules` 保持关闭，避免启动时规则加载与节点 DNS 互相依赖。
 
 域名/IP 规则复用 MetaCubeX/meta-rules-dat、Loyalsoldier/clash-rules，以及现有 Voyra/EdgeTunnel 的 AI 引导、资源和语音 IP 列表。GitHub 规则由 Mihomo 自动更新，模板更新在下次订阅刷新后生效。
 

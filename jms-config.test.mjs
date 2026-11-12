@@ -2,7 +2,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import test from 'node:test';
 import { parse } from 'yaml';
-import worker, { buildConfig } from './jms-config/worker.mjs';
+import worker from './jms-config/worker.mjs';
+import { buildConfig } from './jms-config/policy.mjs';
 
 const policy = () => parse(fs.readFileSync(new URL('./jms-config/clash-base.yaml', import.meta.url), 'utf8'));
 const nodes = () => ({ proxies: ['s1', 's2', 's3', 's4', 's5', 's801'].map(id => ({
@@ -13,7 +14,7 @@ const nodes = () => ({ proxies: ['s1', 's2', 's3', 's4', 's5', 's801'].map(id =>
 test('AI pools only contain verified US nodes in stable fallback order', () => {
   const config = buildConfig(nodes(), policy());
   const expected = ['s3', 's2', 's801'].map(id => `JMS-test@c17${id}.portablesubmarines.com:443`);
-  for (const name of ['Claude-US', 'ChatGPT-US', 'Gemini-US', 'AI-US']) {
+  for (const name of ['AI-US']) {
     const group = config['proxy-groups'].find(g => g.name === name);
     assert.equal(group.type, 'fallback');
     assert.deepEqual(group.proxies, expected);
@@ -41,7 +42,7 @@ test('domestic AI takes precedence and every proxy route has a rejection guard',
   }
   assert.deepEqual(rules.slice(-2), ['MATCH,JMS', 'MATCH,REJECT']);
   assert.equal(config.dns['nameserver-policy']['+.kimi.ai'][0], 'https://dns.alidns.com/dns-query#DIRECT');
-  assert.ok(config.dns['nameserver-policy']['rule-set:jms-gemini-bootstrap,jms-gemini'].every(x => x.endsWith('#Gemini-US')));
+  assert.ok(config.dns['nameserver-policy']['rule-set:jms-gemini-bootstrap,jms-gemini'].every(x => x.endsWith('#AI-US')));
 });
 
 test('unauthenticated requests cannot retrieve configuration or trigger upstream fetches', async () => {

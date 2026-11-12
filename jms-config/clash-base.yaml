@@ -1,4 +1,4 @@
-# JMS remote routing: domestic AI is DIRECT; overseas AI uses US-only fallback.
+# JMS remote routing: domestic AI is DIRECT; overseas AI shares one US-only fallback.
 mixed-port: 7897
 allow-lan: false
 mode: rule
@@ -50,14 +50,14 @@ dns:
     - https://dns.alidns.com/dns-query#DIRECT
     - https://doh.pub/dns-query#DIRECT
     rule-set:jms-claude-bootstrap,jms-anthropic:
-    - https://1.1.1.1/dns-query#Claude-US
-    - https://8.8.8.8/dns-query#Claude-US
+    - https://1.1.1.1/dns-query#AI-US
+    - https://8.8.8.8/dns-query#AI-US
     rule-set:jms-openai-bootstrap,jms-openai:
-    - https://1.1.1.1/dns-query#ChatGPT-US
-    - https://8.8.8.8/dns-query#ChatGPT-US
+    - https://1.1.1.1/dns-query#AI-US
+    - https://8.8.8.8/dns-query#AI-US
     rule-set:jms-gemini-bootstrap,jms-gemini:
-    - https://1.1.1.1/dns-query#Gemini-US
-    - https://8.8.8.8/dns-query#Gemini-US
+    - https://1.1.1.1/dns-query#AI-US
+    - https://8.8.8.8/dns-query#AI-US
     rule-set:jms-ai,jms-ai-resources,jms-artifact-resources:
     - https://1.1.1.1/dns-query#AI-US
     - https://8.8.8.8/dns-query#AI-US
@@ -483,33 +483,6 @@ proxy-groups:
   expected-status: 204
   interval: 300
   tolerance: 50
-- name: Claude-US
-  type: fallback
-  jms-us-only: true
-  proxies:
-  - REJECT
-  url: https://www.gstatic.com/generate_204
-  expected-status: 204
-  interval: 300
-  lazy: false
-- name: ChatGPT-US
-  type: fallback
-  jms-us-only: true
-  proxies:
-  - REJECT
-  url: https://www.gstatic.com/generate_204
-  expected-status: 204
-  interval: 300
-  lazy: false
-- name: Gemini-US
-  type: fallback
-  jms-us-only: true
-  proxies:
-  - REJECT
-  url: https://www.gstatic.com/generate_204
-  expected-status: 204
-  interval: 300
-  lazy: false
 - name: AI-US
   type: fallback
   jms-us-only: true
@@ -1225,21 +1198,21 @@ rule-providers:
 rules:
 - RULE-SET,jms-cn-ai-extra,DIRECT
 - RULE-SET,jms-ai-cn,DIRECT
-- RULE-SET,jms-claude-bootstrap,Claude-US
+- RULE-SET,jms-claude-bootstrap,AI-US
 - RULE-SET,jms-claude-bootstrap,REJECT
-- RULE-SET,jms-anthropic,Claude-US
+- RULE-SET,jms-anthropic,AI-US
 - RULE-SET,jms-anthropic,REJECT
-- RULE-SET,jms-claude-ip,Claude-US,no-resolve
+- RULE-SET,jms-claude-ip,AI-US,no-resolve
 - RULE-SET,jms-claude-ip,REJECT,no-resolve
-- RULE-SET,jms-openai-bootstrap,ChatGPT-US
+- RULE-SET,jms-openai-bootstrap,AI-US
 - RULE-SET,jms-openai-bootstrap,REJECT
-- RULE-SET,jms-openai,ChatGPT-US
+- RULE-SET,jms-openai,AI-US
 - RULE-SET,jms-openai,REJECT
-- RULE-SET,jms-openai-voice,ChatGPT-US,no-resolve
+- RULE-SET,jms-openai-voice,AI-US,no-resolve
 - RULE-SET,jms-openai-voice,REJECT,no-resolve
-- RULE-SET,jms-gemini-bootstrap,Gemini-US
+- RULE-SET,jms-gemini-bootstrap,AI-US
 - RULE-SET,jms-gemini-bootstrap,REJECT
-- RULE-SET,jms-gemini,Gemini-US
+- RULE-SET,jms-gemini,AI-US
 - RULE-SET,jms-gemini,REJECT
 - RULE-SET,jms-ai,AI-US
 - RULE-SET,jms-ai,REJECT

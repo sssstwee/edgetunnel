@@ -2,18 +2,37 @@
   "$schema": "../node_modules/wrangler/config-schema.json",
   "name": "jms-sub-config",
   "main": "worker.mjs",
-  "compatibility_date": "2026-11-12",
-  "compatibility_flags": ["nodejs_compat"],
-  "workers_dev": true,
+  "compatibility_date": "2026-11-09",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "workers_dev": false,
   "preview_urls": false,
-  "secrets": { "required": ["JMS_SUB_URL", "PROFILE_TOKEN"] },
+  "secrets": {
+    "required": [
+      "JMS_SUB_URL",
+      "PROFILE_TOKEN"
+    ]
+  },
   "vars": {
-    "POLICY_URL": "https://raw.githubusercontent.com/sssstwee/edgetunnel/main/jms-config/clash-base.yaml"
+    "POLICY_URL": "https://raw.githubusercontent.com/sssstwee/edgetunnel/main/jms-config/clash-base.yaml?v=single-ai"
   },
   "observability": {
     "enabled": true,
     "head_sampling_rate": 1,
-    "logs": { "enabled": true, "invocation_logs": false },
-    "traces": { "enabled": false }
-  }
+    "logs": {
+      "enabled": true,
+      "invocation_logs": false
+    },
+    "traces": {
+      "enabled": false
+    }
+  },
+  "routes": [
+    {
+      "pattern": "jms.tastedistill.com",
+      "custom_domain": true,
+      "zone_name": "tastedistill.com"
+    }
+  ]
 }
