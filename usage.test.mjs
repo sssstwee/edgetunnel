@@ -100,7 +100,7 @@ test('Clash subscriptions show the actual account request balance without changi
   const response = await worker.fetch(new Request('https://edge.example/sub?token=fixture'), env, {});
   const body = await response.text();
   const result = parse(body);
-  assert.deepEqual(result['proxy-groups'].pop(), { name: '📊 CF 本账期剩余请求：8,765,944 次（估算）', type: 'select', proxies: ['REJECT'] });
+  assert.deepEqual(result['proxy-groups'].pop(), { name: '📊 CF 本账期剩余请求：87.66%（估算）', type: 'select', proxies: ['REJECT'] });
   assert.deepEqual(result, config);
   assert.equal(response.headers.get('subscription-userinfo'), null);
   assert.equal(response.headers.get('etag'), null);

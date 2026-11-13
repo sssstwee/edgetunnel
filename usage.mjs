@@ -162,7 +162,7 @@ async function subscriptionUsage(response, env) {
     const known = usage.success && ['paid', 'free'].includes(usage.plan)
       && Number.isFinite(usage.total) && Number.isFinite(usage.max) && usage.max > 0;
     const name = known
-      ? `📊 CF ${usage.period === 'billing' ? '本账期' : '今日'}剩余请求：${Math.max(0, usage.max - usage.total).toLocaleString('en-US')} 次（估算）`
+      ? `📊 CF ${usage.period === 'billing' ? '本账期' : '今日'}剩余请求：${Math.min(100, Math.max(0, (usage.max - usage.total) / usage.max * 100)).toFixed(2)}%（估算）`
       : '📊 CF 剩余请求：暂不可用';
     // No rule or routing group references this display-only group.
     groups.items.push(document.createNode({ name, type: 'select', proxies: ['REJECT'] }));
