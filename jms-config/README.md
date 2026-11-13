@@ -8,7 +8,7 @@ Clash Verge 只需导入一个受令牌保护的地址。Worker 在服务端合�
 - 未明确分类的外网、普通海外站点使用 `JMS` / `JMS Auto`，不限国家。为统一 Gemini 的 API、登录、验证码和国家域资源出口，整个 Google 规则集（包括 Google、YouTube）归入 `AI-US`。共享 CDN、GitHub/npm 等 AI 客户端依赖也会使用美国出口。Grok 在 X、Copilot 在 Bing 的共用域复用 MetaCubeX twitter/bing 集合，因此普通 X/Bing 访问也走美国。Claude 登录页实测的 hCaptcha 及 Cloudflare / reCAPTCHA / Arkose 验证资源也统一进美国组。
 - Claude/Claude Code、OpenAI/ChatGPT/Codex、Gemini、Meta Muse、Grok、Copilot、DeepL/Lara/Yandex 翻译和其他海外 AI 统一使用美国 `fallback` 组 `AI-US`。
 - 美国白名单依次为 s3、s2、s801，依据 2026-11-13 复核的 Google 地区接口与独立出口检测。节点编号不保证服务商未来不更换出口，变更后应复核白名单。
-- 显式国内 AI 和局域网规则优先；其后通过 AI 应用进程名/路径兜底，再匹配 AI 域名及 IP，最后匹配国内域名和普通代理。启用 HTTP/TLS/QUIC 域名嗅探（不解密 TLS，不改写实际目的地址）。无法取得进程或嗅探域名时，继续按域名/IP/最终规则处理，不能把进程识别当作绝对保证。
+- 显式国内 AI 例外优先；四类关键账号服务的内置域名紧随其后，先于泛化国内 AI 名单，避免被宽泛分类放行。随后处理其他国内 AI、局域网、AI 应用进程名/路径及其余 AI 域名/IP，最后为国内域名和普通代理。启用 HTTP/TLS/QUIC 域名嗅探（不解密 TLS，不改写实际目的地址）。无法取得进程或嗅探域名时，继续按域名/IP/最终规则处理，不能把进程识别当作绝对保证。
 - 移除仅按中国公网 IP 判定 `DIRECT` 的规则。未识别的公网 IP 走普通代理；已知国内域名、国内 AI 与局域网仍直连。这会让只使用公网 IP 的部分国内应用走代理。
 - 每条代理规则后跟同条件的 `REJECT`，最终 `MATCH,JMS` 后也有 `MATCH,REJECT`。节点不支持 UDP 时不会因规则耗尽而直连；节点运行时失效会在代理内失败。
 - 六个 JMS 节点均已通过独立实例的 UDP DNS 转发测试；VLESS 显式启用 `udp` 和 `packet-encoding: xudp`。此测试不代表已验证任意网站的 HTTP/3 或账号内语音业务。

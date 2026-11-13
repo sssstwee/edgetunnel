@@ -88,3 +88,16 @@ test('unclassified public connections have no country-IP DIRECT escape', () => {
   assert.ok(config.rules.indexOf('RULE-SET,jms-ai-shared,AI-US') < domestic);
   assert.ok(config.dns.nameserver.every(r => r.endsWith('#JMS')));
 });
+
+test('pinned account services precede broad domestic AI classifications', () => {
+  const config = buildConfig(nodes(), policy());
+  const broadDirect = config.rules.indexOf('RULE-SET,jms-ai-cn,DIRECT');
+  for (const host of ['+.claude.ai', '+.anthropic.com', '+.openai.com', '+.chatgpt.com', '+.gemini.google.com', '+.muse.ai', '+.metaaivm.com']) {
+    assert.ok(config.dns['nameserver-policy'][host].every(x => x.endsWith('#AI-US')));
+  }
+  for (const name of ['jms-claude-bootstrap', 'jms-openai-bootstrap', 'jms-gemini-bootstrap', 'jms-meta-bootstrap']) {
+    const index = config.rules.indexOf(`RULE-SET,${name},AI-US`);
+    assert.ok(index > 0 && index < broadDirect);
+    assert.equal(config.rules[index + 1], `RULE-SET,${name},REJECT`);
+  }
+});

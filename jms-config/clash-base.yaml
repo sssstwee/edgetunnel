@@ -59,6 +59,27 @@ dns:
   direct-nameserver-follow-policy: false
   respect-rules: false
   nameserver-policy:
+    +.claude.ai:
+    - https://1.1.1.1/dns-query#AI-US
+    - https://8.8.8.8/dns-query#AI-US
+    +.anthropic.com:
+    - https://1.1.1.1/dns-query#AI-US
+    - https://8.8.8.8/dns-query#AI-US
+    +.openai.com:
+    - https://1.1.1.1/dns-query#AI-US
+    - https://8.8.8.8/dns-query#AI-US
+    +.chatgpt.com:
+    - https://1.1.1.1/dns-query#AI-US
+    - https://8.8.8.8/dns-query#AI-US
+    +.gemini.google.com:
+    - https://1.1.1.1/dns-query#AI-US
+    - https://8.8.8.8/dns-query#AI-US
+    +.muse.ai:
+    - https://1.1.1.1/dns-query#AI-US
+    - https://8.8.8.8/dns-query#AI-US
+    +.metaaivm.com:
+    - https://1.1.1.1/dns-query#AI-US
+    - https://8.8.8.8/dns-query#AI-US
     rule-set:jms-cn-ai-extra,jms-ai-cn:
     - https://dns.alidns.com/dns-query#DIRECT
     - https://doh.pub/dns-query#DIRECT
@@ -1507,9 +1528,17 @@ rule-providers:
     - +.sentry.io
     - +.stripe.com
     - +.turn.livekit.cloud
-# Order: domestic AI / LAN, AI apps / domains, known domestic domains, ordinary proxy default.
+# Trusted domestic AI exceptions, then pinned critical AI, then general lists and app guards.
 rules:
 - RULE-SET,jms-cn-ai-extra,DIRECT
+- RULE-SET,jms-claude-bootstrap,AI-US
+- RULE-SET,jms-claude-bootstrap,REJECT
+- RULE-SET,jms-openai-bootstrap,AI-US
+- RULE-SET,jms-openai-bootstrap,REJECT
+- RULE-SET,jms-gemini-bootstrap,AI-US
+- RULE-SET,jms-gemini-bootstrap,REJECT
+- RULE-SET,jms-meta-bootstrap,AI-US
+- RULE-SET,jms-meta-bootstrap,REJECT
 - RULE-SET,jms-ai-cn,DIRECT
 - RULE-SET,jms-private,DIRECT
 - RULE-SET,jms-lancidr,DIRECT,no-resolve
@@ -1523,26 +1552,18 @@ rules:
 - RULE-SET,jms-bing-shared,REJECT
 - RULE-SET,jms-ai-shared,AI-US
 - RULE-SET,jms-ai-shared,REJECT
-- RULE-SET,jms-claude-bootstrap,AI-US
-- RULE-SET,jms-claude-bootstrap,REJECT
 - RULE-SET,jms-anthropic,AI-US
 - RULE-SET,jms-anthropic,REJECT
 - RULE-SET,jms-claude-ip,AI-US,no-resolve
 - RULE-SET,jms-claude-ip,REJECT,no-resolve
-- RULE-SET,jms-openai-bootstrap,AI-US
-- RULE-SET,jms-openai-bootstrap,REJECT
 - RULE-SET,jms-openai,AI-US
 - RULE-SET,jms-openai,REJECT
 - RULE-SET,jms-openai-voice,AI-US,no-resolve
 - RULE-SET,jms-openai-voice,REJECT,no-resolve
 - RULE-SET,jms-google-shared,AI-US
 - RULE-SET,jms-google-shared,REJECT
-- RULE-SET,jms-gemini-bootstrap,AI-US
-- RULE-SET,jms-gemini-bootstrap,REJECT
 - RULE-SET,jms-gemini,AI-US
 - RULE-SET,jms-gemini,REJECT
-- RULE-SET,jms-meta-bootstrap,AI-US
-- RULE-SET,jms-meta-bootstrap,REJECT
 - RULE-SET,jms-ai,AI-US
 - RULE-SET,jms-ai,REJECT
 - RULE-SET,jms-ai-resources,AI-US
