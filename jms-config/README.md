@@ -5,7 +5,7 @@ Clash Verge 只需导入一个受令牌保护的地址。Worker 在服务端合�
 ## 分流
 
 - 国内 AI（包括 Kimi/Moonshot 的海外域名）优先直连，其他国内域名及局域网直连。
-- 未明确分类的外网、普通海外站点使用 `JMS` / `JMS Auto`，不限国家。为统一 Gemini 的 API、登录、验证码和国家域资源出口，整个 Google 规则集（包括 Google、YouTube）归入 `AI-US`。共享 CDN、GitHub/npm 等 AI 客户端依赖也会使用美国出口。
+- 未明确分类的外网、普通海外站点使用 `JMS` / `JMS Auto`，不限国家。为统一 Gemini 的 API、登录、验证码和国家域资源出口，整个 Google 规则集（包括 Google、YouTube）归入 `AI-US`。共享 CDN、GitHub/npm 等 AI 客户端依赖也会使用美国出口。Claude 登录页实测的 hCaptcha 及 Cloudflare / reCAPTCHA / Arkose 验证资源也统一进美国组。
 - Claude、ChatGPT、Gemini、Meta 和其他海外 AI 统一使用美国 `fallback` 组 `AI-US`。
 - 美国白名单依次为 s3、s2、s801，依据 2026-11-13 复核的 Google 地区接口与独立出口检测。节点编号不保证服务商未来不更换出口，变更后应复核白名单。
 - 显式国内 AI 和局域网规则优先；其后通过 AI 应用进程名/路径兜底，再匹配 AI 域名及 IP，最后匹配国内域名和普通代理。启用 HTTP/TLS/QUIC 域名嗅探（不解密 TLS，不改写实际目的地址）。无法取得进程或嗅探域名时，继续按域名/IP/最终规则处理，不能把进程识别当作绝对保证。
@@ -26,6 +26,6 @@ Clash Verge 只需导入一个受令牌保护的地址。Worker 在服务端合�
 
 ## 覆盖边界
 
-核对来源：[Claude Code 网络要求](https://code.claude.com/docs/en/network-config)、[ChatGPT 网络要求](https://help.openai.com/en/articles/9247338-network-recommendations-for-chatgpt-errors-on-web-and-apps)、[Codex 官方源码](https://github.com/openai/codex)、[Gemini CLI 官方源码](https://github.com/google-gemini/gemini-cli)。包含 API、认证、WebSocket、上传/工件、安装更新、插件依赖、遥测及语音 IP；共享主机按域名整体代理，无法按加密 URL 路径只分出 AI 请求。
+核对来源：[Claude Code 网络要求](https://code.claude.com/docs/en/network-config)、[ChatGPT 网络要求](https://help.openai.com/en/articles/9247338-network-recommendations-for-chatgpt-errors-on-web-and-apps)、[Codex 官方源码](https://github.com/openai/codex)、[Gemini CLI 官方源码](https://github.com/google-gemini/gemini-cli)。Statsig 动态切换域复用[官方列表](https://docs.statsig.com/infrastructure/statsig_domains)，WorkOS / AuthKit 使用官方认证域族。另按 [hCaptcha 官方通配域要求](https://docs.hcaptcha.com/#content-security-policy-settings) 覆盖动态资源子域。包含 API、认证、WebSocket、上传/工件、安装更新、插件依赖、遥测及语音 IP；共享主机按域名整体代理，无法按加密 URL 路径只分出 AI 请求。
 
 用户选择保留普通代理兜底，因此不能承诺所有未来新 AI 域名都自动归入 `AI-US`。动态 MCP/第三方网关、自定义 API、远程云端执行请求、未被本机 TUN 接管的连接，需要分别核验。本机规则也不是断开客户端后仍生效的系统防火墙。验收只声明实际采集、逐项路由测试及故障注入覆盖的范围；主页响应或海外 IP 不代表登录、生成、语音等业务全部成功。

@@ -1408,6 +1408,23 @@ rule-providers:
     - +.azure-api.net
     - +.cloudfront.net
     - +.amazonaws.com
+    - +.statsig.com
+    - +.statsigcdn.com
+    - +.statsigapi.net
+    - +.featureassets.org
+    - +.assetsconfigcdn.org
+    - +.prodregistryv2.org
+    - +.beyondwickedmapping.org
+    - cloudflare-dns.com
+    - +.workos.com
+    - +.workoscdn.com
+    - +.authkit.app
+    - +.hcaptcha.com
+    - +.recaptcha.net
+    - +.arkoselabs.com
+    - +.funcaptcha.com
+    - +.nel.cloudflare.com
+    - +.cloudflareinsights.com
     - cdn.usefathom.com
     - +.anthropic.com
     - +.claude.ai
