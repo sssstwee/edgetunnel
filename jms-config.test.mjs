@@ -37,12 +37,12 @@ test('domestic AI takes precedence and every proxy route has a rejection guard',
   assert.ok(rules.indexOf('RULE-SET,jms-cn-ai-extra,DIRECT') < rules.indexOf('RULE-SET,jms-ai,AI-US'));
   assert.ok(rules.indexOf('RULE-SET,jms-ai-cn,DIRECT') < rules.indexOf('RULE-SET,jms-ai,AI-US'));
   for (let i = 0; i < rules.length; i++) {
-    const match = /^(RULE-SET,[^,]+),(JMS|Claude-US|ChatGPT-US|Gemini-US|AI-US)(,no-resolve)?$/.exec(rules[i]);
+    const match = /^((?:RULE-SET|PROCESS-NAME-REGEX|PROCESS-PATH-REGEX),.+),(JMS|Claude-US|ChatGPT-US|Gemini-US|AI-US)(,no-resolve)?$/.exec(rules[i]);
     if (match) assert.equal(rules[i + 1], `${match[1]},REJECT${match[3] || ''}`);
   }
   assert.deepEqual(rules.slice(-2), ['MATCH,JMS', 'MATCH,REJECT']);
   assert.equal(config.dns['nameserver-policy']['+.kimi.ai'][0], 'https://dns.alidns.com/dns-query#DIRECT');
-  assert.ok(config.dns['nameserver-policy']['rule-set:jms-gemini-bootstrap,jms-gemini'].every(x => x.endsWith('#AI-US')));
+  assert.ok(config.dns['nameserver-policy']['rule-set:jms-gemini-bootstrap,jms-gemini,jms-google-shared'].every(x => x.endsWith('#AI-US')));
 });
 
 test('unauthenticated requests cannot retrieve configuration or trigger upstream fetches', async () => {
@@ -68,4 +68,23 @@ test('protected subscription combines fresh JMS nodes with the remote policy', a
   assert.deepEqual(config.rules.slice(-2), ['MATCH,JMS', 'MATCH,REJECT']);
   assert.equal(config['secret-upstream-field'], undefined);
   assert.equal(config.proxies.length, 6);
+});
+
+// These are policy constraints against direct leaks, not a reimplementation of matching.
+test('unclassified public connections have no country-IP DIRECT escape', () => {
+  const config = buildConfig(nodes(), policy());
+  assert.equal(config['find-process-mode'], 'always');
+  assert.equal(config.sniffer.enable, true);
+  assert.equal(config.sniffer['parse-pure-ip'], true);
+  assert.ok(!config.rules.some(r => /cncidr|GEOIP,CN|MATCH,DIRECT/.test(r)));
+  assert.deepEqual(config.rules.filter(r => r.endsWith(',DIRECT') || r.endsWith(',DIRECT,no-resolve')), [
+    'RULE-SET,jms-cn-ai-extra,DIRECT', 'RULE-SET,jms-ai-cn,DIRECT',
+    'RULE-SET,jms-private,DIRECT', 'RULE-SET,jms-lancidr,DIRECT,no-resolve',
+    'RULE-SET,jms-direct,DIRECT',
+  ]);
+  const process = config.rules.findIndex(r => r.startsWith('PROCESS-NAME-REGEX,'));
+  const domestic = config.rules.indexOf('RULE-SET,jms-direct,DIRECT');
+  assert.ok(process > 3 && process < domestic);
+  assert.ok(config.rules.indexOf('RULE-SET,jms-ai-shared,AI-US') < domestic);
+  assert.ok(config.dns.nameserver.every(r => r.endsWith('#JMS')));
 });
