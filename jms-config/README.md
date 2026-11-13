@@ -4,6 +4,14 @@ Clash Verge 只需导入一个受令牌保护的地址。Worker 在服务端合�
 
 Worker 使用 JMS 官方 `noss=1` 参数请求上游，排除即将退役的 Shadowsocks s1；当前保留 s2、s3、s4、s5、s801 五个 VLESS 节点。客户端订阅地址不变。
 
+## 订阅来源与流量
+
+优先请求 `jmssub.net`；网络失败、8 秒超时、HTTP 错误、重定向、无效 YAML、空节点或缺少已验证美国节点时，自动改用官方镜像 `jjsubmarines.com`。两个来源保留相同订阅参数并强制 `noss=1`，同时过滤意外返回的 SS/SSR。镜像也不可用时返回 503，让客户端保留旧配置，避免提供缺失 AI 分流的原始订阅。`X-Subscription-Source` 响应头标识本次采用的来源，不包含凭据。
+
+服务端复用已有订阅凭据调用官方 `justmysocks6.net/members/getbwcounter.php`，将 `monthly_bw_limit_b` 和 `bw_counter_b` 转换为标准 `subscription-userinfo` 响应头。Clash Verge 原生显示已用/总量及进度条，剩余为总量减已用；无需客户端脚本、额外订阅或流量占位节点。API 只提供累计用量，因此将它放入 `download`，`upload` 设为 0，这不代表实际上下行拆分。数值按 API 原始字节传递；套餐的十进制 GB 与客户端的二进制显示可能不同。
+
+流量随订阅刷新更新，保留每 6 小时的更新提示。API 单次查询限时 4 秒；失败或数据无效时沿用所选上游提供的流量头，若上游也没有则省略，不以 0 冒充查询结果。账单重置日不作为订阅到期日；只有上游明确提供的到期时间才保留。API 与订阅链接均仅留在服务端。
+
 ## 分流
 
 - 国内 AI（包括 Kimi/Moonshot 的海外域名）优先直连，其他国内域名及局域网直连。
