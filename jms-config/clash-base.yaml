@@ -71,7 +71,7 @@ dns:
     rule-set:jms-gemini-bootstrap,jms-gemini,jms-google-shared:
     - https://1.1.1.1/dns-query#AI-US
     - https://8.8.8.8/dns-query#AI-US
-    rule-set:jms-ai,jms-ai-resources,jms-artifact-resources,jms-ai-shared:
+    rule-set:jms-ai,jms-ai-resources,jms-artifact-resources,jms-ai-shared,jms-twitter-shared,jms-bing-shared:
     - https://1.1.1.1/dns-query#AI-US
     - https://8.8.8.8/dns-query#AI-US
     rule-set:jms-private:
@@ -523,6 +523,22 @@ rule-providers:
     format: yaml
     url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/openai.yaml
     path: ./ruleset/jms/openai.yaml
+    interval: 86400
+    proxy: JMS
+  jms-twitter-shared:
+    type: http
+    behavior: domain
+    format: yaml
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/twitter.yaml
+    path: ./ruleset/jms/twitter.yaml
+    interval: 86400
+    proxy: JMS
+  jms-bing-shared:
+    type: http
+    behavior: domain
+    format: yaml
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/bing.yaml
+    path: ./ruleset/jms/bing.yaml
     interval: 86400
     proxy: JMS
   jms-google-shared:
@@ -1419,6 +1435,22 @@ rule-providers:
     - +.workos.com
     - +.workoscdn.com
     - +.authkit.app
+    - +.deepl.com
+    - +.deepl.net
+    - +.laratranslate.com
+    - +.modernmt.com
+    - +.translate.yandex.net
+    - translate.yandex.com
+    - translate.yandex.ru
+    - translate.api.cloud.yandex.net
+    - ai.api.cloud.yandex.net
+    - assistant.api.cloud.yandex.net
+    - transcribe.api.cloud.yandex.net
+    - tts.api.cloud.yandex.net
+    - stt.api.cloud.yandex.net
+    - vision.api.cloud.yandex.net
+    - ocr.api.cloud.yandex.net
+    - +.yastatic.net
     - +.hcaptcha.com
     - +.recaptcha.net
     - +.arkoselabs.com
@@ -1484,6 +1516,10 @@ rules:
 - PROCESS-NAME-REGEX,(?i)^(claude|codex|chatgpt|claude code|gemini|antigravity|cursor|windsurf|trae|magpie|magpie-bun|codex-code-mode-host)( helper.*| \(.*\))?$,REJECT
 - PROCESS-PATH-REGEX,(?i)(/Applications/(ChatGPT|Codex|Claude|Cursor|Antigravity|Windsurf|Trae|Magpie)\.app/|/\.local/share/claude/versions/|/\.cache/magpie/bun/),AI-US
 - PROCESS-PATH-REGEX,(?i)(/Applications/(ChatGPT|Codex|Claude|Cursor|Antigravity|Windsurf|Trae|Magpie)\.app/|/\.local/share/claude/versions/|/\.cache/magpie/bun/),REJECT
+- RULE-SET,jms-twitter-shared,AI-US
+- RULE-SET,jms-twitter-shared,REJECT
+- RULE-SET,jms-bing-shared,AI-US
+- RULE-SET,jms-bing-shared,REJECT
 - RULE-SET,jms-ai-shared,AI-US
 - RULE-SET,jms-ai-shared,REJECT
 - RULE-SET,jms-claude-bootstrap,AI-US
