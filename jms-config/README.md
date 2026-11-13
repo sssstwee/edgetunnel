@@ -2,6 +2,8 @@
 
 Clash Verge 只需导入一个受令牌保护的地址。Worker 在服务端合并 JMS 原始节点与此目录的 `clash-base.yaml`，客户端无需本地脚本或 Merge 覆写。公开模板不含订阅 URL、节点凭据或访问令牌。
 
+Worker 使用 JMS 官方 `noss=1` 参数请求上游，排除即将退役的 Shadowsocks s1；当前保留 s2、s3、s4、s5、s801 五个 VLESS 节点。客户端订阅地址不变。
+
 ## 分流
 
 - 国内 AI（包括 Kimi/Moonshot 的海外域名）优先直连，其他国内域名及局域网直连。
@@ -11,7 +13,7 @@ Clash Verge 只需导入一个受令牌保护的地址。Worker 在服务端合�
 - 显式国内 AI 例外优先；四类关键账号服务的内置域名紧随其后，先于泛化国内 AI 名单，避免被宽泛分类放行。随后处理其他国内 AI、局域网、AI 应用进程名/路径及其余 AI 域名/IP，最后为国内域名和普通代理。启用 HTTP/TLS/QUIC 域名嗅探（不解密 TLS，不改写实际目的地址）。无法取得进程或嗅探域名时，继续按域名/IP/最终规则处理，不能把进程识别当作绝对保证。
 - 移除仅按中国公网 IP 判定 `DIRECT` 的规则。未识别的公网 IP 走普通代理；已知国内域名、国内 AI 与局域网仍直连。这会让只使用公网 IP 的部分国内应用走代理。
 - 每条代理规则后跟同条件的 `REJECT`，最终 `MATCH,JMS` 后也有 `MATCH,REJECT`。节点不支持 UDP 时不会因规则耗尽而直连；节点运行时失效会在代理内失败。
-- 六个 JMS 节点均已通过独立实例的 UDP DNS 转发测试；VLESS 显式启用 `udp` 和 `packet-encoding: xudp`。此测试不代表已验证任意网站的 HTTP/3 或账号内语音业务。
+- 保留的五个 VLESS 节点均已通过独立实例的 UDP DNS 转发测试，显式启用 `udp` 和 `packet-encoding: xudp`。此测试不代表已验证任意网站的 HTTP/3 或账号内语音业务。
 - 国内及节点 DNS 使用国内解析器；海外 AI 的加密 DNS 显式绑定 `AI-US`，其余国外 DNS 绑定 `JMS`。使用明确的 DNS 代理后缀，因此 `respect-rules` 保持关闭，避免启动时规则加载与节点 DNS 互相依赖。
 
 域名/IP 规则复用 MetaCubeX/meta-rules-dat、Loyalsoldier/clash-rules、blackmatrix7/ios_rule_script 的域名条目，以及现有 Voyra/EdgeTunnel 的 AI 引导和资源列表。ChatGPT 语音 IP 更新自 [OpenAI 官方 JSON](https://openai.com/chatgpt-voice.json)（2026-11-12 发布，540 条）；后续新增且未列入的公网 IP 仍会走普通代理，不会按中国 IP 回落直连。GitHub 规则由 Mihomo 自动更新，模板更新在下次订阅刷新后生效。

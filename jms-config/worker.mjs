@@ -20,6 +20,7 @@ export default {
       if (source.protocol !== 'https:' || source.hostname !== 'jmssub.net' || source.pathname !== '/members/getsub.php') {
         throw new Error('Invalid upstream subscription');
       }
+      source.searchParams.set('noss', '1');
       const [upstream, template] = await Promise.all([
         fetch(source.href, { headers: { 'User-Agent': 'Clash Verge/Mihomo' }, signal: AbortSignal.timeout(15000), redirect: 'manual' }),
         hostedPolicy(env.POLICY_URL),

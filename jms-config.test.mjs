@@ -53,9 +53,15 @@ test('unauthenticated requests cannot retrieve configuration or trigger upstream
 
 test('protected subscription combines fresh JMS nodes with the remote policy', async t => {
   const upstream = { ...nodes(), rules: ['MATCH,DIRECT'], 'secret-upstream-field': 'omit-this' };
-  t.mock.method(globalThis, 'fetch', async input => new Response(
-    new URL(input).hostname === 'jmssub.net' ? stringify(upstream) : stringify(policy()),
-  ));
+  upstream.proxies = upstream.proxies.filter(p => p.type === 'vless');
+  t.mock.method(globalThis, 'fetch', async input => {
+    const url = new URL(input);
+    if (url.hostname === 'jmssub.net') {
+      assert.equal(url.searchParams.get('noss'), '1');
+      return new Response(stringify(upstream));
+    }
+    return new Response(stringify(policy()));
+  });
   const token = 'a'.repeat(48);
   const response = await worker.fetch(new Request(`https://example.test/clash/${token}.yaml`), {
     PROFILE_TOKEN: token, JMS_SUB_URL: 'https://jmssub.net/members/getsub.php?service=test',
@@ -67,7 +73,7 @@ test('protected subscription combines fresh JMS nodes with the remote policy', a
   assert.deepEqual(config['proxy-groups'].map(g => g.name), ['JMS', 'JMS Auto', 'AI-US']);
   assert.deepEqual(config.rules.slice(-2), ['MATCH,JMS', 'MATCH,REJECT']);
   assert.equal(config['secret-upstream-field'], undefined);
-  assert.equal(config.proxies.length, 6);
+  assert.equal(config.proxies.length, 5);
 });
 
 // These are policy constraints against direct leaks, not a reimplementation of matching.
