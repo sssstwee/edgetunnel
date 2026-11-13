@@ -71,7 +71,7 @@ dns:
     rule-set:jms-gemini-bootstrap,jms-gemini,jms-google-shared:
     - https://1.1.1.1/dns-query#AI-US
     - https://8.8.8.8/dns-query#AI-US
-    rule-set:jms-ai,jms-ai-resources,jms-artifact-resources,jms-ai-shared,jms-twitter-shared,jms-bing-shared:
+    rule-set:jms-ai,jms-ai-resources,jms-artifact-resources,jms-ai-shared,jms-twitter-shared,jms-bing-shared,jms-meta-bootstrap:
     - https://1.1.1.1/dns-query#AI-US
     - https://8.8.8.8/dns-query#AI-US
     rule-set:jms-private:
@@ -1370,6 +1370,7 @@ rule-providers:
     behavior: domain
     payload:
     - +.meta.ai
+    - +.muse.ai
     - +.metaaivm.com
     - +.metaaiusercontent.com
     - +.meta.com
@@ -1512,10 +1513,10 @@ rules:
 - RULE-SET,jms-ai-cn,DIRECT
 - RULE-SET,jms-private,DIRECT
 - RULE-SET,jms-lancidr,DIRECT,no-resolve
-- PROCESS-NAME-REGEX,(?i)^(claude|codex|chatgpt|claude code|gemini|antigravity|cursor|windsurf|trae|magpie|magpie-bun|codex-code-mode-host)( helper.*| \(.*\))?$,AI-US
-- PROCESS-NAME-REGEX,(?i)^(claude|codex|chatgpt|claude code|gemini|antigravity|cursor|windsurf|trae|magpie|magpie-bun|codex-code-mode-host)( helper.*| \(.*\))?$,REJECT
-- PROCESS-PATH-REGEX,(?i)(/Applications/(ChatGPT|Codex|Claude|Cursor|Antigravity|Windsurf|Trae|Magpie)\.app/|/\.local/share/claude/versions/|/\.cache/magpie/bun/),AI-US
-- PROCESS-PATH-REGEX,(?i)(/Applications/(ChatGPT|Codex|Claude|Cursor|Antigravity|Windsurf|Trae|Magpie)\.app/|/\.local/share/claude/versions/|/\.cache/magpie/bun/),REJECT
+- PROCESS-NAME-REGEX,(?i)^(claude|codex|chatgpt|claude code|gemini|muse|musecode|muse-code|muse code|antigravity|cursor|windsurf|trae|magpie|magpie-bun|codex-code-mode-host)( helper.*| \(.*\))?$,AI-US
+- PROCESS-NAME-REGEX,(?i)^(claude|codex|chatgpt|claude code|gemini|muse|musecode|muse-code|muse code|antigravity|cursor|windsurf|trae|magpie|magpie-bun|codex-code-mode-host)( helper.*| \(.*\))?$,REJECT
+- PROCESS-PATH-REGEX,(?i)(/Applications/(ChatGPT|Codex|Claude|Cursor|Antigravity|Windsurf|Trae|Magpie|Muse)\.app/|/\.local/share/claude/versions/|/\.cache/magpie/bun/),AI-US
+- PROCESS-PATH-REGEX,(?i)(/Applications/(ChatGPT|Codex|Claude|Cursor|Antigravity|Windsurf|Trae|Magpie|Muse)\.app/|/\.local/share/claude/versions/|/\.cache/magpie/bun/),REJECT
 - RULE-SET,jms-twitter-shared,AI-US
 - RULE-SET,jms-twitter-shared,REJECT
 - RULE-SET,jms-bing-shared,AI-US
