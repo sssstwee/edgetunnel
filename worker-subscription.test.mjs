@@ -3,6 +3,7 @@ import { createHash } from 'node:crypto';
 import test from 'node:test';
 import { parse, stringify } from 'yaml';
 import worker from './_worker.js';
+import { createUsageWorker } from './usage.mjs';
 import converterWorker from './native-converter/worker.mjs';
 
 const md5 = value => createHash('md5').update(value).digest('hex');
@@ -44,11 +45,11 @@ function environment(host, uuid, nodeOnly = false) {
   };
 }
 
-async function subscriptionResponse(env, target = 'clash') {
+async function subscriptionResponse(env, target = 'clash', handler = worker) {
   const request = new Request(`https://${env.HOST}/sub?target=${target}&token=${token(env.HOST, env.UUID)}`, { headers: { 'User-Agent': 'ClashMeta/1.19.32' } });
   Object.defineProperty(request, 'cf', { value: { colo: 'SJC', country: 'US' } });
   const tasks = [];
-  const response = await worker.fetch(request, env, { waitUntil: promise => tasks.push(promise) });
+  const response = await handler.fetch(request, env, { waitUntil: promise => tasks.push(promise) });
   await Promise.all(tasks);
   return response;
 }
@@ -70,6 +71,17 @@ test('authenticated Worker subscription is converted internally and retains its 
   assert.equal(config.proxies[0]['ech-opts'].enable, true);
   assert.deepEqual(config.dns['proxy-server-nameserver-policy']['ech.example'], ['https://dns.example/dns-query']);
   assert.equal(config['proxy-groups'][0].type, 'url-test');
+});
+
+test('the usage wrapper adds only an information group to the authenticated generated subscription', async t => {
+  setup(t);
+  const env = environment('edge.example', '00000000-0000-4000-8000-000000000001');
+  const baseline = await subscription(env);
+  const response = await subscriptionResponse(env, 'clash', createUsageWorker(worker));
+  const result = parse(await response.text());
+  assert.equal(result['proxy-groups'].pop().name, '📊 CF 剩余请求：暂不可用');
+  assert.deepEqual(result, baseline);
+  assert.equal(response.headers.get('subscription-userinfo'), null);
 });
 
 test('concurrent requests retain separate node identities and hostnames', async t => {

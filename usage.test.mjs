@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import { parse, stringify } from 'yaml';
 import { createUsageWorker, readUsage, subscriptionPlan } from './usage.mjs';
 
 const now = new Date('2026-11-02T07:00:00Z');
@@ -82,3 +83,47 @@ test('proxy traffic is passed through with the original request, environment and
   const worker = createUsageWorker({ fetch(...args) { assert.deepEqual(args, [request, env, ctx]); return originalResponse; } });
   assert.equal(await worker.fetch(request, env, ctx), originalResponse);
 });
+
+test('Clash subscriptions show the actual account request balance without changing proxies or routing', async (t) => {
+  const start = new Date(Date.now() - 86400000).toISOString();
+  const end = new Date(Date.now() + 86400000).toISOString();
+  t.mock.method(globalThis, 'fetch', async (url) => url.includes('/subscriptions')
+    ? Response.json({ success: true, result: [{ ...subscription, current_period_start: start, current_period_end: end }] })
+    : Response.json({ data: { viewer: { accounts: [{ workersInvocationsAdaptive: [{ sum: { requests: 1234000 } }], pagesFunctionsInvocationsAdaptiveGroups: [{ sum: { requests: 56 } }] }] } } }));
+  const config = {
+    proxies: [{ name: 'node', type: 'vless', server: 'edge.example', port: 443 }],
+    'proxy-groups': [{ name: '默认代理', type: 'select', proxies: ['node'] }],
+    rules: ['MATCH,默认代理'], dns: { enable: true },
+  };
+  const worker = createUsageWorker({ fetch: () => new Response(stringify(config), { headers: { 'content-type': 'application/x-yaml', etag: 'old' } }) });
+  const env = { KV: { get: async () => JSON.stringify({ AccountID: 'account', APIToken: 'test-token' }) } };
+  const response = await worker.fetch(new Request('https://edge.example/sub?token=fixture'), env, {});
+  const body = await response.text();
+  const result = parse(body);
+  assert.deepEqual(result['proxy-groups'].pop(), { name: '📊 CF 本账期剩余请求：8,765,944 次（估算）', type: 'select', proxies: ['REJECT'] });
+  assert.deepEqual(result, config);
+  assert.equal(response.headers.get('subscription-userinfo'), null);
+  assert.equal(response.headers.get('etag'), null);
+  assert.equal(response.headers.get('cache-control'), 'no-store');
+  assert.ok(!body.includes('test-token'));
+});
+
+test('unavailable quota is shown as unknown instead of a fabricated request balance', async () => {
+  const worker = createUsageWorker({ fetch: () => new Response('proxy-groups: []\nproxies: []\n', { headers: { 'content-type': 'application/yaml' } }) });
+  const response = await worker.fetch(new Request('https://edge.example/sub'), { KV: { get: async () => '{}' } }, {});
+  assert.equal(parse(await response.text())['proxy-groups'][0].name, '📊 CF 剩余请求：暂不可用');
+});
+
+for (const [status, contentType, body] of [
+  [403, 'application/yaml', 'forbidden'],
+  [200, 'text/plain', 'vless://fixture'],
+  [200, 'application/yaml', 'proxies: []\n'],
+]) {
+  test(`request balance does not alter ${status} ${contentType} subscriptions without full Clash groups`, async () => {
+    const originalResponse = new Response(body, { status, headers: { 'content-type': contentType } });
+    const worker = createUsageWorker({ fetch: () => originalResponse });
+    const response = await worker.fetch(new Request('https://edge.example/sub'), { KV: { get() { throw new Error('must not read'); } } }, {});
+    assert.equal(response, originalResponse);
+    assert.equal(await response.text(), body);
+  });
+}
