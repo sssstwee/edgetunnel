@@ -48,8 +48,8 @@ dns:
   - 223.5.5.5
   - 119.29.29.29
   nameserver:
-  - https://1.1.1.1/dns-query#JMS
-  - https://8.8.8.8/dns-query#JMS
+  - https://1.1.1.1/dns-query#默认代理
+  - https://8.8.8.8/dns-query#默认代理
   proxy-server-nameserver:
   - https://dns.alidns.com/dns-query#DIRECT
   - https://doh.pub/dns-query#DIRECT
@@ -60,41 +60,41 @@ dns:
   respect-rules: false
   nameserver-policy:
     +.claude.ai:
-    - https://1.1.1.1/dns-query#AI-US
-    - https://8.8.8.8/dns-query#AI-US
+    - https://1.1.1.1/dns-query#AI 美国
+    - https://8.8.8.8/dns-query#AI 美国
     +.anthropic.com:
-    - https://1.1.1.1/dns-query#AI-US
-    - https://8.8.8.8/dns-query#AI-US
+    - https://1.1.1.1/dns-query#AI 美国
+    - https://8.8.8.8/dns-query#AI 美国
     +.openai.com:
-    - https://1.1.1.1/dns-query#AI-US
-    - https://8.8.8.8/dns-query#AI-US
+    - https://1.1.1.1/dns-query#AI 美国
+    - https://8.8.8.8/dns-query#AI 美国
     +.chatgpt.com:
-    - https://1.1.1.1/dns-query#AI-US
-    - https://8.8.8.8/dns-query#AI-US
+    - https://1.1.1.1/dns-query#AI 美国
+    - https://8.8.8.8/dns-query#AI 美国
     +.gemini.google.com:
-    - https://1.1.1.1/dns-query#AI-US
-    - https://8.8.8.8/dns-query#AI-US
+    - https://1.1.1.1/dns-query#AI 美国
+    - https://8.8.8.8/dns-query#AI 美国
     +.muse.ai:
-    - https://1.1.1.1/dns-query#AI-US
-    - https://8.8.8.8/dns-query#AI-US
+    - https://1.1.1.1/dns-query#AI 美国
+    - https://8.8.8.8/dns-query#AI 美国
     +.metaaivm.com:
-    - https://1.1.1.1/dns-query#AI-US
-    - https://8.8.8.8/dns-query#AI-US
+    - https://1.1.1.1/dns-query#AI 美国
+    - https://8.8.8.8/dns-query#AI 美国
     rule-set:jms-cn-ai-extra,jms-ai-cn:
     - https://dns.alidns.com/dns-query#DIRECT
     - https://doh.pub/dns-query#DIRECT
     rule-set:jms-claude-bootstrap,jms-anthropic:
-    - https://1.1.1.1/dns-query#AI-US
-    - https://8.8.8.8/dns-query#AI-US
+    - https://1.1.1.1/dns-query#AI 美国
+    - https://8.8.8.8/dns-query#AI 美国
     rule-set:jms-openai-bootstrap,jms-openai:
-    - https://1.1.1.1/dns-query#AI-US
-    - https://8.8.8.8/dns-query#AI-US
+    - https://1.1.1.1/dns-query#AI 美国
+    - https://8.8.8.8/dns-query#AI 美国
     rule-set:jms-gemini-bootstrap,jms-gemini,jms-google-shared:
-    - https://1.1.1.1/dns-query#AI-US
-    - https://8.8.8.8/dns-query#AI-US
+    - https://1.1.1.1/dns-query#AI 美国
+    - https://8.8.8.8/dns-query#AI 美国
     rule-set:jms-ai,jms-ai-resources,jms-artifact-resources,jms-ai-shared,jms-twitter-shared,jms-bing-shared,jms-meta-bootstrap:
-    - https://1.1.1.1/dns-query#AI-US
-    - https://8.8.8.8/dns-query#AI-US
+    - https://1.1.1.1/dns-query#AI 美国
+    - https://8.8.8.8/dns-query#AI 美国
     rule-set:jms-private:
     - system://
     +.deepseek.com:
@@ -494,10 +494,18 @@ dns:
     - https://dns.alidns.com/dns-query#DIRECT
     - https://doh.pub/dns-query#DIRECT
     rule-set:jms-meta-bootstrap:
-    - https://1.1.1.1/dns-query#AI-US
-    - https://8.8.8.8/dns-query#AI-US
+    - https://1.1.1.1/dns-query#AI 美国
+    - https://8.8.8.8/dns-query#AI 美国
   use-hosts: true
   use-system-hosts: true
+# Display names by JMS server id; exits verified 2026-11-14 via ipinfo.io, ipwho.is and ip-api.com.
+# Unknown ids are shown as "JMS · <id>" so a new server never exposes the account prefix.
+jms-node-names:
+  s3: 美国洛杉矶01
+  s2: 美国洛杉矶02
+  s801: 美国洛杉矶03
+  s4: 日本大阪01
+  s5: 荷兰阿姆斯特丹01
 jms-us-nodes:
 - s3
 - s2
@@ -509,18 +517,21 @@ jms-udp-nodes:
 - s5
 - s801
 proxy-groups:
-- name: JMS
+- name: 默认代理
   type: select
+  icon: https://raw.githubusercontent.com/sssstwee/edgetunnel/main/resources/icons/Proxy.png
   include-all-proxies: true
-- name: JMS Auto
+- name: 自动选择
   type: url-test
+  icon: https://raw.githubusercontent.com/sssstwee/edgetunnel/main/resources/icons/Auto.png
   include-all-proxies: true
   url: https://www.gstatic.com/generate_204
   expected-status: 204
   interval: 300
   tolerance: 50
-- name: AI-US
+- name: AI 美国
   type: fallback
+  icon: https://raw.githubusercontent.com/sssstwee/edgetunnel/main/resources/icons/Fallback.png
   jms-us-only: true
   proxies:
   - REJECT
@@ -536,7 +547,7 @@ rule-providers:
     url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/anthropic.yaml
     path: ./ruleset/jms/anthropic.yaml
     interval: 86400
-    proxy: JMS
+    proxy: 默认代理
   jms-openai:
     type: http
     behavior: domain
@@ -544,7 +555,7 @@ rule-providers:
     url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/openai.yaml
     path: ./ruleset/jms/openai.yaml
     interval: 86400
-    proxy: JMS
+    proxy: 默认代理
   jms-twitter-shared:
     type: http
     behavior: domain
@@ -552,7 +563,7 @@ rule-providers:
     url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/twitter.yaml
     path: ./ruleset/jms/twitter.yaml
     interval: 86400
-    proxy: JMS
+    proxy: 默认代理
   jms-bing-shared:
     type: http
     behavior: domain
@@ -560,7 +571,7 @@ rule-providers:
     url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/bing.yaml
     path: ./ruleset/jms/bing.yaml
     interval: 86400
-    proxy: JMS
+    proxy: 默认代理
   jms-google-shared:
     type: http
     behavior: domain
@@ -568,7 +579,7 @@ rule-providers:
     url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/google.yaml
     path: ./ruleset/jms/google.yaml
     interval: 86400
-    proxy: JMS
+    proxy: 默认代理
   jms-gemini:
     type: http
     behavior: domain
@@ -576,7 +587,7 @@ rule-providers:
     url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/google-gemini.yaml
     path: ./ruleset/jms/gemini.yaml
     interval: 86400
-    proxy: JMS
+    proxy: 默认代理
   jms-ai:
     type: http
     behavior: domain
@@ -584,7 +595,7 @@ rule-providers:
     url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-ai-!cn.yaml
     path: ./ruleset/jms/ai.yaml
     interval: 86400
-    proxy: JMS
+    proxy: 默认代理
   jms-ai-cn:
     type: http
     behavior: domain
@@ -592,7 +603,7 @@ rule-providers:
     url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-ai-cn.yaml
     path: ./ruleset/jms/ai-cn.yaml
     interval: 86400
-    proxy: JMS
+    proxy: 默认代理
   jms-direct:
     type: http
     behavior: domain
@@ -600,7 +611,7 @@ rule-providers:
     url: https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/direct.txt
     path: ./ruleset/jms/direct.yaml
     interval: 86400
-    proxy: JMS
+    proxy: 默认代理
   jms-proxy:
     type: http
     behavior: domain
@@ -608,7 +619,7 @@ rule-providers:
     url: https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/proxy.txt
     path: ./ruleset/jms/proxy.yaml
     interval: 86400
-    proxy: JMS
+    proxy: 默认代理
   jms-private:
     type: http
     behavior: domain
@@ -616,7 +627,7 @@ rule-providers:
     url: https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/private.txt
     path: ./ruleset/jms/private.yaml
     interval: 86400
-    proxy: JMS
+    proxy: 默认代理
   jms-lancidr:
     type: http
     behavior: ipcidr
@@ -624,7 +635,7 @@ rule-providers:
     url: https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/lancidr.txt
     path: ./ruleset/jms/lancidr.yaml
     interval: 86400
-    proxy: JMS
+    proxy: 默认代理
   jms-cn-ai-extra:
     type: inline
     behavior: domain
@@ -1567,47 +1578,47 @@ rule-providers:
 # Trusted domestic AI exceptions, then pinned critical AI, then general lists and app guards.
 rules:
 - RULE-SET,jms-cn-ai-extra,DIRECT
-- RULE-SET,jms-claude-bootstrap,AI-US
+- RULE-SET,jms-claude-bootstrap,AI 美国
 - RULE-SET,jms-claude-bootstrap,REJECT
-- RULE-SET,jms-openai-bootstrap,AI-US
+- RULE-SET,jms-openai-bootstrap,AI 美国
 - RULE-SET,jms-openai-bootstrap,REJECT
-- RULE-SET,jms-gemini-bootstrap,AI-US
+- RULE-SET,jms-gemini-bootstrap,AI 美国
 - RULE-SET,jms-gemini-bootstrap,REJECT
-- RULE-SET,jms-meta-bootstrap,AI-US
+- RULE-SET,jms-meta-bootstrap,AI 美国
 - RULE-SET,jms-meta-bootstrap,REJECT
 - RULE-SET,jms-ai-cn,DIRECT
 - RULE-SET,jms-private,DIRECT
 - RULE-SET,jms-lancidr,DIRECT,no-resolve
-- PROCESS-NAME-REGEX,(?i)^(claude|codex|chatgpt|claude code|gemini|muse|musecode|muse-code|muse code|antigravity|cursor|windsurf|trae|magpie|magpie-bun|codex-code-mode-host)( helper.*| \(.*\))?$,AI-US
+- PROCESS-NAME-REGEX,(?i)^(claude|codex|chatgpt|claude code|gemini|muse|musecode|muse-code|muse code|antigravity|cursor|windsurf|trae|magpie|magpie-bun|codex-code-mode-host)( helper.*| \(.*\))?$,AI 美国
 - PROCESS-NAME-REGEX,(?i)^(claude|codex|chatgpt|claude code|gemini|muse|musecode|muse-code|muse code|antigravity|cursor|windsurf|trae|magpie|magpie-bun|codex-code-mode-host)( helper.*| \(.*\))?$,REJECT
-- PROCESS-PATH-REGEX,(?i)(/Applications/(ChatGPT|Codex|Claude|Cursor|Antigravity|Windsurf|Trae|Magpie|Muse)\.app/|/\.local/share/claude/versions/|/\.cache/magpie/bun/),AI-US
+- PROCESS-PATH-REGEX,(?i)(/Applications/(ChatGPT|Codex|Claude|Cursor|Antigravity|Windsurf|Trae|Magpie|Muse)\.app/|/\.local/share/claude/versions/|/\.cache/magpie/bun/),AI 美国
 - PROCESS-PATH-REGEX,(?i)(/Applications/(ChatGPT|Codex|Claude|Cursor|Antigravity|Windsurf|Trae|Magpie|Muse)\.app/|/\.local/share/claude/versions/|/\.cache/magpie/bun/),REJECT
-- RULE-SET,jms-twitter-shared,AI-US
+- RULE-SET,jms-twitter-shared,AI 美国
 - RULE-SET,jms-twitter-shared,REJECT
-- RULE-SET,jms-bing-shared,AI-US
+- RULE-SET,jms-bing-shared,AI 美国
 - RULE-SET,jms-bing-shared,REJECT
-- RULE-SET,jms-ai-shared,AI-US
+- RULE-SET,jms-ai-shared,AI 美国
 - RULE-SET,jms-ai-shared,REJECT
-- RULE-SET,jms-anthropic,AI-US
+- RULE-SET,jms-anthropic,AI 美国
 - RULE-SET,jms-anthropic,REJECT
-- RULE-SET,jms-claude-ip,AI-US,no-resolve
+- RULE-SET,jms-claude-ip,AI 美国,no-resolve
 - RULE-SET,jms-claude-ip,REJECT,no-resolve
-- RULE-SET,jms-openai,AI-US
+- RULE-SET,jms-openai,AI 美国
 - RULE-SET,jms-openai,REJECT
-- RULE-SET,jms-openai-voice,AI-US,no-resolve
+- RULE-SET,jms-openai-voice,AI 美国,no-resolve
 - RULE-SET,jms-openai-voice,REJECT,no-resolve
-- RULE-SET,jms-google-shared,AI-US
+- RULE-SET,jms-google-shared,AI 美国
 - RULE-SET,jms-google-shared,REJECT
-- RULE-SET,jms-gemini,AI-US
+- RULE-SET,jms-gemini,AI 美国
 - RULE-SET,jms-gemini,REJECT
-- RULE-SET,jms-ai,AI-US
+- RULE-SET,jms-ai,AI 美国
 - RULE-SET,jms-ai,REJECT
-- RULE-SET,jms-ai-resources,AI-US
+- RULE-SET,jms-ai-resources,AI 美国
 - RULE-SET,jms-ai-resources,REJECT
-- RULE-SET,jms-artifact-resources,AI-US
+- RULE-SET,jms-artifact-resources,AI 美国
 - RULE-SET,jms-artifact-resources,REJECT
-- RULE-SET,jms-proxy,JMS
+- RULE-SET,jms-proxy,默认代理
 - RULE-SET,jms-proxy,REJECT
 - RULE-SET,jms-direct,DIRECT
-- MATCH,JMS
+- MATCH,默认代理
 - MATCH,REJECT
