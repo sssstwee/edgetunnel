@@ -124,6 +124,36 @@ test('pinned account services precede broad domestic AI classifications', () => 
   }
 });
 
+test('every Claude dependency is pinned to US nodes ahead of all broad DIRECT rules', () => {
+  const config = buildConfig(nodes(), policy());
+  const deps = config['rule-providers']['jms-claude-deps'].payload;
+  const bootstrap = config['rule-providers']['jms-claude-bootstrap'].payload;
+  for (const host of ['+.anthropic.com', '+.claude.ai', '+.claude.com', '+.claude.app', '+.claudeusercontent.com', '+.claudemcpcontent.com', '+.clau.de']) {
+    assert.ok(bootstrap.includes(host), `${host} missing from the Claude bootstrap`);
+  }
+  for (const host of ['+.datadoghq.com', 'cdn.growthbook.io', '+.hcaptcha.com', 'challenges.cloudflare.com', '+.stripe.network', '+.stripecdn.com',
+    'storage.googleapis.com', 'registry.npmjs.org', 'github.com', 'raw.githubusercontent.com', 'esm.sh', 'cdn.plot.ly', '+.api.aws', 'mcp.notion.com']) {
+    assert.ok(deps.includes(host), `${host} is not pinned for Claude`);
+  }
+  assert.equal(new Set(deps).size, deps.length, 'duplicate Claude dependency');
+  const domestic = new Set(config['rule-providers']['jms-cn-ai-extra'].payload);
+  assert.ok(deps.every(host => !domestic.has(host)));
+  const rules = config.rules;
+  const route = rules.indexOf('RULE-SET,jms-claude-deps,AI 美国');
+  assert.equal(route, rules.indexOf('RULE-SET,jms-claude-bootstrap,REJECT') + 1);
+  assert.equal(rules[route + 1], 'RULE-SET,jms-claude-deps,REJECT');
+  for (const direct of ['RULE-SET,jms-ai-cn,DIRECT', 'RULE-SET,jms-private,DIRECT', 'RULE-SET,jms-direct,DIRECT']) assert.ok(route < rules.indexOf(direct));
+  assert.ok(config.dns['nameserver-policy']['rule-set:jms-claude-deps'].every(x => x.endsWith('#AI 美国')));
+  const path = rules.find(r => r.startsWith('PROCESS-PATH-REGEX,') && r.endsWith(',AI 美国'));
+  const pattern = new RegExp(path.split(',').slice(1, -1).join(',').replace(/^\(\?i\)/, ''), 'i');
+  for (const binary of [
+    '/Users/u/Library/Application Support/Claude/claude-code/2.1.325/abc/claude.app/Contents/MacOS/claude',
+    '/Users/u/.vscode/extensions/anthropic.claude-code-2.1.325-darwin-arm64/resources/native-binary/claude',
+    '/opt/homebrew/Caskroom/claude-code/2.1.325/claude', '/Users/u/.local/share/claude/versions/2.1.325',
+    '/Applications/Claude.app/Contents/Frameworks/Claude Helper.app/Contents/MacOS/Claude Helper',
+  ]) assert.ok(pattern.test(binary), binary);
+});
+
 test('overseas AI products missing from the upstream AI list still use US nodes', () => {
   const config = buildConfig(nodes(), policy());
   const shared = config['rule-providers']['jms-ai-shared'].payload;
