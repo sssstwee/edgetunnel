@@ -1527,6 +1527,43 @@ rule-providers:
     - +.sentry.io
     - +.stripe.com
     - +.turn.livekit.cloud
+    # Stripe.js fraud signals and Segment loaders used by AI account/billing pages.
+    - +.stripe.network
+    - +.segment.com
+    # Overseas AI products absent from category-ai-!cn; keep them on verified US nodes.
+    - +.character.ai
+    - +.hailuoai.video
+    - +.replicate.com
+    - +.replicate.delivery
+    - +.runwayml.com
+    - +.ideogram.ai
+    - +.v0.dev
+    - +.v0.app
+    - +.bolt.new
+    - +.lovable.dev
+    - +.lovable.app
+    - +.genspark.ai
+    - +.phind.com
+    - +.together.ai
+    - +.together.xyz
+    - +.fireworks.ai
+    - +.deepinfra.com
+    - +.suno.com
+    - +.suno.ai
+    - +.udio.com
+    - +.lmarena.ai
+    - +.you.com
+    - +.krea.ai
+    - +.leonardo.ai
+    - +.pika.art
+    - +.lumalabs.ai
+    - +.heygen.com
+    - +.stability.ai
+    - +.fal.ai
+    - +.fal.run
+    - +.fal.media
+    - +.civitai.com
+    - +.openart.ai
 # Trusted domestic AI exceptions, then pinned critical AI, then general lists and app guards.
 rules:
 - RULE-SET,jms-cn-ai-extra,DIRECT

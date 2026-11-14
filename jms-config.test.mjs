@@ -110,6 +110,21 @@ test('pinned account services precede broad domestic AI classifications', () => 
   }
 });
 
+test('overseas AI products missing from the upstream AI list still use US nodes', () => {
+  const config = buildConfig(nodes(), policy());
+  const shared = config['rule-providers']['jms-ai-shared'].payload;
+  const domestic = new Set(config['rule-providers']['jms-cn-ai-extra'].payload);
+  for (const host of ['+.stripe.network', '+.character.ai', '+.replicate.com', '+.v0.dev', '+.lovable.dev', '+.suno.com', '+.together.ai', '+.fal.ai']) {
+    assert.ok(shared.includes(host), `${host} is not pinned to AI-US`);
+    assert.ok(!domestic.has(host));
+  }
+  assert.equal(new Set(shared).size, shared.length, 'duplicate shared AI domains');
+  const route = config.rules.indexOf('RULE-SET,jms-ai-shared,AI-US');
+  assert.ok(route >= 0 && route < config.rules.indexOf('RULE-SET,jms-proxy,JMS'));
+  assert.ok(Object.entries(config.dns['nameserver-policy']).some(([key, servers]) =>
+    key.startsWith('rule-set:') && key.slice(9).split(',').includes('jms-ai-shared') && servers.every(x => x.endsWith('#AI-US'))));
+});
+
 const testToken = 'a'.repeat(48);
 const testEnv = {
   PROFILE_TOKEN: testToken,
