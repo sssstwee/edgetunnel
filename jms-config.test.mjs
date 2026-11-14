@@ -13,16 +13,30 @@ const nodes = () => ({ proxies: ['s1', 's2', 's3', 's4', 's5', 's801'].map(id =>
 
 test('AI pools only contain verified US nodes in stable fallback order', () => {
   const config = buildConfig(nodes(), policy());
-  const expected = ['s3', 's2', 's801'].map(id => `JMS-test@c17${id}.portablesubmarines.com:443`);
-  for (const name of ['AI-US']) {
+  const expected = ['美国洛杉矶01 · s3', '美国洛杉矶02 · s2', '美国洛杉矶03 · s801'];
+  for (const name of ['AI 美国']) {
     const group = config['proxy-groups'].find(g => g.name === name);
     assert.equal(group.type, 'fallback');
     assert.deepEqual(group.proxies, expected);
   }
-  const ordinary = config['proxy-groups'].find(g => g.name === 'JMS Auto');
+  const ordinary = config['proxy-groups'].find(g => g.name === '自动选择');
   assert.equal(ordinary.proxies.length, 6);
   assert.ok(config.proxies.filter(p => p.type === 'vless').every(p => p.udp && p['packet-encoding'] === 'xudp'));
   assert.ok(!config['proxy-groups'].some(g => g.proxies.includes('DIRECT')));
+});
+
+test('nodes show verified exit cities in a stable order without the account prefix', () => {
+  const config = buildConfig(nodes(), policy());
+  assert.deepEqual(config.proxies.map(p => p.name), [
+    '美国洛杉矶01 · s3', '美国洛杉矶02 · s2', '美国洛杉矶03 · s801', '日本大阪01 · s4', '荷兰阿姆斯特丹01 · s5', 'JMS · s1',
+  ]);
+  assert.ok(!stringify(config).includes('JMS-test@'));
+  assert.deepEqual(config['proxy-groups'].find(g => g.name === '默认代理').proxies, ['自动选择', ...config.proxies.map(p => p.name)]);
+  assert.ok(config['proxy-groups'].every(g => /\/resources\/icons\/\w+\.png$/.test(g.icon)));
+  assert.equal(config['jms-node-names'], undefined);
+  const renamed = nodes();
+  renamed.proxies.push({ name: 'JMS-test@c17s9.portablesubmarines.com:443', server: 'c17s9.portablesubmarines.com', type: 'vless', port: 443 });
+  assert.equal(buildConfig(renamed, policy()).proxies.at(-1).name, 'JMS · s9');
 });
 
 test('missing US nodes fails instead of admitting Japan, Netherlands or DIRECT', () => {
@@ -34,15 +48,15 @@ test('missing US nodes fails instead of admitting Japan, Netherlands or DIRECT',
 test('domestic AI takes precedence and every proxy route has a rejection guard', () => {
   const config = buildConfig(nodes(), policy());
   const rules = config.rules;
-  assert.ok(rules.indexOf('RULE-SET,jms-cn-ai-extra,DIRECT') < rules.indexOf('RULE-SET,jms-ai,AI-US'));
-  assert.ok(rules.indexOf('RULE-SET,jms-ai-cn,DIRECT') < rules.indexOf('RULE-SET,jms-ai,AI-US'));
+  assert.ok(rules.indexOf('RULE-SET,jms-cn-ai-extra,DIRECT') < rules.indexOf('RULE-SET,jms-ai,AI 美国'));
+  assert.ok(rules.indexOf('RULE-SET,jms-ai-cn,DIRECT') < rules.indexOf('RULE-SET,jms-ai,AI 美国'));
   for (let i = 0; i < rules.length; i++) {
-    const match = /^((?:RULE-SET|PROCESS-NAME-REGEX|PROCESS-PATH-REGEX),.+),(JMS|Claude-US|ChatGPT-US|Gemini-US|AI-US)(,no-resolve)?$/.exec(rules[i]);
+    const match = /^((?:RULE-SET|PROCESS-NAME-REGEX|PROCESS-PATH-REGEX),.+),(默认代理|Claude-US|ChatGPT-US|Gemini-US|AI 美国)(,no-resolve)?$/.exec(rules[i]);
     if (match) assert.equal(rules[i + 1], `${match[1]},REJECT${match[3] || ''}`);
   }
-  assert.deepEqual(rules.slice(-2), ['MATCH,JMS', 'MATCH,REJECT']);
+  assert.deepEqual(rules.slice(-2), ['MATCH,默认代理', 'MATCH,REJECT']);
   assert.equal(config.dns['nameserver-policy']['+.kimi.ai'][0], 'https://dns.alidns.com/dns-query#DIRECT');
-  assert.ok(config.dns['nameserver-policy']['rule-set:jms-gemini-bootstrap,jms-gemini,jms-google-shared'].every(x => x.endsWith('#AI-US')));
+  assert.ok(config.dns['nameserver-policy']['rule-set:jms-gemini-bootstrap,jms-gemini,jms-google-shared'].every(x => x.endsWith('#AI 美国')));
 });
 
 test('unauthenticated requests cannot retrieve configuration or trigger upstream fetches', async t => {
@@ -72,8 +86,8 @@ test('protected subscription combines fresh JMS nodes with the remote policy', a
   assert.equal(response.status, 200);
   assert.equal(response.headers.get('Cache-Control'), 'private, no-store');
   const config = parse(await response.text());
-  assert.deepEqual(config['proxy-groups'].map(g => g.name), ['JMS', 'JMS Auto', 'AI-US']);
-  assert.deepEqual(config.rules.slice(-2), ['MATCH,JMS', 'MATCH,REJECT']);
+  assert.deepEqual(config['proxy-groups'].map(g => g.name), ['默认代理', '自动选择', 'AI 美国']);
+  assert.deepEqual(config.rules.slice(-2), ['MATCH,默认代理', 'MATCH,REJECT']);
   assert.equal(config['secret-upstream-field'], undefined);
   assert.equal(config.proxies.length, 5);
 });
@@ -93,18 +107,18 @@ test('unclassified public connections have no country-IP DIRECT escape', () => {
   const process = config.rules.findIndex(r => r.startsWith('PROCESS-NAME-REGEX,'));
   const domestic = config.rules.indexOf('RULE-SET,jms-direct,DIRECT');
   assert.ok(process > 3 && process < domestic);
-  assert.ok(config.rules.indexOf('RULE-SET,jms-ai-shared,AI-US') < domestic);
-  assert.ok(config.dns.nameserver.every(r => r.endsWith('#JMS')));
+  assert.ok(config.rules.indexOf('RULE-SET,jms-ai-shared,AI 美国') < domestic);
+  assert.ok(config.dns.nameserver.every(r => r.endsWith('#默认代理')));
 });
 
 test('pinned account services precede broad domestic AI classifications', () => {
   const config = buildConfig(nodes(), policy());
   const broadDirect = config.rules.indexOf('RULE-SET,jms-ai-cn,DIRECT');
   for (const host of ['+.claude.ai', '+.anthropic.com', '+.openai.com', '+.chatgpt.com', '+.gemini.google.com', '+.muse.ai', '+.metaaivm.com']) {
-    assert.ok(config.dns['nameserver-policy'][host].every(x => x.endsWith('#AI-US')));
+    assert.ok(config.dns['nameserver-policy'][host].every(x => x.endsWith('#AI 美国')));
   }
   for (const name of ['jms-claude-bootstrap', 'jms-openai-bootstrap', 'jms-gemini-bootstrap', 'jms-meta-bootstrap']) {
-    const index = config.rules.indexOf(`RULE-SET,${name},AI-US`);
+    const index = config.rules.indexOf(`RULE-SET,${name},AI 美国`);
     assert.ok(index > 0 && index < broadDirect);
     assert.equal(config.rules[index + 1], `RULE-SET,${name},REJECT`);
   }
@@ -115,14 +129,14 @@ test('overseas AI products missing from the upstream AI list still use US nodes'
   const shared = config['rule-providers']['jms-ai-shared'].payload;
   const domestic = new Set(config['rule-providers']['jms-cn-ai-extra'].payload);
   for (const host of ['+.stripe.network', '+.character.ai', '+.replicate.com', '+.v0.dev', '+.lovable.dev', '+.suno.com', '+.together.ai', '+.fal.ai']) {
-    assert.ok(shared.includes(host), `${host} is not pinned to AI-US`);
+    assert.ok(shared.includes(host), `${host} is not pinned to AI 美国`);
     assert.ok(!domestic.has(host));
   }
   assert.equal(new Set(shared).size, shared.length, 'duplicate shared AI domains');
-  const route = config.rules.indexOf('RULE-SET,jms-ai-shared,AI-US');
-  assert.ok(route >= 0 && route < config.rules.indexOf('RULE-SET,jms-proxy,JMS'));
+  const route = config.rules.indexOf('RULE-SET,jms-ai-shared,AI 美国');
+  assert.ok(route >= 0 && route < config.rules.indexOf('RULE-SET,jms-proxy,默认代理'));
   assert.ok(Object.entries(config.dns['nameserver-policy']).some(([key, servers]) =>
-    key.startsWith('rule-set:') && key.slice(9).split(',').includes('jms-ai-shared') && servers.every(x => x.endsWith('#AI-US'))));
+    key.startsWith('rule-set:') && key.slice(9).split(',').includes('jms-ai-shared') && servers.every(x => x.endsWith('#AI 美国'))));
 });
 
 const testToken = 'a'.repeat(48);
