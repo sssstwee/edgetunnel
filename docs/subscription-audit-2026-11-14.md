@@ -33,20 +33,45 @@
 
 尚未验证：手机数据网络下各入口落到哪个 colo、两个 DEN 入口是否可用。运营商线路差异仍可能叠加，需要在数据网络下复测。
 
-### 建议
+### 建议（历史）
 
 1. 在数据网络下复测：Mac 连手机热点后执行
    `node tools/probe-cf-entries.mjs <edgetunnel 订阅 yaml> --interface en0 --rounds 5 --extra 3 --json mobile.json`
    以 colo 列和成功率为准。
-2. 按复测结果重排 `ADD.txt` 入口：16 个节点分散到至少 3 个 colo（如 SJC / LAX / DEN / HKG），每个 /16 不超过 4 个；保留每节点现有回源与名称。家宽已测到 `104.19.x`、`104.16.x`、`172.64.x`、`141.101.x`、`162.159.236.x` 落 LAX，`104.26.x` 落 HKG。
+2. 按复测结果重排 `ADD.txt` 入口：优先可靠美国机房；HKG 入口会让部分 API 出口变香港，不采用。
 3. fallback 首位已是 DEN 入口，可保持；`自动选择` 会偏向 SJC 低延迟入口，入口分散后自然缓解。
+
+### 线上已做（2026-11-14 续）
+
+只改 KV `ADD.txt`，**未重新部署 Worker 代码**。Worker `gjtq-vpn-entry` / 域名 `vpn.tastedistill.com` / KV `d6b2e1d8e54c40499d6b6fd7d0e93ca3`。
+
+| 项 | 内容 |
+|---|---|
+| 入口 | 由约 14 SJC + 2 DEN → **8 DEN + 8 SJC**（家宽 `en0` 直连绑 IP + Worker SNI 的 `/cdn-cgi/trace` 核验） |
+| DEN 入口段 | `103.31.4.x`、`162.159.224.x`；变更节点 03/05/07/11/13/15（01/09 原本已是 DEN） |
+| 失效回源 | 04：`192.220.21.116`→`23.225.58.246`（CloudRadium / AS40065，LA）；11：`23.144.12.63`→`64.49.28.173`（TAIPEI101 / AS54286） |
+| 未做 | 第三机房（LAX 入口候选家宽可用，但未硬凑）；**手机数据网络未连热点，未实测** |
+| 私有备份 | 主仓 ignored：`tmp/entry-colo-20261114/`（`ADD-live-20261114-142451.txt` sha256 前缀 `6299ffc864cacea7`；新名单 `ADD-after-20261114.txt` 前缀 `20709e99be008da5`） |
+
+对照：旧 04/11 回源 Google204 仍可能成功（兼容路径 `/proxyip=` direct-first），但 CF/Anthropic/OpenAI 失败；不能用 Google204 单独判定回源健康。
+
+**回滚（仅 KV）：**
+
+```bash
+npx wrangler kv key put ADD.txt \
+  --path tmp/entry-colo-20261114/ADD-live-20261114-142451.txt \
+  --namespace-id d6b2e1d8e54c40499d6b6fd7d0e93ca3 --remote
+```
+
+**客户端：** Clash Verge 需手动刷新 “Cloudflare worker” 订阅（或等自动更新）后才会拿到新入口/回源。
+
+**验收摘要（家宽）：** 实际订阅 16 节点与新名单一致；mihomo 配置校验通过；每节点 5 轮 Google204 + CF `loc=US` + Anthropic/OpenAI 401 认证体均通过（16/16）；DEN/SJC/新 04/11 约 3 分钟轮询+小下载稳定。出口目标 colo 与入口 colo 分开计量。`npm test` 116/116。
 
 ## 验证
 
-- `npm test`：114/114 通过（新增 JMS 海外 AI 美国出口断言）。
+- `npm test`：116/116 通过。
 - mihomo 复测：上述 21 个原先漏网域名在新 JMS 模板下全部命中 `RuleSet(jms-ai-shared) → AI-US`；DeepSeek、Kimi、百度仍 DIRECT，未知域名仍 `JMS`。
-
-未部署任何 Worker、未改线上 KV、未改托管模板仓库。
+- edgetunnel：已更新线上 KV `ADD.txt`（见上节）；未改 Worker 代码、未改托管模板仓库、未切换 Clash Verge 活跃客户端。
 
 ## 补充：Claude 全量请求核查（JMS）
 
