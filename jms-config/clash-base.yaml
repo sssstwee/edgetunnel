@@ -83,6 +83,9 @@ dns:
     rule-set:jms-cn-ai-extra,jms-ai-cn:
     - https://dns.alidns.com/dns-query#DIRECT
     - https://doh.pub/dns-query#DIRECT
+    rule-set:jms-claude-deps:
+    - https://1.1.1.1/dns-query#AI 美国
+    - https://8.8.8.8/dns-query#AI 美国
     rule-set:jms-claude-bootstrap,jms-anthropic:
     - https://1.1.1.1/dns-query#AI 美国
     - https://8.8.8.8/dns-query#AI 美国
@@ -758,6 +761,90 @@ rule-providers:
     - +.segment.io
     - +.sentry.io
     - +.stripe.com
+  # Third-party hosts Claude, Claude Code and Claude Desktop depend on (2026-11-14 audit of the
+  # official network requirements, the CLI and Desktop bundles, claude.ai and live connections).
+  # Pinned right after the Claude bootstrap so no DIRECT or ordinary-proxy rule can claim them first.
+  jms-claude-deps:
+    type: inline
+    behavior: domain
+    payload:
+    # Telemetry, feature flags and crash reports
+    - +.datadoghq.com
+    - cdn.growthbook.io
+    - +.sentry.io
+    - +.statsig.com
+    - +.featuregates.org
+    - +.featureassets.org
+    - +.prodregistryv2.org
+    - bun.report
+    # Sign-in, captcha, billing and support
+    - +.hcaptcha.com
+    - challenges.cloudflare.com
+    - +.recaptcha.net
+    - accounts.google.com
+    - oauth2.googleapis.com
+    - js.stripe.com
+    - api.stripe.com
+    - checkout.stripe.com
+    - billing.stripe.com
+    - +.stripe.network
+    - +.stripecdn.com
+    - +.intercom.io
+    - +.intercomcdn.com
+    - +.segment.io
+    - cdn.segment.com
+    - cdn.usefathom.com
+    - +.workos.com
+    - login.microsoftonline.com
+    # Installer, auto-update, plugins and release notes
+    - storage.googleapis.com
+    - registry.npmjs.org
+    - github.com
+    - api.github.com
+    - codeload.github.com
+    - raw.githubusercontent.com
+    - objects.githubusercontent.com
+    - release-assets.githubusercontent.com
+    - formulae.brew.sh
+    - bun.sh
+    - +.googlesource.com
+    # Artifact fonts and libraries
+    - fonts.googleapis.com
+    - fonts.gstatic.com
+    - cdnjs.cloudflare.com
+    - cdn.jsdelivr.net
+    - cdn.tailwindcss.com
+    - code.jquery.com
+    - unpkg.com
+    - esm.sh
+    - cdn.plot.ly
+    # Claude in Chrome extension install and updates
+    - chromewebstore.google.com
+    - clients2.google.com
+    - clients2.googleusercontent.com
+    - update.googleapis.com
+    # Claude on Bedrock, Claude Platform on AWS, Vertex AI and Foundry
+    - +.api.aws
+    - bedrock-runtime.us-east-1.amazonaws.com
+    - bedrock-runtime.us-west-2.amazonaws.com
+    - sts.amazonaws.com
+    - claude.googleapis.com
+    - aiplatform.googleapis.com
+    - us-east5-aiplatform.googleapis.com
+    - +.services.ai.azure.com
+    # MCP connectors Claude ships with
+    - mcp.asana.com
+    - mcp.atlassian.com
+    - mcp.notion.com
+    - mcp.linear.app
+    - mcp.slack.com
+    - mcp.figma.com
+    - mcp.box.com
+    - mcp.intercom.com
+    - mcp.sentry.dev
+    - mcp.amplitude.com
+    - drivemcp.googleapis.com
+    - gmailmcp.googleapis.com
   jms-claude-ip:
     type: inline
     behavior: ipcidr
@@ -1580,6 +1667,8 @@ rules:
 - RULE-SET,jms-cn-ai-extra,DIRECT
 - RULE-SET,jms-claude-bootstrap,AI 美国
 - RULE-SET,jms-claude-bootstrap,REJECT
+- RULE-SET,jms-claude-deps,AI 美国
+- RULE-SET,jms-claude-deps,REJECT
 - RULE-SET,jms-openai-bootstrap,AI 美国
 - RULE-SET,jms-openai-bootstrap,REJECT
 - RULE-SET,jms-gemini-bootstrap,AI 美国
@@ -1591,8 +1680,8 @@ rules:
 - RULE-SET,jms-lancidr,DIRECT,no-resolve
 - PROCESS-NAME-REGEX,(?i)^(claude|codex|chatgpt|claude code|gemini|muse|musecode|muse-code|muse code|antigravity|cursor|windsurf|trae|magpie|magpie-bun|codex-code-mode-host)( helper.*| \(.*\))?$,AI 美国
 - PROCESS-NAME-REGEX,(?i)^(claude|codex|chatgpt|claude code|gemini|muse|musecode|muse-code|muse code|antigravity|cursor|windsurf|trae|magpie|magpie-bun|codex-code-mode-host)( helper.*| \(.*\))?$,REJECT
-- PROCESS-PATH-REGEX,(?i)(/Applications/(ChatGPT|Codex|Claude|Cursor|Antigravity|Windsurf|Trae|Magpie|Muse)\.app/|/\.local/share/claude/versions/|/\.cache/magpie/bun/),AI 美国
-- PROCESS-PATH-REGEX,(?i)(/Applications/(ChatGPT|Codex|Claude|Cursor|Antigravity|Windsurf|Trae|Magpie|Muse)\.app/|/\.local/share/claude/versions/|/\.cache/magpie/bun/),REJECT
+- PROCESS-PATH-REGEX,(?i)(/Applications/(ChatGPT|Codex|Claude|Cursor|Antigravity|Windsurf|Trae|Magpie|Muse)\.app/|/\.local/share/claude/versions/|/Library/Application Support/Claude/claude-code/|/extensions/anthropic\.claude-code-|/Caskroom/claude-code/|/\.cache/magpie/bun/),AI 美国
+- PROCESS-PATH-REGEX,(?i)(/Applications/(ChatGPT|Codex|Claude|Cursor|Antigravity|Windsurf|Trae|Magpie|Muse)\.app/|/\.local/share/claude/versions/|/Library/Application Support/Claude/claude-code/|/extensions/anthropic\.claude-code-|/Caskroom/claude-code/|/\.cache/magpie/bun/),REJECT
 - RULE-SET,jms-twitter-shared,AI 美国
 - RULE-SET,jms-twitter-shared,REJECT
 - RULE-SET,jms-bing-shared,AI 美国

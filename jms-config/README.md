@@ -36,6 +36,17 @@ Worker 使用 JMS 官方 `noss=1` 参数请求上游，排除即将退役的 Sha
 
 Muse 的 `muse.ai` 除自动更新的 AI 清单外，还固定在内置 Meta 优先规则中；与 `metaaivm.com`、Meta 认证/CDN 域共用美国策略及 DNS。Muse / Muse Code 进程名称和 Muse.app 路径也列入兜底。
 
+## Claude / Claude Code 专项
+
+覆盖 claude.ai 网页、Claude Desktop（含 Cowork、Artifact、MCP Apps、Claude in Chrome 桥接与自动更新）、Claude Code（原生安装、npm/bun、Homebrew、VS Code 扩展、Desktop 内置副本）、Console、Bedrock / Vertex / Foundry / Claude Platform on AWS 与官方 MCP 连接器。清单来自[官方网络要求](https://code.claude.com/docs/en/network-config)、[Desktop 网络要求](https://code.claude.com/docs/en/desktop)、[Anthropic IP 段](https://platform.claude.com/docs/en/api/ip-addresses)、CLI 与 Desktop 安装包内的主机字符串、claude.ai 页面实际请求和本机内核的实时连接。
+
+- 一方域名（`anthropic.com`、`claude.ai`、`claude.com`、`claude.app`、`claudeusercontent.com`、`claudemcpcontent.com`、`clau.de` 等及其全部子域）在 `jms-claude-bootstrap`，仅次于少量国内 AI 例外，先于任何其他直连规则。
+- 第三方依赖在 `jms-claude-deps`，紧跟其后：Datadog / GrowthBook / Sentry / Statsig 遥测与特性开关，hCaptcha / Turnstile / reCAPTCHA / Google 登录，Stripe / Intercom / Segment，安装更新与插件所需的 `storage.googleapis.com`、npm、GitHub、Homebrew、googlesource，Artifact 字体与脚本库，Chrome 扩展更新，Bedrock / Vertex / Foundry / `*.api.aws`，以及 Claude 内置的 MCP 连接器主机。
+- IP 直连：`160.79.104.0/23`、`153.61.224.0/22`、`2607:6bc0::/48`。
+- 进程兜底：进程名 `claude`、`Claude`、`Claude Helper*`；路径 `/Applications/Claude.app/`、`~/.local/share/claude/versions/`、`~/Library/Application Support/Claude/claude-code/`、编辑器扩展 `anthropic.claude-code-*`、Homebrew `Caskroom/claude-code/`。npm 安装的 Claude Code 以 `node` 进程运行，只能依靠上述域名规则。
+- 以上每组都有同条件 `REJECT` 兜底，DNS 也经 `AI 美国` 解析。
+- 剩余限制：TUN 只接管 IPv4。所在网络提供 IPv6 时，自行取得 AAAA 记录的应用（如开启“安全 DNS”的浏览器）可能绕过代理直连；在这类网络上，请在 Clash Verge 中启用 IPv6 接管，或关闭该网卡的 IPv6。
+
 ## 覆盖边界
 
 核对来源：[Claude Code 网络要求](https://code.claude.com/docs/en/network-config)、[ChatGPT 网络要求](https://help.openai.com/en/articles/9247338-network-recommendations-for-chatgpt-errors-on-web-and-apps)、[Codex 官方源码](https://github.com/openai/codex)、[Gemini CLI 官方源码](https://github.com/google-gemini/gemini-cli)。Statsig 动态切换域复用[官方列表](https://docs.statsig.com/infrastructure/statsig_domains)，WorkOS / AuthKit 使用官方认证域族。另按 [hCaptcha 官方通配域要求](https://docs.hcaptcha.com/#content-security-policy-settings) 覆盖动态资源子域。包含 API、认证、WebSocket、上传/工件、安装更新、插件依赖、遥测及语音 IP；共享主机按域名整体代理，无法按加密 URL 路径只分出 AI 请求。

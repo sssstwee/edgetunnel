@@ -15,7 +15,7 @@
     ]
   },
   "vars": {
-    "POLICY_URL": "https://raw.githubusercontent.com/sssstwee/edgetunnel/main/jms-config/clash-base.yaml?v=city-names-20261114"
+    "POLICY_URL": "https://raw.githubusercontent.com/sssstwee/edgetunnel/main/jms-config/clash-base.yaml?v=claude-deps-20261114"
   },
   "observability": {
     "enabled": true,

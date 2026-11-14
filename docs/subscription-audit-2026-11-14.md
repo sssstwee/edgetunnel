@@ -47,3 +47,13 @@
 - mihomo 复测：上述 21 个原先漏网域名在新 JMS 模板下全部命中 `RuleSet(jms-ai-shared) → AI-US`；DeepSeek、Kimi、百度仍 DIRECT，未知域名仍 `JMS`。
 
 未部署任何 Worker、未改线上 KV、未改托管模板仓库。
+
+## 补充：Claude 全量请求核查（JMS）
+
+清单来源：官方 Claude Code / Desktop 网络要求与 IP 段文档；Claude Code 2.1.325 与 Claude Desktop 安装包内的主机字符串；claude.ai 登录页实际加载的主机；本机内核实时连接表（`claude`、`Claude Helper` 进程）。共 141 个主机及 3 个 Anthropic IP。
+
+修改前用线上配置实测：没有任何 Claude 主机走 DIRECT，但 23 个走 `默认代理`（可能从日本或荷兰出口），包括 `cdn.growthbook.io`（Claude Code 特性开关）、`api.datadoghq.com`、`bun.report`、`*.stripecdn.com`、`esm.sh`、`cdn.plot.ly`、`bedrock-mantle.*.api.aws`、`aws-external-anthropic.*.api.aws` 及 10 个官方 MCP 连接器主机。原生 `claude` / `Claude Helper` 进程会被进程规则兜住，浏览器和 npm 安装（`node` 进程）则不会。
+
+新增 `jms-claude-deps` 紧跟 Claude 一方规则，先于所有直连规则，并补齐 Desktop 内置、编辑器扩展、Homebrew 三种 Claude Code 进程路径。修改后 140/144 走 `AI 美国`。剩余 `ghcr.io`、`graph.microsoft.com`、Vimeo、Loom 属通用服务，有意不改。约 200 个通用域名的分流结果零变化。
+
+国内直连清单（category-ai-cn、private、Loyalsoldier direct）中与 Claude 相关的只有 Google Fonts 和 reCAPTCHA，两者均被更早的规则改为 `AI 美国`。TUN 仅接管 IPv4，IPv6 网络下的绕过风险见 `jms-config/README.md`。
