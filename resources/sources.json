@@ -24,12 +24,6 @@
           "behavior": "domain"
         },
         {
-          "source": "google.txt",
-          "path": "rules/google.yaml",
-          "kind": "rule",
-          "behavior": "domain"
-        },
-        {
           "source": "proxy.txt",
           "path": "rules/proxy.yaml",
           "kind": "rule",
@@ -116,6 +110,30 @@
         {
           "source": "geo/geosite/openai.yaml",
           "path": "rules/openai.yaml",
+          "kind": "rule",
+          "behavior": "domain"
+        },
+        {
+          "source": "geo/geosite/google-gemini.yaml",
+          "path": "rules/gemini.yaml",
+          "kind": "rule",
+          "behavior": "domain"
+        },
+        {
+          "source": "geo/geosite/twitter.yaml",
+          "path": "rules/twitter.yaml",
+          "kind": "rule",
+          "behavior": "domain"
+        },
+        {
+          "source": "geo/geosite/bing.yaml",
+          "path": "rules/bing.yaml",
+          "kind": "rule",
+          "behavior": "domain"
+        },
+        {
+          "source": "geo/geosite/google.yaml",
+          "path": "rules/google.yaml",
           "kind": "rule",
           "behavior": "domain"
         }
