@@ -7,7 +7,7 @@ function decodeSubscriptionText(raw) {
     return trimmed.replace(/\r\n/g, '\n');
   }
   try {
-    const decoded = Buffer.from(trimmed.replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString('utf8');
+    const decoded = new TextDecoder().decode(Uint8Array.from(atob(trimmed.replace(/-/g, '+').replace(/_/g, '/')), char => char.charCodeAt(0)));
     if (/^(vmess|vless|trojan|ss|hy2|hysteria2|anytls):\/\//m.test(decoded) || /proxies\s*:/.test(decoded)) {
       return decoded.replace(/\r\n/g, '\n');
     }

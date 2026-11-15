@@ -73,6 +73,49 @@ test('authenticated Worker subscription is converted internally and retains its 
   assert.equal(config['proxy-groups'][0].type, 'url-test');
 });
 
+test('XHTTP subscription carries upstream padding and reuse through the private converter and ECH patch', async t => {
+  setup(t);
+  const env = environment('edge.example', '00000000-0000-4000-8000-000000000001');
+  const settings = await env.KV.get('config.json', 'json');
+  settings.传输协议 = 'xhttp';
+  settings.ALPN = 'h2';
+  settings.连接复用 = { 启用: true, xmux: { maxConnections: 4, maxConcurrency: 0, hMaxReusableSecs: 3600, hKeepAlivePeriod: 0 } };
+  await env.KV.put('config.json', JSON.stringify(settings));
+  const result = await subscription(env);
+  const node = result.proxies[0];
+  assert.equal(node.network, 'xhttp');
+  assert.equal(node.uuid, env.UUID);
+  assert.equal(node.servername, env.HOST);
+  assert.equal(node['ech-opts'].enable, true);
+  assert.equal(node['xhttp-opts'].mode, 'stream-one');
+  assert.equal(node['xhttp-opts'].host, env.HOST);
+  assert.equal(node['xhttp-opts']['x-padding-header'], env.UUID.slice(1, 7));
+  assert.equal(node['xhttp-opts']['x-padding-key'], '_' + env.UUID.slice(25, 31));
+  assert.equal(node['xhttp-opts']['reuse-settings']['max-connections'], '4');
+  assert.equal(node['xhttp-opts']['reuse-settings']['max-concurrency'], undefined);
+  assert.equal(node['ws-opts'], undefined);
+  assert.deepEqual(node.alpn, ['h2']);
+  assert.equal(result['proxy-groups'][0].type, 'url-test');
+});
+
+test('explicit XHTTP ADD URI retains its relay path and reuse metadata', async t => {
+  setup(t);
+  const env = environment('edge.example', '00000000-0000-4000-8000-000000000001', true);
+  const extra = { xPaddingObfsMode: true, xPaddingMethod: 'tokenish', xPaddingPlacement: 'queryInHeader', xPaddingHeader: env.UUID.slice(1, 7), xPaddingKey: '_' + env.UUID.slice(25, 31), xmux: { maxConnections: 4, maxConcurrency: 0 } };
+  const uri = new URL(`vless://${env.UUID}@198.51.100.1:443`);
+  for (const [key, value] of Object.entries({ security: 'tls', type: 'xhttp', mode: 'stream-one', host: env.HOST, sni: env.HOST, alpn: 'h2', path: '/proxyip=192.0.2.55:443', extra: JSON.stringify(extra) })) uri.searchParams.set(key, value);
+  uri.hash = 'US-XHTTP';
+  await env.KV.put('ADD.txt', uri.href);
+  const result = await subscription(env);
+  const node = result.proxies[0];
+  assert.equal(node.network, 'xhttp');
+  assert.equal(node.server, '198.51.100.1');
+  assert.equal(node['xhttp-opts'].path, '/proxyip=192.0.2.55:443');
+  assert.equal(node['xhttp-opts']['x-padding-key'], extra.xPaddingKey);
+  assert.equal(node['xhttp-opts']['reuse-settings']['max-connections'], '4');
+  assert.equal(node['ech-opts'].enable, true);
+});
+
 test('the usage wrapper adds only an information group to the authenticated generated subscription', async t => {
   setup(t);
   const env = environment('edge.example', '00000000-0000-4000-8000-000000000001');

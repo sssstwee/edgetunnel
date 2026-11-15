@@ -155,6 +155,20 @@ test('XHTTP without xmux does not force reuse-settings', async () => {
   assert.equal(Object.hasOwn(config.proxies[0]['xhttp-opts'], 'reuse-settings'), false);
 });
 
+test('base64 XHTTP subscriptions work with Workers globals and no Node Buffer', async () => {
+  const encoded = btoa(xhttpUri({ remark: '美国 XHTTP', extra: workerExtra() }));
+  const saved = globalThis.Buffer;
+  try {
+    globalThis.Buffer = undefined;
+    const config = parse(await convertSubscription(encoded, 'clash', { SUBLIST: true }, kv()));
+    assert.equal(config.proxies[0].network, 'xhttp');
+    assert.equal(config.proxies[0]['xhttp-opts']['x-padding-key'], 'fixture_padding_key');
+    assert.equal(config.proxies[0].name, '美国 XHTTP');
+  } finally {
+    globalThis.Buffer = saved;
+  }
+});
+
 test('invalid XHTTP extra fails without credential details', async () => {
   const secret = 'fixture-secret-should-not-leak';
   const uri = xhttpUri({ extra: `{not-json:${secret}` });

@@ -21,6 +21,8 @@ Clash / Mihomo 完整订阅的分组、图标、AI 分流和 DNS 统一维护在
 
 `routing.mjs` 仅保留节点域名解析的启动保护，并读取自有仓库镜像的 OpenAI 语音网段更新模板内联快照（超时 5 秒、最大 256KiB、边缘缓存 1 小时）。读取失败保留模板快照；仅节点订阅不注入任何配置。Voyra 定时同步同一模板并保留 VPS 原生 AI 出口。规则和 DNS 的维护说明、验证及回退方式均见托管模板目录。
 
+已合并上游 2026-11-10 的 XHTTP 连接复用配置。私有转换服务将 VLESS URI 的 `mode`、`extra` 与 `xmux` 转为 Mihomo `xhttp-opts` / `reuse-settings`，保留 TLS、ECH 和托管分流。切换时须同时更新后台传输协议、复用设置与 `ADD.txt` 中显式 URI 的传输参数；完整 Mihomo 配置使用 `h2`、`stream-one`，原始 VLESS 订阅保留原生 XHTTP 参数。转换器无法表示的其他目标格式会明确失败。主 Worker 继续接受已有 WS/gRPC 节点，回滚使用切换前的配置、节点名单和 Worker 版本。
+
 后台订阅转换后端填写当前 Worker 自身的 HTTPS 域名时，使用内置转换；新建配置默认如此，不向外部转换服务发送节点。`SUBCONFIG` 继续填写原自有 `acl4ssr.ini`。模板每 300 秒检查更新，以转换服务的专用 KV 保存最后可用版本；上游不可用时使用旧模板。仅节点输出可独立于托管模板工作，原有 TLS/ECH 补丁继续执行。显式配置其他转换后端时仍可使用旧转换路径，便于回退。
 
 CF 主订阅已不依赖 Voyra VPS 的 Caddy / subconverter / policy-server。现有 CF 节点继续使用原回源 IP，停用 Voyra 不会自动移除这些节点。Voyra 自身的 Xray / AnyTLS / HY2 / WARP 节点和旧订阅入口仍独立依赖 VPS，保留原样至用户决定停用。完整依赖清单与验证方式见 [VPS 依赖说明](VPS-DEPENDENCIES.md)。
