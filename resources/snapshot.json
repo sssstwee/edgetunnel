@@ -31,10 +31,10 @@
       "path": "rules/google.yaml",
       "kind": "rule",
       "behavior": "domain",
-      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/34b1f4f02b447b8ab5826f91d57d3acd1363d65b/google.txt",
-      "sourceCommit": "34b1f4f02b447b8ab5826f91d57d3acd1363d65b",
-      "sha256": "21a04f287800943b3fdfdef1f843173086171d9a0b5c9c33c3f73e1ec77d4c9e",
-      "bytes": 3368
+      "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/f181fff77f5f243f69bfc12b45e0fa10bed899fc/geo/geosite/google.yaml",
+      "sourceCommit": "f181fff77f5f243f69bfc12b45e0fa10bed899fc",
+      "sha256": "af1c3d4efca189eb489ecae848f90beee4c3305cfe02cc5256b5389c33c8d358",
+      "bytes": 24953
     },
     {
       "path": "rules/proxy.yaml",
@@ -305,6 +305,33 @@
       "url": "https://openai.com/chatgpt-voice.json",
       "sha256": "d2923918cc4cd6bf382f379b1601af871fbff66d8fefb81d4457f2ccba1ec959",
       "bytes": 14530
+    },
+    {
+      "path": "rules/gemini.yaml",
+      "kind": "rule",
+      "behavior": "domain",
+      "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/f181fff77f5f243f69bfc12b45e0fa10bed899fc/geo/geosite/google-gemini.yaml",
+      "sourceCommit": "f181fff77f5f243f69bfc12b45e0fa10bed899fc",
+      "sha256": "40c485dad07a502b12ced8878e66ed966e411ccd79ff4432f40e4c0f1b0a4476",
+      "bytes": 1541
+    },
+    {
+      "path": "rules/twitter.yaml",
+      "kind": "rule",
+      "behavior": "domain",
+      "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/f181fff77f5f243f69bfc12b45e0fa10bed899fc/geo/geosite/twitter.yaml",
+      "sourceCommit": "f181fff77f5f243f69bfc12b45e0fa10bed899fc",
+      "sha256": "e21969caac51ecd0534345a8b19166d7a0c31cd595a8eef167e1d82f5ed1d414",
+      "bytes": 523
+    },
+    {
+      "path": "rules/bing.yaml",
+      "kind": "rule",
+      "behavior": "domain",
+      "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/f181fff77f5f243f69bfc12b45e0fa10bed899fc/geo/geosite/bing.yaml",
+      "sourceCommit": "f181fff77f5f243f69bfc12b45e0fa10bed899fc",
+      "sha256": "6b001003152c6ce33b2fe80667eb7ff1adc48549fb6a9678b583308567017715",
+      "bytes": 1045
     }
   ],
   "geodata": {
