@@ -1,5 +1,6 @@
 import { generate, parseExternalConfig, parseSubscription } from '@subconverter/core';
 import { parse, stringify } from 'yaml';
+import { applyXhttpToClashProxies, assertClashCompatibleXhttp, attachXhttpOverlays } from './xhttp.mjs';
 
 const MAX_BYTES = 262144;
 const CACHE_SECONDS = 300;
@@ -72,9 +73,10 @@ export function renderPolicy(proxies, template) {
 }
 
 export async function convertSubscription(raw, target, conversion, kv, skipCertVerify = false) {
-  const nodes = parseSubscription(raw);
+  const nodes = attachXhttpOverlays(parseSubscription(raw), raw);
   if (!nodes.length) throw new Error('Subscription contains no supported nodes');
   const format = target.split('&')[0];
+  assertClashCompatibleXhttp(nodes, format);
   const settings = {
     nodeList: Boolean(conversion.SUBLIST),
     addEmoji: Boolean(conversion.SUBEMOJI),
@@ -90,6 +92,7 @@ export async function convertSubscription(raw, target, conversion, kv, skipCertV
   if (format !== 'clash') return generate(nodes, { target: format, settings, surgeVersion: Number(new URLSearchParams(target.split('&').slice(1).join('&')).get('ver')) || 5, includeRules: !conversion.SUBLIST });
   const output = parse(generate(nodes, { target: format, settings: { ...settings, nodeList: true }, includeRules: false }));
   if (!output.proxies?.length) throw new Error('Clash output contains no supported nodes');
+  applyXhttpToClashProxies(output.proxies, nodes);
   if (conversion.SUBLIST) return stringify({ proxies: output.proxies }, { lineWidth: 0 });
   return stringify(renderPolicy(output.proxies, await hostedPolicy(conversion.SUBCONFIG, kv)), { lineWidth: 0 });
 }
