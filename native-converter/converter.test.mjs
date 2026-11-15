@@ -155,6 +155,13 @@ test('XHTTP without xmux does not force reuse-settings', async () => {
   assert.equal(Object.hasOwn(config.proxies[0]['xhttp-opts'], 'reuse-settings'), false);
 });
 
+test('XHTTP IPv6 endpoints match URI metadata without bracket differences', async () => {
+  const config = parse(await convertSubscription(xhttpUri({ server: '[2001:db8::1]', extra: workerExtra() }), 'clash', { SUBLIST: true }, kv()));
+  assert.equal(config.proxies[0].server, '2001:db8::1');
+  assert.equal(config.proxies[0].network, 'xhttp');
+  assert.equal(config.proxies[0]['xhttp-opts']['x-padding-key'], 'fixture_padding_key');
+});
+
 test('base64 XHTTP subscriptions work with Workers globals and no Node Buffer', async () => {
   const encoded = btoa(xhttpUri({ remark: '美国 XHTTP', extra: workerExtra() }));
   const saved = globalThis.Buffer;

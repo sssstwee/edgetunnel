@@ -24,7 +24,7 @@ function splitSubscriptionLinks(text) {
 }
 
 function identityKey({ uuid, server, port, path, host, remark }) {
-  return [uuid, server, String(port), path || '/', host || '', remark || ''].join('\0');
+  return [uuid, server.replace(/^\[|\]$/g, ''), String(port), path || '/', host || '', remark || ''].join('\0');
 }
 
 function nodeIdentity(node) {
