@@ -2,6 +2,8 @@
 
 此目录是独立部署的 GPL-3.0 组件，复用 [jinganix/subconverter](https://github.com/jinganix/subconverter) 的 `@subconverter/core` 0.4.0。原 EdgeTunnel 的许可证保持原值，部署产物通过标准 HTTP 请求 / 响应在私有 Service Binding 间通信，转换引擎不打包到 EdgeTunnel 代理 Worker 中。
 
+普通节点字段仍由 `@subconverter/core` 生成；VLESS `type=xhttp` 的 URI `extra`（含 padding / xmux）由本目录最小适配层补齐为 Mihomo `network: xhttp` + `xhttp-opts`（`xmux` → `reuse-settings`）。非 Clash/Mihomo 目标在无法安全表示 XHTTP 时直接拒绝，不会降级成伪 TCP。ECH 等 TLS 热补丁仍由主 Worker 处理。
+
 服务只接收 `/convert` 的 POST：`{ raw, target, conversion, skipCertVerify }`。没有公网路由和 workers.dev 地址，也不接收需要代抓取的私人订阅 URL；鉴权及节点生成由 EdgeTunnel 原入口执行。模板与公开资源由自有 GitHub 获取，最后有效模板存放于专用 `POLICY_CACHE` KV，300 秒检查更新。
 
 ```sh
