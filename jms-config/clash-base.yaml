@@ -1,4 +1,4 @@
-# Domestic domains and LAN are DIRECT. Overseas AI shares one US-only fallback.
+# Domestic domains, mainland China addresses without a domain and LAN are DIRECT. Overseas AI shares one US-only fallback.
 mixed-port: 7897
 allow-lan: false
 mode: rule
@@ -644,6 +644,14 @@ rule-providers:
     path: ./ruleset/jms/private.yaml
     interval: 86400
     proxy: 默认代理
+  jms-cncidr:
+    type: http
+    behavior: ipcidr
+    format: yaml
+    url: https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/cncidr.txt
+    path: ./ruleset/jms/cncidr.yaml
+    interval: 86400
+    proxy: 默认代理
   jms-lancidr:
     type: http
     behavior: ipcidr
@@ -804,6 +812,8 @@ rule-providers:
     - +.stripecdn.com
     - +.intercom.io
     - +.intercomcdn.com
+    - +.intercomassets.com
+    - +.intercom.help
     - +.segment.io
     - cdn.segment.com
     - cdn.usefathom.com
@@ -821,6 +831,10 @@ rule-providers:
     - formulae.brew.sh
     - bun.sh
     - +.googlesource.com
+    # Documentation site assets (code.claude.com is hosted on Mintlify)
+    - +.mintcdn.com
+    - mintlify.b-cdn.net
+    - +.mintlify.site
     # Artifact fonts and libraries
     - fonts.googleapis.com
     - fonts.gstatic.com
@@ -844,6 +858,8 @@ rule-providers:
     - claude.googleapis.com
     - aiplatform.googleapis.com
     - us-east5-aiplatform.googleapis.com
+    - aiplatform.us.rep.googleapis.com
+    - aiplatform.eu.rep.googleapis.com
     - +.services.ai.azure.com
     # MCP connectors Claude ships with
     - mcp.asana.com
@@ -1717,11 +1733,13 @@ rules:
 - RULE-SET,jms-artifact-resources,REJECT
 # Keep the proxy list's precedence for domains present in both lists.
 - AND,((RULE-SET,jms-direct),(NOT,((RULE-SET,jms-proxy)))),DIRECT
-- PROCESS-NAME-REGEX,(?i)^(claude|codex|chatgpt|claude code|gemini|muse|musecode|muse-code|muse code|antigravity|cursor|windsurf|trae|magpie|magpie-bun|codex-code-mode-host)( helper.*| \(.*\))?$,AI 美国
-- PROCESS-NAME-REGEX,(?i)^(claude|codex|chatgpt|claude code|gemini|muse|musecode|muse-code|muse code|antigravity|cursor|windsurf|trae|magpie|magpie-bun|codex-code-mode-host)( helper.*| \(.*\))?$,REJECT
+- PROCESS-NAME-REGEX,(?i)^(claude|codex|chatgpt|claude code|gemini|muse|musecode|muse-code|muse code|antigravity|cursor|windsurf|trae|magpie|magpie-bun|codex-code-mode-host|com\.apple\.virtualization\.virtualmachine)( helper.*| \(.*\))?$,AI 美国
+- PROCESS-NAME-REGEX,(?i)^(claude|codex|chatgpt|claude code|gemini|muse|musecode|muse-code|muse code|antigravity|cursor|windsurf|trae|magpie|magpie-bun|codex-code-mode-host|com\.apple\.virtualization\.virtualmachine)( helper.*| \(.*\))?$,REJECT
 - PROCESS-PATH-REGEX,(?i)(/Applications/(ChatGPT|Codex|Claude|Cursor|Antigravity|Windsurf|Trae|Magpie|Muse)\.app/|/\.local/share/claude/versions/|/Library/Application Support/Claude/claude-code/|/extensions/anthropic\.claude-code-|/Caskroom/claude-code/|/\.cache/magpie/bun/),AI 美国
 - PROCESS-PATH-REGEX,(?i)(/Applications/(ChatGPT|Codex|Claude|Cursor|Antigravity|Windsurf|Trae|Magpie|Muse)\.app/|/\.local/share/claude/versions/|/Library/Application Support/Claude/claude-code/|/extensions/anthropic\.claude-code-|/Caskroom/claude-code/|/\.cache/magpie/bun/),REJECT
 - RULE-SET,jms-proxy,默认代理
 - RULE-SET,jms-proxy,REJECT
+# Pure-IP connections to mainland China addresses. Fake-ip domain traffic carries no IP and never matches.
+- RULE-SET,jms-cncidr,DIRECT,no-resolve
 - MATCH,默认代理
 - MATCH,REJECT

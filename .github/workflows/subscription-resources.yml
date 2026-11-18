@@ -29,10 +29,6 @@ jobs:
         run: node resources/sync.mjs
         env:
           GH_TOKEN: ${{ github.token }}
-      - name: Verify and publish complete Geo data release
-        run: node resources/sync.mjs --publish-geodata
-        env:
-          GH_TOKEN: ${{ github.token }}
       - name: Commit public resource snapshots
         run: |
           git config user.name 'github-actions[bot]'
@@ -42,3 +38,8 @@ jobs:
             git commit -m 'chore: refresh subscription resources'
             git push origin HEAD:main
           fi
+      # Rule snapshots are committed first so a Geo release failure cannot freeze routing lists.
+      - name: Verify and publish complete Geo data release
+        run: node resources/sync.mjs --publish-geodata
+        env:
+          GH_TOKEN: ${{ github.token }}
