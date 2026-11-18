@@ -102,15 +102,15 @@ test('only domestic domains and the existing LAN rules can select DIRECT', () =>
   assert.deepEqual(config.rules.filter(r => r.endsWith(',DIRECT') || r.endsWith(',DIRECT,no-resolve')), [
     'RULE-SET,jms-cn-ai-extra,DIRECT', 'RULE-SET,jms-ai-cn,DIRECT',
     'RULE-SET,jms-private,DIRECT', 'RULE-SET,jms-lancidr,DIRECT,no-resolve',
-    'RULE-SET,jms-cn-domains,DIRECT',
+    'RULE-SET,jms-direct,DIRECT',
   ]);
   const process = config.rules.findIndex(r => r.startsWith('PROCESS-NAME-REGEX,'));
-  const domestic = config.rules.indexOf('RULE-SET,jms-cn-domains,DIRECT');
+  const domestic = config.rules.indexOf('RULE-SET,jms-direct,DIRECT');
   assert.ok(process > 3 && process < domestic);
   assert.ok(config.rules.indexOf('RULE-SET,jms-ai-shared,AI 美国') < domestic);
-  assert.equal(config['rule-providers']['jms-cn-domains'].behavior, 'domain');
+  assert.equal(config['rule-providers']['jms-direct'].behavior, 'domain');
   assert.equal(config['rule-providers']['jms-lancidr'].behavior, 'ipcidr');
-  assert.ok(config.dns['nameserver-policy']['rule-set:jms-cn-domains'].every(r => r.endsWith('#DIRECT')));
+  assert.ok(config.dns['nameserver-policy']['rule-set:jms-direct'].every(r => r.endsWith('#DIRECT')));
   assert.ok(config.dns.nameserver.every(r => r.endsWith('#默认代理')));
 });
 
@@ -145,7 +145,7 @@ test('every Claude dependency is pinned to US nodes ahead of all broad DIRECT ru
   const route = rules.indexOf('RULE-SET,jms-claude-deps,AI 美国');
   assert.equal(route, rules.indexOf('RULE-SET,jms-claude-bootstrap,REJECT') + 1);
   assert.equal(rules[route + 1], 'RULE-SET,jms-claude-deps,REJECT');
-  for (const direct of ['RULE-SET,jms-ai-cn,DIRECT', 'RULE-SET,jms-private,DIRECT', 'RULE-SET,jms-cn-domains,DIRECT']) assert.ok(route < rules.indexOf(direct));
+  for (const direct of ['RULE-SET,jms-ai-cn,DIRECT', 'RULE-SET,jms-private,DIRECT', 'RULE-SET,jms-direct,DIRECT']) assert.ok(route < rules.indexOf(direct));
   assert.ok(config.dns['nameserver-policy']['rule-set:jms-claude-deps'].every(x => x.endsWith('#AI 美国')));
   const path = rules.find(r => r.startsWith('PROCESS-PATH-REGEX,') && r.endsWith(',AI 美国'));
   const pattern = new RegExp(path.split(',').slice(1, -1).join(',').replace(/^\(\?i\)/, ''), 'i');

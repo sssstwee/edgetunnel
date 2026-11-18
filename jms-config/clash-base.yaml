@@ -509,7 +509,7 @@ dns:
     rule-set:jms-proxy:
     - https://1.1.1.1/dns-query#默认代理
     - https://8.8.8.8/dns-query#默认代理
-    rule-set:jms-cn-domains:
+    rule-set:jms-direct:
     - https://dns.alidns.com/dns-query#DIRECT
     - https://doh.pub/dns-query#DIRECT
   use-hosts: true
@@ -620,12 +620,12 @@ rule-providers:
     path: ./ruleset/jms/ai-cn.yaml
     interval: 86400
     proxy: 默认代理
-  jms-cn-domains:
+  jms-direct:
     type: http
     behavior: domain
-    format: mrs
-    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/cn.mrs
-    path: ./ruleset/jms/cn-domains.mrs
+    format: yaml
+    url: https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/direct.txt
+    path: ./ruleset/jms/direct.yaml
     interval: 86400
     proxy: 默认代理
   jms-proxy:
@@ -1721,6 +1721,6 @@ rules:
 - RULE-SET,jms-artifact-resources,REJECT
 - RULE-SET,jms-proxy,默认代理
 - RULE-SET,jms-proxy,REJECT
-- RULE-SET,jms-cn-domains,DIRECT
+- RULE-SET,jms-direct,DIRECT
 - MATCH,默认代理
 - MATCH,REJECT
