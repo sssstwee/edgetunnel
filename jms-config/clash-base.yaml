@@ -3,7 +3,7 @@ mixed-port: 7897
 allow-lan: false
 mode: rule
 log-level: info
-ipv6: false
+ipv6: true
 tcp-concurrent: true
 unified-delay: true
 find-process-mode: always
@@ -27,6 +27,9 @@ tun:
   stack: mixed
   auto-route: true
   auto-detect-interface: true
+  strict-route: true
+  inet6-address:
+  - fdfe:dcba:9876::1/126
   dns-hijack:
   - any:53
   - tcp://any:53
@@ -44,6 +47,10 @@ dns:
   - localhost
   - '*.msftncsi.com'
   - www.msftconnecttest.com
+  - +.openai.com
+  - +.chatgpt.com
+  - +.oaistatic.com
+  - +.oaiusercontent.com
   default-nameserver:
   - 223.5.5.5
   - 119.29.29.29
