@@ -1,4 +1,4 @@
-# JMS remote routing: domestic AI is DIRECT; overseas AI shares one US-only fallback.
+# Domestic domains and LAN are DIRECT. Overseas AI shares one US-only fallback.
 mixed-port: 7897
 allow-lan: false
 mode: rule
@@ -506,6 +506,12 @@ dns:
     rule-set:jms-meta-bootstrap:
     - https://1.1.1.1/dns-query#AI 美国
     - https://8.8.8.8/dns-query#AI 美国
+    rule-set:jms-proxy:
+    - https://1.1.1.1/dns-query#默认代理
+    - https://8.8.8.8/dns-query#默认代理
+    rule-set:jms-cn-domains:
+    - https://dns.alidns.com/dns-query#DIRECT
+    - https://doh.pub/dns-query#DIRECT
   use-hosts: true
   use-system-hosts: true
 # Display names by JMS server id; exits verified 2026-11-14 via ipinfo.io, ipwho.is and ip-api.com.
@@ -614,12 +620,12 @@ rule-providers:
     path: ./ruleset/jms/ai-cn.yaml
     interval: 86400
     proxy: 默认代理
-  jms-direct:
+  jms-cn-domains:
     type: http
     behavior: domain
-    format: yaml
-    url: https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/direct.txt
-    path: ./ruleset/jms/direct.yaml
+    format: mrs
+    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/cn.mrs
+    path: ./ruleset/jms/cn-domains.mrs
     interval: 86400
     proxy: 默认代理
   jms-proxy:
@@ -1715,6 +1721,6 @@ rules:
 - RULE-SET,jms-artifact-resources,REJECT
 - RULE-SET,jms-proxy,默认代理
 - RULE-SET,jms-proxy,REJECT
-- RULE-SET,jms-direct,DIRECT
+- RULE-SET,jms-cn-domains,DIRECT
 - MATCH,默认代理
 - MATCH,REJECT

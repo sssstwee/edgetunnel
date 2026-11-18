@@ -5002,21 +5002,6 @@ function log(...args) {
 	if (调试日志打印) console.log({ event: 'worker_debug', code: 代理错误类别(args.at(-1)), revision: 传输修订 });
 }
 
-function applyClashApiDirectRules(yaml) {
-  const hosts = ["cc-api.tokenforsell.com", "clash-harmony-api.pages.dev"];
-  const lines = yaml.replace(/\r\n/g, "\n").split("\n");
-  const start = lines.findIndex((line) => /^rules:\s*$/.test(line));
-  if (start < 0) return yaml;
-  let end = start + 1;
-  while (end < lines.length && !/^[^\s#]/.test(lines[end])) end++;
-  const existing = lines.slice(start + 1, end).filter((line) => {
-    const rule = line.trim().replace(/^-\s*/, "").replace(/^["']|["']$/g, "");
-    const parts = rule.split(",").map((part) => part.trim());
-    return !(parts[0] === "DOMAIN" && hosts.includes(parts[1]));
-  });
-  lines.splice(start + 1, end - start - 1, ...hosts.map((host) => `  - DOMAIN,${host},DIRECT`), ...existing);
-  return lines.join("\n");
-}
 async function Clash订阅配置文件热补丁(Clash_原始订阅内容, config_JSON = {}) {
 	const uuid = config_JSON?.UUID || null;
 	const ECH启用 = Boolean(config_JSON?.ECH);
@@ -5171,7 +5156,7 @@ async function Clash订阅配置文件热补丁(Clash_原始订阅内容, config
 		clash_yaml = 插入NameserverPolicy(clash_yaml, hostsEntries);
 	}
 
-	if (!需要处理ECH && !需要处理gRPC) return applyClashApiDirectRules(await applyClashRouting(clash_yaml, HOSTS));
+	if (!需要处理ECH && !需要处理gRPC) return applyClashRouting(clash_yaml, HOSTS);
 
 	const lines = clash_yaml.split('\n');
 	const processedLines = [];
@@ -5231,7 +5216,7 @@ async function Clash订阅配置文件热补丁(Clash_原始订阅内容, config
 		}
 	}
 
-	return applyClashApiDirectRules(await applyClashRouting(processedLines.join('\n'), HOSTS, ECH启用 ? ECH_DNS : null));
+	return applyClashRouting(processedLines.join('\n'), HOSTS, ECH启用 ? ECH_DNS : null);
 }
 
 async function Singbox订阅配置文件热补丁(SingBox_原始订阅内容, config_JSON = {}) {

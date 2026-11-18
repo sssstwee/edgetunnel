@@ -17,7 +17,7 @@ function setup(t) {
   const policy = {
     mode: 'rule', ipv6: false,
     'proxy-groups': [{ name: '默认代理', type: 'url-test', 'include-all-proxies': true, icon: 'https://owned.example/Proxy.png' }],
-    rules: ['MATCH,默认代理'],
+    rules: ['DOMAIN-SUFFIX,example.cn,DIRECT', 'MATCH,默认代理', 'NETWORK,UDP,REJECT'],
     dns: { enable: true, 'proxy-server-nameserver': ['223.5.5.5'] },
   };
   t.mock.method(globalThis, 'fetch', async input => {
@@ -71,6 +71,7 @@ test('authenticated Worker subscription is converted internally and retains its 
   assert.equal(config.proxies[0]['ech-opts'].enable, true);
   assert.deepEqual(config.dns['proxy-server-nameserver-policy']['ech.example'], ['https://dns.example/dns-query']);
   assert.equal(config['proxy-groups'][0].type, 'url-test');
+  assert.deepEqual(config.rules, ['DOMAIN-SUFFIX,example.cn,DIRECT', 'MATCH,默认代理', 'NETWORK,UDP,REJECT']);
 });
 
 test('XHTTP subscription carries upstream padding and reuse through the private converter and ECH patch', async t => {
