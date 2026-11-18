@@ -18,8 +18,8 @@ Worker 使用 JMS 官方 `noss=1` 参数请求上游，排除即将退役的 Sha
 - 未明确分类的外网、普通海外站点使用 `默认代理` / `自动选择`，不限国家。为统一 Gemini 的 API、登录、验证码和国家域资源出口，整个 Google 规则集（包括 Google、YouTube）归入 `AI 美国`。共享 CDN、GitHub/npm 等 AI 客户端依赖也会使用美国出口。Grok 在 X、Copilot 在 Bing 的共用域复用 MetaCubeX twitter/bing 集合，因此普通 X/Bing 访问也走美国。Claude 登录页实测的 hCaptcha 及 Cloudflare / reCAPTCHA / Arkose 验证资源也统一进美国组。
 - Claude/Claude Code、OpenAI/ChatGPT/Codex、Gemini、Meta Muse、Grok、Copilot、DeepL/Lara/Yandex 翻译和其他海外 AI 统一使用美国 `fallback` 组 `AI 美国`。MetaCubeX `category-ai-!cn` 未收录的 character.ai、Replicate、Runway、v0、Bolt、Lovable、Suno、Together、Fireworks、DeepInfra、LMArena、Hailuo 国际版等，以及 Stripe 风控 `stripe.network`、Segment，在 `jms-ai-shared` 中固定为 `AI 美国`。
 - 美国白名单依次为 s3、s2、s801，依据 2026-11-13 复核的 Google 地区接口与独立出口检测。节点编号不保证服务商未来不更换出口，变更后应复核白名单。
-- 显式国内 AI 例外优先；四类关键账号服务的内置域名紧随其后，先于泛化国内 AI 名单，避免被宽泛分类放行。随后处理其他国内 AI、局域网、AI 应用进程名/路径及其余 AI 域名/IP，最后为国内域名和普通代理。启用 HTTP/TLS/QUIC 域名嗅探（不解密 TLS，不改写实际目的地址）。无法取得进程或嗅探域名时，继续按域名/IP/最终规则处理，不能把进程识别当作绝对保证。
-- 未匹配的公网域名及公网 IP 均进入 `默认代理`，包括解析到中国公网 IP 的未知域名。
+- 显式国内 AI 例外优先。已知海外 AI 域名和 IP、局域网及国内域名先于 AI 应用的进程名和路径规则。国内和通用代理清单都收录的域名保持代理。启用 HTTP、TLS 和 QUIC 域名嗅探，保留实际目的地址。
+- 未收录的公网目标在识别出 AI 应用进程时使用 `AI 美国`，其余使用 `默认代理`。解析到中国公网 IP 的未知域名也按这套规则分流。
 - 每条代理规则后跟同条件的 `REJECT`，最终 `MATCH,默认代理` 后也有 `MATCH,REJECT`。节点不支持 UDP 时不会因规则耗尽而直连；节点运行时失效会在代理内失败。
 - 保留的五个 VLESS 节点均已通过独立实例的 UDP DNS 转发测试，显式启用 `udp` 和 `packet-encoding: xudp`。此测试不代表已验证任意网站的 HTTP/3 或账号内语音业务。
 - 国内及节点 DNS 使用国内解析器；海外 AI 的加密 DNS 显式绑定 `AI 美国`，其余国外 DNS 绑定 `默认代理`。使用明确的 DNS 代理后缀，因此 `respect-rules` 保持关闭，避免启动时规则加载与节点 DNS 互相依赖。

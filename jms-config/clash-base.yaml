@@ -1691,10 +1691,6 @@ rules:
 - RULE-SET,jms-ai-cn,DIRECT
 - RULE-SET,jms-private,DIRECT
 - RULE-SET,jms-lancidr,DIRECT,no-resolve
-- PROCESS-NAME-REGEX,(?i)^(claude|codex|chatgpt|claude code|gemini|muse|musecode|muse-code|muse code|antigravity|cursor|windsurf|trae|magpie|magpie-bun|codex-code-mode-host)( helper.*| \(.*\))?$,AI 美国
-- PROCESS-NAME-REGEX,(?i)^(claude|codex|chatgpt|claude code|gemini|muse|musecode|muse-code|muse code|antigravity|cursor|windsurf|trae|magpie|magpie-bun|codex-code-mode-host)( helper.*| \(.*\))?$,REJECT
-- PROCESS-PATH-REGEX,(?i)(/Applications/(ChatGPT|Codex|Claude|Cursor|Antigravity|Windsurf|Trae|Magpie|Muse)\.app/|/\.local/share/claude/versions/|/Library/Application Support/Claude/claude-code/|/extensions/anthropic\.claude-code-|/Caskroom/claude-code/|/\.cache/magpie/bun/),AI 美国
-- PROCESS-PATH-REGEX,(?i)(/Applications/(ChatGPT|Codex|Claude|Cursor|Antigravity|Windsurf|Trae|Magpie|Muse)\.app/|/\.local/share/claude/versions/|/Library/Application Support/Claude/claude-code/|/extensions/anthropic\.claude-code-|/Caskroom/claude-code/|/\.cache/magpie/bun/),REJECT
 - RULE-SET,jms-twitter-shared,AI 美国
 - RULE-SET,jms-twitter-shared,REJECT
 - RULE-SET,jms-bing-shared,AI 美国
@@ -1719,8 +1715,13 @@ rules:
 - RULE-SET,jms-ai-resources,REJECT
 - RULE-SET,jms-artifact-resources,AI 美国
 - RULE-SET,jms-artifact-resources,REJECT
+# Keep the proxy list's precedence for domains present in both lists.
+- AND,((RULE-SET,jms-direct),(NOT,((RULE-SET,jms-proxy)))),DIRECT
+- PROCESS-NAME-REGEX,(?i)^(claude|codex|chatgpt|claude code|gemini|muse|musecode|muse-code|muse code|antigravity|cursor|windsurf|trae|magpie|magpie-bun|codex-code-mode-host)( helper.*| \(.*\))?$,AI 美国
+- PROCESS-NAME-REGEX,(?i)^(claude|codex|chatgpt|claude code|gemini|muse|musecode|muse-code|muse code|antigravity|cursor|windsurf|trae|magpie|magpie-bun|codex-code-mode-host)( helper.*| \(.*\))?$,REJECT
+- PROCESS-PATH-REGEX,(?i)(/Applications/(ChatGPT|Codex|Claude|Cursor|Antigravity|Windsurf|Trae|Magpie|Muse)\.app/|/\.local/share/claude/versions/|/Library/Application Support/Claude/claude-code/|/extensions/anthropic\.claude-code-|/Caskroom/claude-code/|/\.cache/magpie/bun/),AI 美国
+- PROCESS-PATH-REGEX,(?i)(/Applications/(ChatGPT|Codex|Claude|Cursor|Antigravity|Windsurf|Trae|Magpie|Muse)\.app/|/\.local/share/claude/versions/|/Library/Application Support/Claude/claude-code/|/extensions/anthropic\.claude-code-|/Caskroom/claude-code/|/\.cache/magpie/bun/),REJECT
 - RULE-SET,jms-proxy,默认代理
 - RULE-SET,jms-proxy,REJECT
-- RULE-SET,jms-direct,DIRECT
 - MATCH,默认代理
 - MATCH,REJECT

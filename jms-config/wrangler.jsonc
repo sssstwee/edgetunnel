@@ -15,7 +15,7 @@
     ]
   },
   "vars": {
-    "POLICY_URL": "https://raw.githubusercontent.com/sssstwee/edgetunnel/1b961b0d664be90ac5a9900b71f10cb573e2f64e/jms-config/clash-base.yaml?v=domestic-domain-direct-20261118"
+    "POLICY_URL": "https://raw.githubusercontent.com/sssstwee/edgetunnel/1ab80ae5f6ea7c7a513f5fdddc982dfd649f3201/jms-config/clash-base.yaml?v=domestic-before-process-20261118"
   },
   "observability": {
     "enabled": true,
