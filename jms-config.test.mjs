@@ -6,6 +6,7 @@ import worker from './jms-config/worker.mjs';
 import { buildConfig } from './jms-config/policy.mjs';
 
 const policy = () => parse(fs.readFileSync(new URL('./jms-config/clash-base.yaml', import.meta.url), 'utf8'));
+const domesticRoute = 'AND,((RULE-SET,jms-direct),(NOT,((RULE-SET,jms-proxy)))),DIRECT';
 const nodes = () => ({ proxies: ['s1', 's2', 's3', 's4', 's5', 's801'].map(id => ({
   name: `JMS-test@c17${id}.portablesubmarines.com:443`, server: `c17${id}.portablesubmarines.com`,
   type: id === 's1' ? 'ss' : 'vless', port: 443,
@@ -102,11 +103,14 @@ test('only domestic domains and the existing LAN rules can select DIRECT', () =>
   assert.deepEqual(config.rules.filter(r => r.endsWith(',DIRECT') || r.endsWith(',DIRECT,no-resolve')), [
     'RULE-SET,jms-cn-ai-extra,DIRECT', 'RULE-SET,jms-ai-cn,DIRECT',
     'RULE-SET,jms-private,DIRECT', 'RULE-SET,jms-lancidr,DIRECT,no-resolve',
-    'RULE-SET,jms-direct,DIRECT',
+    domesticRoute,
   ]);
-  const process = config.rules.findIndex(r => r.startsWith('PROCESS-NAME-REGEX,'));
-  const domestic = config.rules.indexOf('RULE-SET,jms-direct,DIRECT');
-  assert.ok(process > 3 && process < domestic);
+  const domestic = config.rules.indexOf(domesticRoute);
+  const generalProxy = config.rules.indexOf('RULE-SET,jms-proxy,默认代理');
+  for (const type of ['PROCESS-NAME-REGEX,', 'PROCESS-PATH-REGEX,']) {
+    const process = config.rules.findIndex(r => r.startsWith(type));
+    assert.ok(domestic < process && process < generalProxy);
+  }
   assert.ok(config.rules.indexOf('RULE-SET,jms-ai-shared,AI 美国') < domestic);
   assert.equal(config['rule-providers']['jms-direct'].behavior, 'domain');
   assert.equal(config['rule-providers']['jms-lancidr'].behavior, 'ipcidr');
@@ -145,7 +149,7 @@ test('every Claude dependency is pinned to US nodes ahead of all broad DIRECT ru
   const route = rules.indexOf('RULE-SET,jms-claude-deps,AI 美国');
   assert.equal(route, rules.indexOf('RULE-SET,jms-claude-bootstrap,REJECT') + 1);
   assert.equal(rules[route + 1], 'RULE-SET,jms-claude-deps,REJECT');
-  for (const direct of ['RULE-SET,jms-ai-cn,DIRECT', 'RULE-SET,jms-private,DIRECT', 'RULE-SET,jms-direct,DIRECT']) assert.ok(route < rules.indexOf(direct));
+  for (const direct of ['RULE-SET,jms-ai-cn,DIRECT', 'RULE-SET,jms-private,DIRECT', domesticRoute]) assert.ok(route < rules.indexOf(direct));
   assert.ok(config.dns['nameserver-policy']['rule-set:jms-claude-deps'].every(x => x.endsWith('#AI 美国')));
   const path = rules.find(r => r.startsWith('PROCESS-PATH-REGEX,') && r.endsWith(',AI 美国'));
   const pattern = new RegExp(path.split(',').slice(1, -1).join(',').replace(/^\(\?i\)/, ''), 'i');
