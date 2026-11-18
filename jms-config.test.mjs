@@ -99,12 +99,16 @@ test('only domestic domains and the existing LAN rules can select DIRECT', () =>
   assert.equal(config['find-process-mode'], 'always');
   assert.equal(config.sniffer.enable, true);
   assert.equal(config.sniffer['parse-pure-ip'], true);
-  assert.ok(!config.rules.some(r => /cncidr|GEOIP,CN|MATCH,DIRECT/.test(r)));
+  assert.ok(!config.rules.some(r => /GEOIP,CN|MATCH,DIRECT/.test(r)));
   assert.deepEqual(config.rules.filter(r => r.endsWith(',DIRECT') || r.endsWith(',DIRECT,no-resolve')), [
     'RULE-SET,jms-cn-ai-extra,DIRECT', 'RULE-SET,jms-ai-cn,DIRECT',
     'RULE-SET,jms-private,DIRECT', 'RULE-SET,jms-lancidr,DIRECT,no-resolve',
-    domesticRoute,
+    domesticRoute, 'RULE-SET,jms-cncidr,DIRECT,no-resolve',
   ]);
+  // China addresses only decide pure-IP connections, after every AI, process and proxy-list rule.
+  assert.deepEqual(config.rules.slice(-5), ['RULE-SET,jms-proxy,默认代理', 'RULE-SET,jms-proxy,REJECT',
+    'RULE-SET,jms-cncidr,DIRECT,no-resolve', 'MATCH,默认代理', 'MATCH,REJECT']);
+  assert.equal(config['rule-providers']['jms-cncidr'].behavior, 'ipcidr');
   const domestic = config.rules.indexOf(domesticRoute);
   const generalProxy = config.rules.indexOf('RULE-SET,jms-proxy,默认代理');
   for (const type of ['PROCESS-NAME-REGEX,', 'PROCESS-PATH-REGEX,']) {
@@ -159,6 +163,13 @@ test('every Claude dependency is pinned to US nodes ahead of all broad DIRECT ru
     '/opt/homebrew/Caskroom/claude-code/2.1.325/claude', '/Users/u/.local/share/claude/versions/2.1.325',
     '/Applications/Claude.app/Contents/Frameworks/Claude Helper.app/Contents/MacOS/Claude Helper',
   ]) assert.ok(pattern.test(binary), binary);
+  const name = rules.find(r => r.startsWith('PROCESS-NAME-REGEX,') && r.endsWith(',AI 美国'));
+  const names = new RegExp(name.split(',').slice(1, -1).join(',').replace(/^\(\?i\)/, ''), 'i');
+  for (const process of ['claude', 'Claude Helper (Renderer)', 'com.apple.Virtualization.VirtualMachine']) assert.ok(names.test(process), process);
+  assert.ok(!names.test('node'));
+  for (const host of ['+.intercomassets.com', '+.intercom.help', '+.mintcdn.com', 'mintlify.b-cdn.net', '+.mintlify.site']) {
+    assert.ok(deps.includes(host), `${host} is not pinned for Claude`);
+  }
 });
 
 test('overseas AI products missing from the upstream AI list still use US nodes', () => {

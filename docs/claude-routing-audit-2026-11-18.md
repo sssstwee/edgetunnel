@@ -22,7 +22,17 @@
 
 落入 `默认代理`（仍代理，JMS 下可能是日本或荷兰出口）的 Claude 相关主机：`static.intercomassets.com`、`intercom.help`（帮助中心）、`mintcdn.com`、`mintlify.b-cdn.net`、`claude-code.mintlify.site`（文档站资源）、`app.corridor.dev`，以及 VS Code / JetBrains / Open VSX 扩展市场。
 
-## 优化方案
+## 实施（同日）
+
+只改订阅，不改客户端（电脑 Clash Verge、手机野猫代理，均为 Mihomo 内核）。
+
+- EdgeTunnel 模板（`xiaomao-ai-proxy` 分支 `claude/claude-deps-routing-20261118`，`acl4ssr.ini` 固定到 65494dd）：新增 `claude-deps` → `Claude 专用`（路由与 DNS），新增 `cncidr` 纯 IP 直连，新增 sniffer。WorkOS、Google / Microsoft 账号主机和 OpenAI 自己的 Sentry 项目不放入该集合，以免改变 ChatGPT、Gemini、Copilot 的登录出口。
+- JMS 模板：`jms-claude-deps` 补充 Intercom 资源与帮助中心、Mintlify 文档资源、Vertex 区域端点；新增 `jms-cncidr` 纯 IP 直连；进程兜底加入 Cowork 虚拟机进程。
+- 资源同步：创建草稿 Release 后直接使用 API 的返回值（原先立即查询列表时看不到新草稿，导致 11-07 起失败）；规则快照先于 Geo 发布提交，Geo 发布失败不再冻结规则。
+- 复测（同一匹配脚本）：Claude 相关主机 DIRECT 仍为 0；EdgeTunnel 的 Claude 遥测和登录依赖全部改为 `Claude 专用`；国内与国际样本结果不变；中国大陆纯 IP 改为 DIRECT。
+- EdgeTunnel 没有进程规则，Claude 进程以纯 IP 连接中国大陆地址时也会直连。Anthropic 没有部署在中国大陆的端点，这类连接不是 Claude 服务请求。
+
+## 优化方案（原始建议）
 
 ### P1 EdgeTunnel：Claude 依赖固定到 `Claude 专用`（托管模板仓库）
 

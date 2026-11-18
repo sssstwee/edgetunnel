@@ -19,7 +19,8 @@ Worker 使用 JMS 官方 `noss=1` 参数请求上游，排除即将退役的 Sha
 - Claude/Claude Code、OpenAI/ChatGPT/Codex、Gemini、Meta Muse、Grok、Copilot、DeepL/Lara/Yandex 翻译和其他海外 AI 统一使用美国 `fallback` 组 `AI 美国`。MetaCubeX `category-ai-!cn` 未收录的 character.ai、Replicate、Runway、v0、Bolt、Lovable、Suno、Together、Fireworks、DeepInfra、LMArena、Hailuo 国际版等，以及 Stripe 风控 `stripe.network`、Segment，在 `jms-ai-shared` 中固定为 `AI 美国`。
 - 美国白名单依次为 s3、s2、s801，依据 2026-11-13 复核的 Google 地区接口与独立出口检测。节点编号不保证服务商未来不更换出口，变更后应复核白名单。
 - 显式国内 AI 例外优先。已知海外 AI 域名和 IP、局域网及国内域名先于 AI 应用的进程名和路径规则。国内和通用代理清单都收录的域名保持代理。启用 HTTP、TLS 和 QUIC 域名嗅探，保留实际目的地址。
-- 未收录的公网目标在识别出 AI 应用进程时使用 `AI 美国`，其余使用 `默认代理`。解析到中国公网 IP 的未知域名也按这套规则分流。
+- 未收录的公网目标在识别出 AI 应用进程时使用 `AI 美国`，其余使用 `默认代理`。域名流量不在本地解析，未知域名即使解析到中国公网 IP 也按这套规则分流。
+- 没有域名、也未嗅探出可识别域名的纯 IP 连接，目标属于中国大陆网段（Loyalsoldier `cncidr`，`no-resolve`）时直连。该规则位于全部 AI、进程和通用代理规则之后，仅次于 `MATCH`。
 - 每条代理规则后跟同条件的 `REJECT`，最终 `MATCH,默认代理` 后也有 `MATCH,REJECT`。节点不支持 UDP 时不会因规则耗尽而直连；节点运行时失效会在代理内失败。
 - 保留的五个 VLESS 节点均已通过独立实例的 UDP DNS 转发测试，显式启用 `udp` 和 `packet-encoding: xudp`。此测试不代表已验证任意网站的 HTTP/3 或账号内语音业务。
 - 国内及节点 DNS 使用国内解析器；海外 AI 的加密 DNS 显式绑定 `AI 美国`，其余国外 DNS 绑定 `默认代理`。使用明确的 DNS 代理后缀，因此 `respect-rules` 保持关闭，避免启动时规则加载与节点 DNS 互相依赖。
@@ -41,9 +42,9 @@ Muse 的 `muse.ai` 除自动更新的 AI 清单外，还固定在内置 Meta 优
 覆盖 claude.ai 网页、Claude Desktop（含 Cowork、Artifact、MCP Apps、Claude in Chrome 桥接与自动更新）、Claude Code（原生安装、npm/bun、Homebrew、VS Code 扩展、Desktop 内置副本）、Console、Bedrock / Vertex / Foundry / Claude Platform on AWS 与官方 MCP 连接器。清单来自[官方网络要求](https://code.claude.com/docs/en/network-config)、[Desktop 网络要求](https://code.claude.com/docs/en/desktop)、[Anthropic IP 段](https://platform.claude.com/docs/en/api/ip-addresses)、CLI 与 Desktop 安装包内的主机字符串、claude.ai 页面实际请求和本机内核的实时连接。
 
 - 一方域名（`anthropic.com`、`claude.ai`、`claude.com`、`claude.app`、`claudeusercontent.com`、`claudemcpcontent.com`、`clau.de` 等及其全部子域）在 `jms-claude-bootstrap`，仅次于少量国内 AI 例外，先于任何其他直连规则。
-- 第三方依赖在 `jms-claude-deps`，紧跟其后：Datadog / GrowthBook / Sentry / Statsig 遥测与特性开关，hCaptcha / Turnstile / reCAPTCHA / Google 登录，Stripe / Intercom / Segment，安装更新与插件所需的 `storage.googleapis.com`、npm、GitHub、Homebrew、googlesource，Artifact 字体与脚本库，Chrome 扩展更新，Bedrock / Vertex / Foundry / `*.api.aws`，以及 Claude 内置的 MCP 连接器主机。
+- 第三方依赖在 `jms-claude-deps`，紧跟其后：Datadog / GrowthBook / Sentry / Statsig 遥测与特性开关，hCaptcha / Turnstile / reCAPTCHA / Google 登录，Stripe / Intercom（含帮助中心与静态资源域）/ Segment，code.claude.com 文档站的 Mintlify 资源，安装更新与插件所需的 `storage.googleapis.com`、npm、GitHub、Homebrew、googlesource，Artifact 字体与脚本库，Chrome 扩展更新，Bedrock / Vertex / Foundry / `*.api.aws`，以及 Claude 内置的 MCP 连接器主机。
 - Anthropic IP 段 `160.79.104.0/23`、`153.61.224.0/22`、`2607:6bc0::/48` 同样进入 `AI 美国`。
-- 进程兜底：进程名 `claude`、`Claude`、`Claude Helper*`；路径 `/Applications/Claude.app/`、`~/.local/share/claude/versions/`、`~/Library/Application Support/Claude/claude-code/`、编辑器扩展 `anthropic.claude-code-*`、Homebrew `Caskroom/claude-code/`。npm 安装的 Claude Code 以 `node` 进程运行，只能依靠上述域名规则。
+- 进程兜底：进程名 `claude`、`Claude`、`Claude Helper*`；路径 `/Applications/Claude.app/`、`~/.local/share/claude/versions/`、`~/Library/Application Support/Claude/claude-code/`、编辑器扩展 `anthropic.claude-code-*`、Homebrew `Caskroom/claude-code/`；Cowork 虚拟机进程 `com.apple.Virtualization.VirtualMachine`（也会匹配其他使用 Apple 虚拟化框架的虚拟机）。npm 安装的 Claude Code 以 `node` 进程运行，只能依靠上述域名规则。
 - 以上每组都有同条件 `REJECT` 兜底，DNS 也经 `AI 美国` 解析。
 - 模板启用 IPv6 TUN。实际接管范围取决于客户端的 TUN 设置。
 
