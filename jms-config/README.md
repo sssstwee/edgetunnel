@@ -14,12 +14,12 @@ Worker 使用 JMS 官方 `noss=1` 参数请求上游，排除即将退役的 Sha
 
 ## 分流
 
-- 国内 AI（包括 Kimi/Moonshot 的海外域名）优先直连，其他国内域名及局域网直连。
+- 已配置的国内 AI、MetaCubeX `cn` 国内域名、局域网域名和原有私有网段保持直连。
 - 未明确分类的外网、普通海外站点使用 `默认代理` / `自动选择`，不限国家。为统一 Gemini 的 API、登录、验证码和国家域资源出口，整个 Google 规则集（包括 Google、YouTube）归入 `AI 美国`。共享 CDN、GitHub/npm 等 AI 客户端依赖也会使用美国出口。Grok 在 X、Copilot 在 Bing 的共用域复用 MetaCubeX twitter/bing 集合，因此普通 X/Bing 访问也走美国。Claude 登录页实测的 hCaptcha 及 Cloudflare / reCAPTCHA / Arkose 验证资源也统一进美国组。
 - Claude/Claude Code、OpenAI/ChatGPT/Codex、Gemini、Meta Muse、Grok、Copilot、DeepL/Lara/Yandex 翻译和其他海外 AI 统一使用美国 `fallback` 组 `AI 美国`。MetaCubeX `category-ai-!cn` 未收录的 character.ai、Replicate、Runway、v0、Bolt、Lovable、Suno、Together、Fireworks、DeepInfra、LMArena、Hailuo 国际版等，以及 Stripe 风控 `stripe.network`、Segment，在 `jms-ai-shared` 中固定为 `AI 美国`。
 - 美国白名单依次为 s3、s2、s801，依据 2026-11-13 复核的 Google 地区接口与独立出口检测。节点编号不保证服务商未来不更换出口，变更后应复核白名单。
 - 显式国内 AI 例外优先；四类关键账号服务的内置域名紧随其后，先于泛化国内 AI 名单，避免被宽泛分类放行。随后处理其他国内 AI、局域网、AI 应用进程名/路径及其余 AI 域名/IP，最后为国内域名和普通代理。启用 HTTP/TLS/QUIC 域名嗅探（不解密 TLS，不改写实际目的地址）。无法取得进程或嗅探域名时，继续按域名/IP/最终规则处理，不能把进程识别当作绝对保证。
-- 移除仅按中国公网 IP 判定 `DIRECT` 的规则。未识别的公网 IP 走普通代理；已知国内域名、国内 AI 与局域网仍直连。这会让只使用公网 IP 的部分国内应用走代理。
+- 未匹配的公网域名及公网 IP 均进入 `默认代理`，包括解析到中国公网 IP 的未知域名。
 - 每条代理规则后跟同条件的 `REJECT`，最终 `MATCH,默认代理` 后也有 `MATCH,REJECT`。节点不支持 UDP 时不会因规则耗尽而直连；节点运行时失效会在代理内失败。
 - 保留的五个 VLESS 节点均已通过独立实例的 UDP DNS 转发测试，显式启用 `udp` 和 `packet-encoding: xudp`。此测试不代表已验证任意网站的 HTTP/3 或账号内语音业务。
 - 国内及节点 DNS 使用国内解析器；海外 AI 的加密 DNS 显式绑定 `AI 美国`，其余国外 DNS 绑定 `默认代理`。使用明确的 DNS 代理后缀，因此 `respect-rules` 保持关闭，避免启动时规则加载与节点 DNS 互相依赖。
@@ -42,10 +42,10 @@ Muse 的 `muse.ai` 除自动更新的 AI 清单外，还固定在内置 Meta 优
 
 - 一方域名（`anthropic.com`、`claude.ai`、`claude.com`、`claude.app`、`claudeusercontent.com`、`claudemcpcontent.com`、`clau.de` 等及其全部子域）在 `jms-claude-bootstrap`，仅次于少量国内 AI 例外，先于任何其他直连规则。
 - 第三方依赖在 `jms-claude-deps`，紧跟其后：Datadog / GrowthBook / Sentry / Statsig 遥测与特性开关，hCaptcha / Turnstile / reCAPTCHA / Google 登录，Stripe / Intercom / Segment，安装更新与插件所需的 `storage.googleapis.com`、npm、GitHub、Homebrew、googlesource，Artifact 字体与脚本库，Chrome 扩展更新，Bedrock / Vertex / Foundry / `*.api.aws`，以及 Claude 内置的 MCP 连接器主机。
-- IP 直连：`160.79.104.0/23`、`153.61.224.0/22`、`2607:6bc0::/48`。
+- Anthropic IP 段 `160.79.104.0/23`、`153.61.224.0/22`、`2607:6bc0::/48` 同样进入 `AI 美国`。
 - 进程兜底：进程名 `claude`、`Claude`、`Claude Helper*`；路径 `/Applications/Claude.app/`、`~/.local/share/claude/versions/`、`~/Library/Application Support/Claude/claude-code/`、编辑器扩展 `anthropic.claude-code-*`、Homebrew `Caskroom/claude-code/`。npm 安装的 Claude Code 以 `node` 进程运行，只能依靠上述域名规则。
 - 以上每组都有同条件 `REJECT` 兜底，DNS 也经 `AI 美国` 解析。
-- 剩余限制：TUN 只接管 IPv4。所在网络提供 IPv6 时，自行取得 AAAA 记录的应用（如开启“安全 DNS”的浏览器）可能绕过代理直连；在这类网络上，请在 Clash Verge 中启用 IPv6 接管，或关闭该网卡的 IPv6。
+- 模板启用 IPv6 TUN。实际接管范围取决于客户端的 TUN 设置。
 
 ## 覆盖边界
 
