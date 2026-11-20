@@ -346,3 +346,12 @@ test('remote rule sets use the mirrored binary format and the AI pool probes an 
   assert.equal(ai.url, 'https://api.anthropic.com/v1/models');
   assert.equal(String(ai['expected-status']), '401/405');
 });
+
+test('sniffed domains replace poisoned destinations and stale fake-ips fail fast', () => {
+  const config = buildConfig(nodes(), policy());
+  assert.equal(config.sniffer['override-destination'], true);
+  assert.ok(config.sniffer['skip-domain'].includes('+.push.apple.com'));
+  assert.equal(config.dns['fake-ip-range'], '198.18.0.1/16');
+  assert.equal(config.rules[0], 'IP-CIDR,198.18.0.0/16,REJECT,no-resolve');
+  assert.ok(config.rules.indexOf('RULE-SET,jms-lancidr,DIRECT,no-resolve') > 0);
+});
