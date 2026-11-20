@@ -171,6 +171,11 @@
           "kind": "png"
         },
         {
+          "source": "IconSet/Color/Google.png",
+          "path": "icons/Gemini.png",
+          "kind": "png"
+        },
+        {
           "source": "IconSet/Color/Round_Robin.png",
           "path": "icons/Round_Robin.png",
           "kind": "png"

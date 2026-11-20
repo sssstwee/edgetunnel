@@ -196,6 +196,14 @@
       "bytes": 20153
     },
     {
+      "path": "icons/Gemini.png",
+      "kind": "png",
+      "url": "https://raw.githubusercontent.com/zuluion/Qure/0d484e5fb24f1c1bb52372bfb057d3a001aaa648/IconSet/Color/Google.png",
+      "sourceCommit": "0d484e5fb24f1c1bb52372bfb057d3a001aaa648",
+      "sha256": "c815cd27d60bff0af3e65704e837dcacb9f6d46be42a2ac1a5b70c3e2e41c15c",
+      "bytes": 6646
+    },
+    {
       "path": "icons/Round_Robin.png",
       "kind": "png",
       "url": "https://raw.githubusercontent.com/zuluion/Qure/0d484e5fb24f1c1bb52372bfb057d3a001aaa648/IconSet/Color/Round_Robin.png",
