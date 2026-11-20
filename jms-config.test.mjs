@@ -329,3 +329,20 @@ test('remote policy failure never serves raw nodes without the existing AI routi
   assert.equal(response.status, 503);
   assert.ok(!(await response.text()).includes('proxies:'));
 });
+
+test('remote rule sets use the mirrored binary format and the AI pool probes an AI endpoint', () => {
+  const config = buildConfig(nodes(), policy());
+  const mirror = 'https://raw.githubusercontent.com/sssstwee/edgetunnel/main/resources/rules/';
+  const remote = Object.entries(config['rule-providers']).filter(([, provider]) => provider.type === 'http');
+  assert.equal(remote.length, 13);
+  for (const [name, provider] of remote) {
+    assert.equal(provider.format, 'mrs', name);
+    assert.ok(provider.url.startsWith(mirror) && provider.url.endsWith('.mrs'), name);
+    assert.ok(provider.path.endsWith('.mrs'), name);
+    assert.ok(['domain', 'ipcidr'].includes(provider.behavior), name);
+    assert.ok(fs.existsSync(new URL('./resources/rules/' + provider.url.slice(mirror.length), import.meta.url)), name);
+  }
+  const ai = config['proxy-groups'].find(group => group.name === 'AI 美国');
+  assert.equal(ai.url, 'https://api.anthropic.com/v1/models');
+  assert.equal(String(ai['expected-status']), '401/405');
+});

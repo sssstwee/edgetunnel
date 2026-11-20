@@ -15,7 +15,7 @@
     ]
   },
   "vars": {
-    "POLICY_URL": "https://raw.githubusercontent.com/sssstwee/edgetunnel/56f373ebb6c6aecd72b568080521eaa8a5a4af49/jms-config/clash-base.yaml?v=claude-deps-cn-ip-20261118"
+    "POLICY_URL": "https://raw.githubusercontent.com/sssstwee/edgetunnel/4b53419e1f4883bf264400ebc5c8ca5e767ea3ab/jms-config/clash-base.yaml?v=mrs-api-probe-20261120"
   },
   "observability": {
     "enabled": true,

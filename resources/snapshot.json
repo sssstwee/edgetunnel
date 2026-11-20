@@ -340,6 +340,186 @@
       "sourceCommit": "f181fff77f5f243f69bfc12b45e0fa10bed899fc",
       "sha256": "6b001003152c6ce33b2fe80667eb7ff1adc48549fb6a9678b583308567017715",
       "bytes": 1045
+    },
+    {
+      "path": "rules/reject.mrs",
+      "kind": "mrs",
+      "behavior": "domain",
+      "source": "rules/reject.yaml",
+      "compiler": "Mihomo Meta v1.19.33 darwin arm64 with go1.22.12 Wed Oct 21 16:48:26 UTC 2026",
+      "sha256": "278344f9d89a3bf13277e92095c07bbe635be288f760e96a2f75338af9700647",
+      "bytes": 1922083
+    },
+    {
+      "path": "rules/icloud.mrs",
+      "kind": "mrs",
+      "behavior": "domain",
+      "source": "rules/icloud.yaml",
+      "compiler": "Mihomo Meta v1.19.33 darwin arm64 with go1.22.12 Wed Oct 21 16:48:26 UTC 2026",
+      "sha256": "c31dc4d91ccd8b446f8358883349c633466e5adbc46432375bf29075843f5b05",
+      "bytes": 574
+    },
+    {
+      "path": "rules/apple.mrs",
+      "kind": "mrs",
+      "behavior": "domain",
+      "source": "rules/apple.yaml",
+      "compiler": "Mihomo Meta v1.19.33 darwin arm64 with go1.22.12 Wed Oct 21 16:48:26 UTC 2026",
+      "sha256": "a84ec588d55d8ca0d3586d604ba33ade82ef7f9951ec12a213d6ff05698d56e4",
+      "bytes": 1634
+    },
+    {
+      "path": "rules/google.mrs",
+      "kind": "mrs",
+      "behavior": "domain",
+      "source": "rules/google.yaml",
+      "compiler": "Mihomo Meta v1.19.33 darwin arm64 with go1.22.12 Wed Oct 21 16:48:26 UTC 2026",
+      "sha256": "ad92420fecc12694f11af2ed86ddc5d233ec1350b1ae15e8d24959fda23bc200",
+      "bytes": 8973
+    },
+    {
+      "path": "rules/proxy.mrs",
+      "kind": "mrs",
+      "behavior": "domain",
+      "source": "rules/proxy.yaml",
+      "compiler": "Mihomo Meta v1.19.33 darwin arm64 with go1.22.12 Wed Oct 21 16:48:26 UTC 2026",
+      "sha256": "85d027c468309bbd4453fac81f9dbe0d0f2e4e04829a17cff0620e3fbf32064e",
+      "bytes": 199271
+    },
+    {
+      "path": "rules/direct.mrs",
+      "kind": "mrs",
+      "behavior": "domain",
+      "source": "rules/direct.yaml",
+      "compiler": "Mihomo Meta v1.19.33 darwin arm64 with go1.22.12 Wed Oct 21 16:48:26 UTC 2026",
+      "sha256": "4e6d5da954eae31cf6630c46d7808ff42cd5c917d28f2549803a38e3c6d30284",
+      "bytes": 530843
+    },
+    {
+      "path": "rules/private.mrs",
+      "kind": "mrs",
+      "behavior": "domain",
+      "source": "rules/private.yaml",
+      "compiler": "Mihomo Meta v1.19.33 darwin arm64 with go1.22.12 Wed Oct 21 16:48:26 UTC 2026",
+      "sha256": "df452ab1bfb572f366f00001fa4525f16f137dc670aed2c60af0100dc397d3ec",
+      "bytes": 781
+    },
+    {
+      "path": "rules/gfw.mrs",
+      "kind": "mrs",
+      "behavior": "domain",
+      "source": "rules/gfw.yaml",
+      "compiler": "Mihomo Meta v1.19.33 darwin arm64 with go1.22.12 Wed Oct 21 16:48:26 UTC 2026",
+      "sha256": "6c13b384d330bedcde0315a9b0e7c7c3d1259efada6f7c46597a6a2d9ae3d920",
+      "bytes": 34985
+    },
+    {
+      "path": "rules/tld-not-cn.mrs",
+      "kind": "mrs",
+      "behavior": "domain",
+      "source": "rules/tld-not-cn.yaml",
+      "compiler": "Mihomo Meta v1.19.33 darwin arm64 with go1.22.12 Wed Oct 21 16:48:26 UTC 2026",
+      "sha256": "1b3941da04d537521251fb76b3ec7a29f0aaefb4048a5f79f4542442c7025af5",
+      "bytes": 4517
+    },
+    {
+      "path": "rules/telegramcidr.mrs",
+      "kind": "mrs",
+      "behavior": "ipcidr",
+      "source": "rules/telegramcidr.yaml",
+      "compiler": "Mihomo Meta v1.19.33 darwin arm64 with go1.22.12 Wed Oct 21 16:48:26 UTC 2026",
+      "sha256": "d121af95b9aeca3d8c29b2112d5e6685b2a6716383df8ae31b5fbb3408c527b3",
+      "bytes": 145
+    },
+    {
+      "path": "rules/cncidr.mrs",
+      "kind": "mrs",
+      "behavior": "ipcidr",
+      "source": "rules/cncidr.yaml",
+      "compiler": "Mihomo Meta v1.19.33 darwin arm64 with go1.22.12 Wed Oct 21 16:48:26 UTC 2026",
+      "sha256": "937a8a20e09657aae60296e0ac1bf9db03813d5d25826aff9f2102a2e78b0e05",
+      "bytes": 37470
+    },
+    {
+      "path": "rules/lancidr.mrs",
+      "kind": "mrs",
+      "behavior": "ipcidr",
+      "source": "rules/lancidr.yaml",
+      "compiler": "Mihomo Meta v1.19.33 darwin arm64 with go1.22.12 Wed Oct 21 16:48:26 UTC 2026",
+      "sha256": "65027bee3076ec49024935c0eb9e4b85a447687db384d4b8d2763b6c2566ec1f",
+      "bytes": 236
+    },
+    {
+      "path": "rules/line.mrs",
+      "kind": "mrs",
+      "behavior": "domain",
+      "source": "rules/line.yaml",
+      "compiler": "Mihomo Meta v1.19.33 darwin arm64 with go1.22.12 Wed Oct 21 16:48:26 UTC 2026",
+      "sha256": "cb553fec05e5d082ce502db4d518b594ea66eb481e0db31905ce395ebee640e4",
+      "bytes": 289
+    },
+    {
+      "path": "rules/ai.mrs",
+      "kind": "mrs",
+      "behavior": "domain",
+      "source": "rules/ai.yaml",
+      "compiler": "Mihomo Meta v1.19.33 darwin arm64 with go1.22.12 Wed Oct 21 16:48:26 UTC 2026",
+      "sha256": "980e6f5b7543751f8fa2323b0c5bc9b86421f0593fffe3851c57035616a16ce6",
+      "bytes": 2281
+    },
+    {
+      "path": "rules/ai-cn.mrs",
+      "kind": "mrs",
+      "behavior": "domain",
+      "source": "rules/ai-cn.yaml",
+      "compiler": "Mihomo Meta v1.19.33 darwin arm64 with go1.22.12 Wed Oct 21 16:48:26 UTC 2026",
+      "sha256": "b64e9f4e9823fb6d17290b74591ca94a8944ccd3a27efce649cf8a67e5394fae",
+      "bytes": 1162
+    },
+    {
+      "path": "rules/anthropic.mrs",
+      "kind": "mrs",
+      "behavior": "domain",
+      "source": "rules/anthropic.yaml",
+      "compiler": "Mihomo Meta v1.19.33 darwin arm64 with go1.22.12 Wed Oct 21 16:48:26 UTC 2026",
+      "sha256": "e9ae426a74d8b4c4389b9570475412448810bb79fa6e81c65122c0d06f85a6ad",
+      "bytes": 300
+    },
+    {
+      "path": "rules/openai.mrs",
+      "kind": "mrs",
+      "behavior": "domain",
+      "source": "rules/openai.yaml",
+      "compiler": "Mihomo Meta v1.19.33 darwin arm64 with go1.22.12 Wed Oct 21 16:48:26 UTC 2026",
+      "sha256": "842a11bfebd1078258407617ac14380529e1f3873e0e01a87d9dc64300a4ba63",
+      "bytes": 439
+    },
+    {
+      "path": "rules/gemini.mrs",
+      "kind": "mrs",
+      "behavior": "domain",
+      "source": "rules/gemini.yaml",
+      "compiler": "Mihomo Meta v1.19.33 darwin arm64 with go1.22.12 Wed Oct 21 16:48:26 UTC 2026",
+      "sha256": "5074fba5de498ff336a929506176fe48079270a4888511a7dff19c214293aca6",
+      "bytes": 612
+    },
+    {
+      "path": "rules/twitter.mrs",
+      "kind": "mrs",
+      "behavior": "domain",
+      "source": "rules/twitter.yaml",
+      "compiler": "Mihomo Meta v1.19.33 darwin arm64 with go1.22.12 Wed Oct 21 16:48:26 UTC 2026",
+      "sha256": "b287eac1d2a97da62e17cffddf55e0296665a289a41fba774fdba7397e6ea3f7",
+      "bytes": 324
+    },
+    {
+      "path": "rules/bing.mrs",
+      "kind": "mrs",
+      "behavior": "domain",
+      "source": "rules/bing.yaml",
+      "compiler": "Mihomo Meta v1.19.33 darwin arm64 with go1.22.12 Wed Oct 21 16:48:26 UTC 2026",
+      "sha256": "1aa380872305dd451eed6043324fb282df2fc60b450deed483084cb9eb1f9efe",
+      "bytes": 564
     }
   ],
   "geodata": {
