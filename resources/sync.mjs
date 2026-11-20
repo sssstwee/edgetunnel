@@ -4,6 +4,7 @@ import { isIP } from 'node:net';
 import { readFile, writeFile, mkdir, mkdtemp, rm, rename } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { zstdDecompressSync } from 'node:zlib';
 import { parse } from 'yaml';
 
 const root = dirname(fileURLToPath(import.meta.url));
@@ -28,6 +29,33 @@ function validate(file, data) {
     payload.forEach(validatePrefix);
   }
   if (file.kind === 'cidr') data.toString().trim().split(/\s+/).forEach(validatePrefix);
+  if (file.kind === 'mrs') {
+    // MRS is a zstd stream whose payload starts with the "MRS" magic.
+    if (!data.subarray(0, 4).equals(Buffer.from('28b52ffd', 'hex'))) throw new Error(`Invalid MRS: ${file.path}`);
+    if (typeof zstdDecompressSync === 'function' && zstdDecompressSync(data).subarray(0, 3).toString() !== 'MRS') throw new Error(`Invalid MRS: ${file.path}`);
+  }
+}
+
+// Domain and IP-CIDR lists are also published as Mihomo binary rule sets (.mrs), compiled from the validated YAML.
+const compiledFrom = files => files.filter(file => file.kind === 'rule' && ['domain', 'ipcidr'].includes(file.behavior))
+  .map(file => ({ path: file.path.replace(/\.yaml$/, '.mrs'), kind: 'mrs', behavior: file.behavior, source: file.path }));
+
+function mihomo() {
+  const binary = process.env.MIHOMO;
+  if (!binary) throw new Error('Set MIHOMO to a Mihomo binary to compile .mrs rule sets');
+  return { binary, version: execFileSync(binary, ['-v'], { encoding: 'utf8' }).split('\n')[0].trim() };
+}
+
+async function compile(files, dir) {
+  const { binary, version } = mihomo();
+  const entries = [];
+  for (const file of compiledFrom(files)) {
+    execFileSync(binary, ['convert-ruleset', file.behavior, 'yaml', join(dir, file.source), join(dir, file.path)], { stdio: 'ignore' });
+    const data = await readFile(join(dir, file.path));
+    validate(file, data);
+    entries.push({ ...file, compiler: version, sha256: hash(data), bytes: data.length });
+  }
+  return entries;
 }
 
 function validatePrefix(prefix) {
@@ -94,9 +122,10 @@ async function refresh() {
       }
     }));
     for (const worker of workers) if (worker.status === 'rejected') throw worker.reason;
-    snapshot.files = results.slice(0, files.length);
+    const compiled = await compile(files, staged);
+    snapshot.files = [...results.slice(0, files.length), ...compiled];
     // Only replace the last-good snapshot after every download has passed validation.
-    for (const path of [...files.map(file => file.path), ...geodata.map(file => `.cache/${file.name}`)]) {
+    for (const path of [...files.map(file => file.path), ...compiled.map(file => file.path), ...geodata.map(file => `.cache/${file.name}`)]) {
       await mkdir(join(root, dirname(path)), { recursive: true });
       await rename(join(staged, path), join(root, path));
     }
@@ -104,12 +133,22 @@ async function refresh() {
   } finally {
     await rm(staged, { recursive: true, force: true });
   }
-  console.log(`Validated ${files.length} files and ${geodata.length} Geo data assets`);
+  console.log(`Validated ${files.length} files, ${snapshot.files.length - files.length} compiled rule sets and ${geodata.length} Geo data assets`);
+}
+
+// Recompile the committed YAML rule snapshots without downloading anything.
+async function recompile() {
+  const snapshot = JSON.parse(await readFile(join(root, 'snapshot.json')));
+  const downloaded = snapshot.files.filter(file => file.kind !== 'mrs');
+  snapshot.files = [...downloaded, ...await compile(downloaded, root)];
+  await writeFile(join(root, 'snapshot.json'), JSON.stringify(snapshot, null, 2) + '\n');
+  console.log(`Compiled ${snapshot.files.length - downloaded.length} rule sets`);
 }
 
 async function check() {
   const snapshot = JSON.parse(await readFile(join(root, 'snapshot.json')));
-  const expected = [...sources.sources.flatMap(source => source.files), ...sources.remote].map(file => file.path).sort();
+  const listed = [...sources.sources.flatMap(source => source.files), ...sources.remote];
+  const expected = [...listed, ...compiledFrom(listed)].map(file => file.path).sort();
   if (JSON.stringify(expected) !== JSON.stringify(snapshot.files.map(file => file.path).sort())) throw new Error('Source manifest and snapshot differ');
   for (const file of snapshot.files) {
     const data = await readFile(join(root, file.path));
@@ -154,5 +193,6 @@ async function publish(snapshot) {
 }
 
 if (process.argv.includes('--check')) await check();
+else if (process.argv.includes('--compile')) await recompile();
 else if (process.argv.includes('--publish-geodata')) await publish(await check());
 else await refresh();

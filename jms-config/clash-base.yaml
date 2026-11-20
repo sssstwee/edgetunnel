@@ -551,113 +551,113 @@ proxy-groups:
   jms-us-only: true
   proxies:
   - REJECT
-  url: https://www.gstatic.com/generate_204
-  expected-status: 204
+  url: https://api.anthropic.com/v1/models
+  expected-status: 401/405
   interval: 300
   lazy: false
 rule-providers:
   jms-anthropic:
     type: http
     behavior: domain
-    format: yaml
-    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/anthropic.yaml
-    path: ./ruleset/jms/anthropic.yaml
+    format: mrs
+    url: https://raw.githubusercontent.com/sssstwee/edgetunnel/main/resources/rules/anthropic.mrs
+    path: ./ruleset/jms/anthropic.mrs
     interval: 86400
     proxy: 默认代理
   jms-openai:
     type: http
     behavior: domain
-    format: yaml
-    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/openai.yaml
-    path: ./ruleset/jms/openai.yaml
+    format: mrs
+    url: https://raw.githubusercontent.com/sssstwee/edgetunnel/main/resources/rules/openai.mrs
+    path: ./ruleset/jms/openai.mrs
     interval: 86400
     proxy: 默认代理
   jms-twitter-shared:
     type: http
     behavior: domain
-    format: yaml
-    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/twitter.yaml
-    path: ./ruleset/jms/twitter.yaml
+    format: mrs
+    url: https://raw.githubusercontent.com/sssstwee/edgetunnel/main/resources/rules/twitter.mrs
+    path: ./ruleset/jms/twitter.mrs
     interval: 86400
     proxy: 默认代理
   jms-bing-shared:
     type: http
     behavior: domain
-    format: yaml
-    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/bing.yaml
-    path: ./ruleset/jms/bing.yaml
+    format: mrs
+    url: https://raw.githubusercontent.com/sssstwee/edgetunnel/main/resources/rules/bing.mrs
+    path: ./ruleset/jms/bing.mrs
     interval: 86400
     proxy: 默认代理
   jms-google-shared:
     type: http
     behavior: domain
-    format: yaml
-    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/google.yaml
-    path: ./ruleset/jms/google.yaml
+    format: mrs
+    url: https://raw.githubusercontent.com/sssstwee/edgetunnel/main/resources/rules/google.mrs
+    path: ./ruleset/jms/google.mrs
     interval: 86400
     proxy: 默认代理
   jms-gemini:
     type: http
     behavior: domain
-    format: yaml
-    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/google-gemini.yaml
-    path: ./ruleset/jms/gemini.yaml
+    format: mrs
+    url: https://raw.githubusercontent.com/sssstwee/edgetunnel/main/resources/rules/gemini.mrs
+    path: ./ruleset/jms/gemini.mrs
     interval: 86400
     proxy: 默认代理
   jms-ai:
     type: http
     behavior: domain
-    format: yaml
-    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-ai-!cn.yaml
-    path: ./ruleset/jms/ai.yaml
+    format: mrs
+    url: https://raw.githubusercontent.com/sssstwee/edgetunnel/main/resources/rules/ai.mrs
+    path: ./ruleset/jms/ai.mrs
     interval: 86400
     proxy: 默认代理
   jms-ai-cn:
     type: http
     behavior: domain
-    format: yaml
-    url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-ai-cn.yaml
-    path: ./ruleset/jms/ai-cn.yaml
+    format: mrs
+    url: https://raw.githubusercontent.com/sssstwee/edgetunnel/main/resources/rules/ai-cn.mrs
+    path: ./ruleset/jms/ai-cn.mrs
     interval: 86400
     proxy: 默认代理
   jms-direct:
     type: http
     behavior: domain
-    format: yaml
-    url: https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/direct.txt
-    path: ./ruleset/jms/direct.yaml
+    format: mrs
+    url: https://raw.githubusercontent.com/sssstwee/edgetunnel/main/resources/rules/direct.mrs
+    path: ./ruleset/jms/direct.mrs
     interval: 86400
     proxy: 默认代理
   jms-proxy:
     type: http
     behavior: domain
-    format: yaml
-    url: https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/proxy.txt
-    path: ./ruleset/jms/proxy.yaml
+    format: mrs
+    url: https://raw.githubusercontent.com/sssstwee/edgetunnel/main/resources/rules/proxy.mrs
+    path: ./ruleset/jms/proxy.mrs
     interval: 86400
     proxy: 默认代理
   jms-private:
     type: http
     behavior: domain
-    format: yaml
-    url: https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/private.txt
-    path: ./ruleset/jms/private.yaml
+    format: mrs
+    url: https://raw.githubusercontent.com/sssstwee/edgetunnel/main/resources/rules/private.mrs
+    path: ./ruleset/jms/private.mrs
     interval: 86400
     proxy: 默认代理
   jms-cncidr:
     type: http
     behavior: ipcidr
-    format: yaml
-    url: https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/cncidr.txt
-    path: ./ruleset/jms/cncidr.yaml
+    format: mrs
+    url: https://raw.githubusercontent.com/sssstwee/edgetunnel/main/resources/rules/cncidr.mrs
+    path: ./ruleset/jms/cncidr.mrs
     interval: 86400
     proxy: 默认代理
   jms-lancidr:
     type: http
     behavior: ipcidr
-    format: yaml
-    url: https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/lancidr.txt
-    path: ./ruleset/jms/lancidr.yaml
+    format: mrs
+    url: https://raw.githubusercontent.com/sssstwee/edgetunnel/main/resources/rules/lancidr.mrs
+    path: ./ruleset/jms/lancidr.mrs
     interval: 86400
     proxy: 默认代理
   jms-cn-ai-extra:
