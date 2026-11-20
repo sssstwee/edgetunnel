@@ -15,7 +15,7 @@
     ]
   },
   "vars": {
-    "POLICY_URL": "https://raw.githubusercontent.com/sssstwee/edgetunnel/4b53419e1f4883bf264400ebc5c8ca5e767ea3ab/jms-config/clash-base.yaml?v=mrs-api-probe-20261120"
+    "POLICY_URL": "https://raw.githubusercontent.com/sssstwee/edgetunnel/2c70edc99567c22957e17d4600783eae4924657b/jms-config/clash-base.yaml?v=sniff-override-20261120"
   },
   "observability": {
     "enabled": true,
