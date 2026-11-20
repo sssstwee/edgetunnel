@@ -25,7 +25,7 @@ Worker 使用 JMS 官方 `noss=1` 参数请求上游，排除即将退役的 Sha
 - 保留的五个 VLESS 节点均已通过独立实例的 UDP DNS 转发测试，显式启用 `udp` 和 `packet-encoding: xudp`。此测试不代表已验证任意网站的 HTTP/3 或账号内语音业务。
 - 国内及节点 DNS 使用国内解析器；海外 AI 的加密 DNS 显式绑定 `AI 美国`，其余国外 DNS 绑定 `默认代理`。使用明确的 DNS 代理后缀，因此 `respect-rules` 保持关闭，避免启动时规则加载与节点 DNS 互相依赖。
 
-域名/IP 规则复用 MetaCubeX/meta-rules-dat、Loyalsoldier/clash-rules、blackmatrix7/ios_rule_script 的域名条目，以及现有 EdgeTunnel 的 AI 引导和资源列表。2026-11-20 起，13 个远程规则集改为读取本仓库 `resources/rules/` 每日同步的镜像，并使用 Mihomo 二进制格式（`.mrs`）以降低客户端内存和加载时间；`AI 美国` 改用 `https://api.anthropic.com/v1/models` 探活（HEAD 405 / GET 401 视为可达），不再只检测通用连通性。ChatGPT 语音 IP 更新自 [OpenAI 官方 JSON](https://openai.com/chatgpt-voice.json)（2026-11-12 发布，540 条）；后续新增且未列入的公网 IP 仍会走普通代理，不会按中国 IP 回落直连。GitHub 规则由 Mihomo 自动更新，模板更新在下次订阅刷新后生效。
+域名/IP 规则复用 MetaCubeX/meta-rules-dat、Loyalsoldier/clash-rules、blackmatrix7/ios_rule_script 的域名条目，以及现有 EdgeTunnel 的 AI 引导和资源列表。2026-11-20 起，嗅探器开启 `override-destination`：应用若绕过内核 DNS、拿到被污染的 IP，仍按嗅探出的真实域名经节点远端解析连接（Apple 推送等固定 IP 服务在 `skip-domain` 中跳过）；规则首条拒绝没有映射的 fake-ip（`198.18.0.0/16`），使内核重启后残留的 fake-ip 立即失败重试，而不是被当作局域网地址直连超时。同日，13 个远程规则集改为读取本仓库 `resources/rules/` 每日同步的镜像，并使用 Mihomo 二进制格式（`.mrs`）以降低客户端内存和加载时间；`AI 美国` 改用 `https://api.anthropic.com/v1/models` 探活（HEAD 405 / GET 401 视为可达），不再只检测通用连通性。ChatGPT 语音 IP 更新自 [OpenAI 官方 JSON](https://openai.com/chatgpt-voice.json)（2026-11-12 发布，540 条）；后续新增且未列入的公网 IP 仍会走普通代理，不会按中国 IP 回落直连。GitHub 规则由 Mihomo 自动更新，模板更新在下次订阅刷新后生效。
 
 ## 托管
 

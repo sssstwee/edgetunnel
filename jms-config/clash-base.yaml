@@ -11,7 +11,8 @@ sniffer:
   enable: true
   force-dns-mapping: true
   parse-pure-ip: true
-  override-destination: false
+  # Dial the sniffed domain, so apps that resolved through a poisoned DNS outside the core still reach the real host.
+  override-destination: true
   sniff:
     HTTP:
       ports: [80, 8080-8880]
@@ -19,6 +20,9 @@ sniffer:
       ports: [443, 8443]
     QUIC:
       ports: [443, 8443]
+  skip-domain:
+  - +.push.apple.com
+  - Mijia Cloud
 profile:
   store-selected: true
   store-fake-ip: true
@@ -1693,6 +1697,8 @@ rule-providers:
     - +.openart.ai
 # Trusted domestic AI exceptions, then pinned critical AI, then general lists and app guards.
 rules:
+# A fake-ip without a live mapping (cached across a core restart) fails fast instead of timing out as a LAN address.
+- IP-CIDR,198.18.0.0/16,REJECT,no-resolve
 - RULE-SET,jms-cn-ai-extra,DIRECT
 - RULE-SET,jms-claude-bootstrap,AI 美国
 - RULE-SET,jms-claude-bootstrap,REJECT
