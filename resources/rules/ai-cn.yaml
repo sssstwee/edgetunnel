@@ -1,26 +1,28 @@
 payload:
     - cueme-api.quark.cn
     - ai.zhaomi.cn
+    - +.xiaohuanxiong.com
     - +.zhiexa.com
-    - +.doubaoapps.com
     - +.liblib.tv
     - +.rwkv.cn
     - +.rwkv.com
     - +.tapnow.top
+    - +.deepseeksvc.com
     - +.qianwen.com
     - +.qianwenai.com
     - +.qwen.ai
-    - +.yzsgo.com
+    - +.qwenlm.ai
+    - +.deepseek.com
     - +.tongyi.com
     - +.antafu.com
     - +.antaq.com
-    - +.aorizon.cn
+    - +.skillhub.cn
     - +.happyhorse.cn
     - +.happyshrimp.cn
-    - +.linka2a.net
+    - +.sleeplesshorizon.cn
+    - +.diandianlife.top
     - +.dumate.cn
     - +.miaoda.cn
-    - +.deepseeksvc.com
     - +.mcpworld.com
     - +.tiangong.cn
     - +.bigmodel.cn
@@ -30,8 +32,6 @@ payload:
     - +.zhipucn.com
     - +.kimi.com
     - +.moonshot.cn
-    - +.deepseek.com
-    - +.diandianlife.top
     - +.askdiandian.com
     - +.hailuoai.com
     - +.minimaxi.com
@@ -42,6 +42,7 @@ payload:
     - +.xiaoaiassist.com
     - +.miaibox.com
     - +.baichuan-ai.com
+    - +.nia-teams.com
     - +.cueme.cn
     - +.n.cn
     - +.namiso.com
@@ -55,18 +56,26 @@ payload:
     - +.xiezuocat.com
     - +.aispeech.com
     - +.dui.ai
-    - +.liblib.art
-    - +.clawhub-mirror.com
-    - +.skillhub.cn
-    - +.safeskill.cn
     - +.duiopen.com
-    - +.sleeplesshorizon.cn
-    - +.qwenlm.ai
+    - +.senseaudio.cn
+    - +.senseavatar.com
+    - +.sensecore.cn
+    - +.sensefoundry.cn
+    - +.sensenova.cn
+    - +.sensetime.com
+    - +.liblib.cloud
+    - +.liblib.art
+    - +.aorizon.cn
+    - +.safeskill.cn
+    - +.clawhub-mirror.com
+    - +.linka2a.net
+    - +.yzsgo.com
     - +.shunjing.xin
     - +.kakaxing.com
     - +.favonis.cloud
     - +.favonis.com
     - +.favonis.space
+    - +.ai-indeed.com
     - +.butterfly-static.cn
     - +.butterflyai.cn
     - +.coze-dns-01.com
@@ -89,7 +98,7 @@ payload:
     - +.instreet.com
     - +.doubao-dev.com
     - +.doubao.com
-    - +.liblib.cloud
+    - +.doubaoapps.com
     - +.doubaocdn.com
     - +.hi-butterfly.cn
     - +.maoxiangai.com
