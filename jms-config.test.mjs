@@ -383,6 +383,9 @@ test('sniffed domains replace poisoned destinations and stale fake-ips fail fast
     assert.ok(config.dns['fake-ip-filter'].includes(host), host);
   }
   assert.equal(config.rules[0], 'IP-CIDR,198.18.0.0/16,REJECT,no-resolve');
+  assert.equal(config.rules[1], 'DOMAIN,play.googleapis.com,REJECT');
+  assert.ok(config.rules.indexOf('DOMAIN,play.googleapis.com,REJECT') < config.rules.indexOf('RULE-SET,jms-google-shared,AI 美国'));
+  assert.ok(config.rules.indexOf('DOMAIN,play.googleapis.com,REJECT') < config.rules.indexOf('RULE-SET,jms-ai-shared,AI 美国'));
   assert.ok(config.rules.indexOf('RULE-SET,jms-lancidr,DIRECT,no-resolve') > 0);
 });
 
