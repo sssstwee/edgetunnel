@@ -15,7 +15,7 @@
     ]
   },
   "vars": {
-    "POLICY_URL": "https://raw.githubusercontent.com/sssstwee/edgetunnel/2c70edc99567c22957e17d4600783eae4924657b/jms-config/clash-base.yaml?v=sniff-override-20261120"
+    "POLICY_URL": "https://raw.githubusercontent.com/sssstwee/edgetunnel/56120e371ae54d8632e6c83efed36d7118181eb9/jms-config/clash-base.yaml?v=ai-tools-20261121"
   },
   "observability": {
     "enabled": true,
