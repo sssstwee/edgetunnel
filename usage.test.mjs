@@ -127,3 +127,27 @@ for (const [status, contentType, body] of [
     assert.equal(await response.text(), body);
   });
 }
+
+test('subscription usage lookup caches healthy balance across back-to-back refreshes', async (t) => {
+  const start = new Date(Date.now() - 86400000).toISOString();
+  const end = new Date(Date.now() + 86400000).toISOString();
+  let calls = 0;
+  t.mock.method(globalThis, 'fetch', async (url) => {
+    calls += 1;
+    return url.includes('/subscriptions')
+      ? Response.json({ success: true, result: [{ ...subscription, current_period_start: start, current_period_end: end }] })
+      : Response.json({ data: { viewer: { accounts: [{ workersInvocationsAdaptive: [{ sum: { requests: 1000000 } }], pagesFunctionsInvocationsAdaptiveGroups: [{ sum: { requests: 0 } }] }] } } });
+  });
+  const config = {
+    proxies: [{ name: 'node', type: 'vless', server: 'edge.example', port: 443 }],
+    'proxy-groups': [{ name: '默认代理', type: 'select', proxies: ['node'] }],
+    rules: ['MATCH,默认代理'],
+  };
+  const worker = createUsageWorker({ fetch: () => new Response(stringify(config), { headers: { 'content-type': 'application/yaml' } }) });
+  const env = { KV: { get: async () => JSON.stringify({ AccountID: 'cached-account', APIToken: 'test-token' }) } };
+  const first = parse(await (await worker.fetch(new Request('https://edge.example/sub?token=a'), env, {})).text());
+  const second = parse(await (await worker.fetch(new Request('https://edge.example/sub?token=a'), env, {})).text());
+  assert.equal(calls, 2);
+  assert.equal(first['proxy-groups'].at(-1).name, '📊 CF 本账期剩余请求：90.00%（估算）');
+  assert.equal(second['proxy-groups'].at(-1).name, '📊 CF 本账期剩余请求：90.00%（估算）');
+});

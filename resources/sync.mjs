@@ -5,7 +5,7 @@ import { readFile, writeFile, mkdir, mkdtemp, rm, rename } from 'node:fs/promise
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { zstdDecompressSync } from 'node:zlib';
-import { parse } from 'yaml';
+import { parse, stringify } from 'yaml';
 
 const root = dirname(fileURLToPath(import.meta.url));
 const cache = join(root, '.cache');
@@ -36,9 +36,13 @@ function validate(file, data) {
   }
 }
 
-// Domain and IP-CIDR lists are also published as Mihomo binary rule sets (.mrs), compiled from the validated YAML.
-const compiledFrom = files => files.filter(file => file.kind === 'rule' && ['domain', 'ipcidr'].includes(file.behavior))
-  .map(file => ({ path: file.path.replace(/\.yaml$/, '.mrs'), kind: 'mrs', behavior: file.behavior, source: file.path }));
+// Domain, IP-CIDR and OpenAI voice lists are also published as Mihomo binary rule sets (.mrs), compiled from the validated snapshots.
+const compiledFrom = files => [
+  ...files.filter(file => file.kind === 'rule' && ['domain', 'ipcidr'].includes(file.behavior))
+    .map(file => ({ path: file.path.replace(/\.yaml$/, '.mrs'), kind: 'mrs', behavior: file.behavior, source: file.path })),
+  ...files.filter(file => file.kind === 'voice')
+    .map(file => ({ path: 'rules/openai-voice.mrs', kind: 'mrs', behavior: 'ipcidr', source: file.path })),
+];
 
 function mihomo() {
   const binary = process.env.MIHOMO;
@@ -50,7 +54,20 @@ async function compile(files, dir) {
   const { binary, version } = mihomo();
   const entries = [];
   for (const file of compiledFrom(files)) {
-    execFileSync(binary, ['convert-ruleset', file.behavior, 'yaml', join(dir, file.source), join(dir, file.path)], { stdio: 'ignore' });
+    let sourcePath = join(dir, file.source);
+    let tempYaml;
+    if (file.source.endsWith('.json')) {
+      const prefixes = [...new Set(JSON.parse(await readFile(sourcePath, 'utf8')).prefixes?.flatMap(entry => [entry.ipv4Prefix, entry.ipv6Prefix]).filter(Boolean))].sort();
+      tempYaml = join(dir, `.compile-${Date.now()}-${Math.random().toString(16).slice(2)}.yaml`);
+      await writeFile(tempYaml, stringify({ payload: prefixes }));
+      sourcePath = tempYaml;
+    }
+    try {
+      await mkdir(join(dir, dirname(file.path)), { recursive: true });
+      execFileSync(binary, ['convert-ruleset', file.behavior, 'yaml', sourcePath, join(dir, file.path)], { stdio: 'ignore' });
+    } finally {
+      if (tempYaml) await rm(tempYaml, { force: true });
+    }
     const data = await readFile(join(dir, file.path));
     validate(file, data);
     entries.push({ ...file, compiler: version, sha256: hash(data), bytes: data.length });

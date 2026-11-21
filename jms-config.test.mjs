@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import test from 'node:test';
 import { parse, stringify } from 'yaml';
-import worker from './jms-config/worker.mjs';
+import worker, { createJmsWorker } from './jms-config/worker.mjs';
 import { buildConfig } from './jms-config/policy.mjs';
 
 const policy = () => parse(fs.readFileSync(new URL('./jms-config/clash-base.yaml', import.meta.url), 'utf8'));
@@ -15,13 +15,18 @@ const nodes = () => ({ proxies: ['s1', 's2', 's3', 's4', 's5', 's801'].map(id =>
 test('AI pools only contain verified US nodes in stable fallback order', () => {
   const config = buildConfig(nodes(), policy());
   const expected = ['美国洛杉矶01 · s3', '美国洛杉矶02 · s2', '美国洛杉矶03 · s801'];
-  for (const name of ['AI 美国']) {
+  for (const name of ['Claude 美国', 'AI 美国']) {
     const group = config['proxy-groups'].find(g => g.name === name);
     assert.equal(group.type, 'fallback');
     assert.deepEqual(group.proxies, expected);
+    assert.equal(group['max-failed-times'], 2);
+    assert.equal(group.timeout, 5000);
   }
   const ordinary = config['proxy-groups'].find(g => g.name === '自动选择');
   assert.equal(ordinary.proxies.length, 6);
+  assert.equal(ordinary['max-failed-times'], 2);
+  assert.equal(config['keep-alive-interval'], 30);
+  assert.equal(config['keep-alive-idle'], 30);
   assert.ok(config.proxies.filter(p => p.type === 'vless').every(p => p.udp && p['packet-encoding'] === 'xudp'));
   assert.ok(!config['proxy-groups'].some(g => g.proxies.includes('DIRECT')));
 });
@@ -52,12 +57,21 @@ test('domestic AI takes precedence and every proxy route has a rejection guard',
   assert.ok(rules.indexOf('RULE-SET,jms-cn-ai-extra,DIRECT') < rules.indexOf('RULE-SET,jms-ai,AI 美国'));
   assert.ok(rules.indexOf('RULE-SET,jms-ai-cn,DIRECT') < rules.indexOf('RULE-SET,jms-ai,AI 美国'));
   for (let i = 0; i < rules.length; i++) {
-    const match = /^((?:RULE-SET|PROCESS-NAME-REGEX|PROCESS-PATH-REGEX),.+),(默认代理|Claude-US|ChatGPT-US|Gemini-US|AI 美国)(,no-resolve)?$/.exec(rules[i]);
+    const match = /^((?:RULE-SET|PROCESS-NAME-REGEX|PROCESS-PATH-REGEX),.+),(默认代理|Claude-US|ChatGPT-US|Gemini-US|Claude 美国|AI 美国)(,no-resolve)?$/.exec(rules[i]);
     if (match) assert.equal(rules[i + 1], `${match[1]},REJECT${match[3] || ''}`);
   }
   assert.deepEqual(rules.slice(-2), ['MATCH,默认代理', 'MATCH,REJECT']);
-  assert.equal(config.dns['nameserver-policy']['+.kimi.ai'][0], 'https://dns.alidns.com/dns-query#DIRECT');
+  assert.ok(config['rule-providers']['jms-cn-ai-extra'].payload.includes('+.kimi.ai'));
+  assert.deepEqual(config.dns['nameserver-policy']['rule-set:jms-cn-ai-extra,jms-ai-cn'], [
+    'https://dns.alidns.com/dns-query#DIRECT',
+    'https://doh.pub/dns-query#DIRECT',
+  ]);
+  // No redundant explicit #DIRECT domain overrides duplicating jms-cn-ai-extra / jms-ai-cn.
+  const explicitDirectDns = Object.entries(config.dns['nameserver-policy'])
+    .filter(([k, v]) => !k.startsWith('rule-set:') && v.every(s => s.endsWith('#DIRECT')));
+  assert.equal(explicitDirectDns.length, 0);
   assert.ok(config.dns['nameserver-policy']['rule-set:jms-gemini-bootstrap,jms-gemini,jms-google-shared'].every(x => x.endsWith('#AI 美国')));
+  assert.ok(config.dns['nameserver-policy']['rule-set:jms-claude-bootstrap,jms-anthropic'].every(x => x.endsWith('#Claude 美国')));
 });
 
 test('unauthenticated requests cannot retrieve configuration or trigger upstream fetches', async t => {
@@ -87,7 +101,7 @@ test('protected subscription combines fresh JMS nodes with the remote policy', a
   assert.equal(response.status, 200);
   assert.equal(response.headers.get('Cache-Control'), 'private, no-store');
   const config = parse(await response.text());
-  assert.deepEqual(config['proxy-groups'].map(g => g.name), ['默认代理', '自动选择', 'AI 美国']);
+  assert.deepEqual(config['proxy-groups'].map(g => g.name), ['默认代理', '自动选择', 'Claude 美国', 'AI 美国']);
   assert.deepEqual(config.rules.slice(-2), ['MATCH,默认代理', 'MATCH,REJECT']);
   assert.equal(config['secret-upstream-field'], undefined);
   assert.equal(config.proxies.length, 5);
@@ -125,11 +139,19 @@ test('only domestic domains and the existing LAN rules can select DIRECT', () =>
 test('pinned account services precede broad domestic AI classifications', () => {
   const config = buildConfig(nodes(), policy());
   const broadDirect = config.rules.indexOf('RULE-SET,jms-ai-cn,DIRECT');
-  for (const host of ['+.claude.ai', '+.anthropic.com', '+.openai.com', '+.chatgpt.com', '+.gemini.google.com', '+.muse.ai', '+.metaaivm.com']) {
+  for (const host of ['+.claude.ai', '+.anthropic.com']) {
+    assert.ok(config.dns['nameserver-policy'][host].every(x => x.endsWith('#Claude 美国')));
+  }
+  for (const host of ['+.openai.com', '+.chatgpt.com', '+.gemini.google.com', '+.muse.ai', '+.metaaivm.com']) {
     assert.ok(config.dns['nameserver-policy'][host].every(x => x.endsWith('#AI 美国')));
   }
-  for (const name of ['jms-claude-bootstrap', 'jms-openai-bootstrap', 'jms-gemini-bootstrap', 'jms-meta-bootstrap']) {
-    const index = config.rules.indexOf(`RULE-SET,${name},AI 美国`);
+  for (const [name, group] of [
+    ['jms-claude-bootstrap', 'Claude 美国'],
+    ['jms-openai-bootstrap', 'AI 美国'],
+    ['jms-gemini-bootstrap', 'AI 美国'],
+    ['jms-meta-bootstrap', 'AI 美国'],
+  ]) {
+    const index = config.rules.indexOf(`RULE-SET,${name},${group}`);
     assert.ok(index > 0 && index < broadDirect);
     assert.equal(config.rules[index + 1], `RULE-SET,${name},REJECT`);
   }
@@ -150,12 +172,12 @@ test('every Claude dependency is pinned to US nodes ahead of all broad DIRECT ru
   const domestic = new Set(config['rule-providers']['jms-cn-ai-extra'].payload);
   assert.ok(deps.every(host => !domestic.has(host)));
   const rules = config.rules;
-  const route = rules.indexOf('RULE-SET,jms-claude-deps,AI 美国');
+  const route = rules.indexOf('RULE-SET,jms-claude-deps,Claude 美国');
   assert.equal(route, rules.indexOf('RULE-SET,jms-claude-bootstrap,REJECT') + 1);
   assert.equal(rules[route + 1], 'RULE-SET,jms-claude-deps,REJECT');
   for (const direct of ['RULE-SET,jms-ai-cn,DIRECT', 'RULE-SET,jms-private,DIRECT', domesticRoute]) assert.ok(route < rules.indexOf(direct));
-  assert.ok(config.dns['nameserver-policy']['rule-set:jms-claude-deps'].every(x => x.endsWith('#AI 美国')));
-  const path = rules.find(r => r.startsWith('PROCESS-PATH-REGEX,') && r.endsWith(',AI 美国'));
+  assert.ok(config.dns['nameserver-policy']['rule-set:jms-claude-deps'].every(x => x.endsWith('#Claude 美国')));
+  const path = rules.find(r => r.startsWith('PROCESS-PATH-REGEX,') && r.endsWith(',Claude 美国'));
   const pattern = new RegExp(path.split(',').slice(1, -1).join(',').replace(/^\(\?i\)/, ''), 'i');
   for (const binary of [
     '/Users/u/Library/Application Support/Claude/claude-code/2.1.325/abc/claude.app/Contents/MacOS/claude',
@@ -163,7 +185,7 @@ test('every Claude dependency is pinned to US nodes ahead of all broad DIRECT ru
     '/opt/homebrew/Caskroom/claude-code/2.1.325/claude', '/Users/u/.local/share/claude/versions/2.1.325',
     '/Applications/Claude.app/Contents/Frameworks/Claude Helper.app/Contents/MacOS/Claude Helper',
   ]) assert.ok(pattern.test(binary), binary);
-  const name = rules.find(r => r.startsWith('PROCESS-NAME-REGEX,') && r.endsWith(',AI 美国'));
+  const name = rules.find(r => r.startsWith('PROCESS-NAME-REGEX,') && r.endsWith(',Claude 美国'));
   const names = new RegExp(name.split(',').slice(1, -1).join(',').replace(/^\(\?i\)/, ''), 'i');
   for (const process of ['claude', 'Claude Helper (Renderer)', 'com.apple.Virtualization.VirtualMachine']) assert.ok(names.test(process), process);
   assert.ok(!names.test('node'));
@@ -330,11 +352,11 @@ test('remote policy failure never serves raw nodes without the existing AI routi
   assert.ok(!(await response.text()).includes('proxies:'));
 });
 
-test('remote rule sets use the mirrored binary format and the AI pool probes an AI endpoint', () => {
+test('remote rule sets use the mirrored binary format and Claude/AI pools probe independently', () => {
   const config = buildConfig(nodes(), policy());
   const mirror = 'https://raw.githubusercontent.com/sssstwee/edgetunnel/main/resources/rules/';
   const remote = Object.entries(config['rule-providers']).filter(([, provider]) => provider.type === 'http');
-  assert.equal(remote.length, 13);
+  assert.equal(remote.length, 14);
   for (const [name, provider] of remote) {
     assert.equal(provider.format, 'mrs', name);
     assert.ok(provider.url.startsWith(mirror) && provider.url.endsWith('.mrs'), name);
@@ -342,9 +364,14 @@ test('remote rule sets use the mirrored binary format and the AI pool probes an 
     assert.ok(['domain', 'ipcidr'].includes(provider.behavior), name);
     assert.ok(fs.existsSync(new URL('./resources/rules/' + provider.url.slice(mirror.length), import.meta.url)), name);
   }
+  assert.equal(config['rule-providers']['jms-ai-resources'], undefined);
+  assert.equal(config['rule-providers']['jms-artifact-resources'], undefined);
+  const claude = config['proxy-groups'].find(group => group.name === 'Claude 美国');
+  assert.equal(claude.url, 'https://api.anthropic.com/v1/models');
+  assert.equal(String(claude['expected-status']), '401/405');
   const ai = config['proxy-groups'].find(group => group.name === 'AI 美国');
-  assert.equal(ai.url, 'https://api.anthropic.com/v1/models');
-  assert.equal(String(ai['expected-status']), '401/405');
+  assert.equal(ai.url, 'https://www.gstatic.com/generate_204');
+  assert.equal(String(ai['expected-status']), '204');
 });
 
 test('sniffed domains replace poisoned destinations and stale fake-ips fail fast', () => {
@@ -352,6 +379,9 @@ test('sniffed domains replace poisoned destinations and stale fake-ips fail fast
   assert.equal(config.sniffer['override-destination'], true);
   assert.ok(config.sniffer['skip-domain'].includes('+.push.apple.com'));
   assert.equal(config.dns['fake-ip-range'], '198.18.0.1/16');
+  for (const host of ['captive.apple.com', 'connectivitycheck.gstatic.com', '+.ntp.org', '+.stun.*', '+.push.apple.com']) {
+    assert.ok(config.dns['fake-ip-filter'].includes(host), host);
+  }
   assert.equal(config.rules[0], 'IP-CIDR,198.18.0.0/16,REJECT,no-resolve');
   assert.ok(config.rules.indexOf('RULE-SET,jms-lancidr,DIRECT,no-resolve') > 0);
 });
@@ -362,12 +392,27 @@ test('installed AI tools stay on the US AI pool by domain and by process path', 
   for (const domain of ['+.ampcode.com', '+.ampcode.app', '+.warp.dev', '+.t3.chat', '+.anysphere.co']) assert.ok(shared.includes(domain), domain);
   assert.ok(template['rule-providers']['jms-gemini-bootstrap'].payload.includes('+.geminicli.com'));
   const paths = template.rules.filter(rule => rule.startsWith('PROCESS-PATH-REGEX,'));
-  assert.deepEqual(paths.map(rule => rule.split(',').at(-1)), ['AI 美国', 'REJECT']);
-  const pattern = new RegExp(paths[0].slice('PROCESS-PATH-REGEX,'.length, paths[0].lastIndexOf(',')).replace('(?i)', ''), 'i');
+  assert.deepEqual(paths.map(rule => rule.split(',').at(-1)), ['Claude 美国', 'REJECT', 'AI 美国', 'REJECT']);
+  const aiPathRule = paths.find(rule => rule.endsWith(',AI 美国'));
+  const pattern = new RegExp(aiPathRule.slice('PROCESS-PATH-REGEX,'.length, aiPathRule.lastIndexOf(',')).replace('(?i)', ''), 'i');
   for (const path of ['/Applications/Amp.app/Contents/MacOS/Amp', '/Applications/Warp.app/Contents/MacOS/stable',
-    '/Applications/T3 Code (Beta).app/Contents/MacOS/T3 Code (Beta)', '/Applications/Grok Bot.app/Contents/MacOS/Grok Bot',
+    '/Applications/T3 Code (Beta).app/Contents/MacOS/T3 Code (Beta)', '/Applications/T3 Code.app/Contents/MacOS/T3 Code',
+    '/Applications/Grok Bot.app/Contents/MacOS/Grok Bot',
     '/Users/me/.grok/downloads/grok-1.0.89-macos-aarch64']) assert.ok(pattern.test(path), path);
   assert.equal(pattern.test('/Applications/WeChat.app/Contents/MacOS/WeChat'), false);
   // Process guards stay after the domestic list, so these apps still reach domestic hosts directly.
   assert.ok(template.rules.indexOf(paths[0]) > template.rules.findIndex(rule => rule.includes('(RULE-SET,jms-direct)')));
+});
+
+test('bundled policy Worker serves subscriptions without fetching a remote template', async t => {
+  const calls = mockSources(t);
+  const bundled = createJmsWorker(fs.readFileSync(new URL('./jms-config/clash-base.yaml', import.meta.url), 'utf8'));
+  const env = { PROFILE_TOKEN: testToken, JMS_SUB_URL: testEnv.JMS_SUB_URL };
+  const response = await bundled.fetch(new Request(`https://example.test/clash/${testToken}.yaml`), env);
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get('X-Policy-Source'), 'bundled');
+  assert.equal(calls.filter(c => c.url.hostname === 'example.test').length, 0);
+  const config = parse(await response.text());
+  assert.deepEqual(config['proxy-groups'].map(g => g.name), ['默认代理', '自动选择', 'Claude 美国', 'AI 美国']);
+  assert.equal(config.proxies.length, 5);
 });

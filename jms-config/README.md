@@ -16,7 +16,7 @@ Worker 使用 JMS 官方 `noss=1` 参数请求上游，排除即将退役的 Sha
 
 - 已配置的国内 AI、Loyalsoldier 国内域名、局域网域名和原有私有网段保持直连。
 - 未明确分类的外网、普通海外站点使用 `默认代理` / `自动选择`，不限国家。为统一 Gemini 的 API、登录、验证码和国家域资源出口，整个 Google 规则集（包括 Google、YouTube）归入 `AI 美国`。共享 CDN、GitHub/npm 等 AI 客户端依赖也会使用美国出口。Grok 在 X、Copilot 在 Bing 的共用域复用 MetaCubeX twitter/bing 集合，因此普通 X/Bing 访问也走美国。Claude 登录页实测的 hCaptcha 及 Cloudflare / reCAPTCHA / Arkose 验证资源也统一进美国组。
-- Claude/Claude Code、OpenAI/ChatGPT/Codex、Gemini、Meta Muse、Grok、Copilot、DeepL/Lara/Yandex 翻译和其他海外 AI 统一使用美国 `fallback` 组 `AI 美国`。MetaCubeX `category-ai-!cn` 未收录的 character.ai、Replicate、Runway、v0、Bolt、Lovable、Suno、Together、Fireworks、DeepInfra、LMArena、Hailuo 国际版等，以及 Stripe 风控 `stripe.network`、Segment，在 `jms-ai-shared` 中固定为 `AI 美国`。
+- Claude / Claude Code 及其第三方依赖和 Anthropic IP 使用独立美国 `fallback` 组 `Claude 美国`（以 `https://api.anthropic.com/v1/models` 探活，401/405 视为可达）；OpenAI/ChatGPT/Codex、Gemini、Google、Meta Muse、Grok、Copilot、DeepL/Lara/Yandex 翻译和其他海外 AI 使用美国 `fallback` 组 `AI 美国`（以 `https://www.gstatic.com/generate_204` 探活，避免 Anthropic API 抖动影响 Google/OpenAI/GitHub 等流量）。两个美国组均仅包含已验证美国白名单节点并显式设置 `timeout: 5000`、`max-failed-times: 2`。MetaCubeX `category-ai-!cn` 未收录的 character.ai、Replicate、Runway、v0、Bolt、Lovable、Suno、Together、Fireworks、DeepInfra、LMArena、Hailuo 国际版等，以及 Stripe 风控 `stripe.network`、Segment，在 `jms-ai-shared` 中固定为 `AI 美国`。
 - 美国白名单依次为 s3、s2、s801，依据 2026-11-13 复核的 Google 地区接口与独立出口检测。节点编号不保证服务商未来不更换出口，变更后应复核白名单。
 - 显式国内 AI 例外优先。已知海外 AI 域名和 IP、局域网及国内域名先于 AI 应用的进程名和路径规则。国内和通用代理清单都收录的域名保持代理。启用 HTTP、TLS 和 QUIC 域名嗅探，保留实际目的地址。
 - 未收录的公网目标在识别出 AI 应用进程时使用 `AI 美国`，其余使用 `默认代理`。域名流量不在本地解析，未知域名即使解析到中国公网 IP 也按这套规则分流。
@@ -27,11 +27,11 @@ Worker 使用 JMS 官方 `noss=1` 参数请求上游，排除即将退役的 Sha
 
 域名/IP 规则复用 MetaCubeX/meta-rules-dat、Loyalsoldier/clash-rules、blackmatrix7/ios_rule_script 的域名条目，以及现有 EdgeTunnel 的 AI 引导和资源列表。2026-11-20 起，嗅探器开启 `override-destination`：应用若绕过内核 DNS、拿到被污染的 IP，仍按嗅探出的真实域名经节点远端解析连接（Apple 推送等固定 IP 服务在 `skip-domain` 中跳过）；规则首条拒绝没有映射的 fake-ip（`198.18.0.0/16`），使内核重启后残留的 fake-ip 立即失败重试，而不是被当作局域网地址直连超时。同日，13 个远程规则集改为读取本仓库 `resources/rules/` 每日同步的镜像，并使用 Mihomo 二进制格式（`.mrs`）以降低客户端内存和加载时间；`AI 美国` 改用 `https://api.anthropic.com/v1/models` 探活（HEAD 405 / GET 401 视为可达），不再只检测通用连通性。ChatGPT 语音 IP 更新自 [OpenAI 官方 JSON](https://openai.com/chatgpt-voice.json)（2026-11-12 发布，540 条）；后续新增且未列入的公网 IP 仍会走普通代理，不会按中国 IP 回落直连。GitHub 规则由 Mihomo 自动更新，模板更新在下次订阅刷新后生效。
 
-2026-11-21 起，按本机 AI 客户端二进制中的主机名复核两条订阅：Amp、Warp、T3 Chat、Anysphere 加入 `jms-ai-shared`，`geminicli.com` 加入 `jms-gemini-bootstrap`；进程兜底路径加入 Amp、Warp、T3 Code、Grok Bot 与 `~/.grok/` 下的 grok CLI。进程规则仍位于国内清单之后，这些应用访问国内地址照常直连。
+2026-11-21 起，按本机 AI 客户端二进制中的主机名复核两条订阅：Amp、Warp、T3 Chat、Anysphere 加入 `jms-ai-shared`，`geminicli.com` 加入 `jms-gemini-bootstrap`；进程兜底路径加入 Amp、Warp、T3 Code、Grok Bot 与 `~/.grok/` 下的 grok CLI。进程规则仍位于国内清单之后，这些应用访问国内地址照常直连。同日进一步优化：① ChatGPT 语音 IP 改由仓库每日同步编译的 `resources/rules/openai-voice.mrs` 提供（14 个远程 `.mrs` 规则集），移除模板内联的 540 条过期 IP、132 条冗余国内 AI DNS 条目以及完全被遮蔽的 `jms-ai-resources` / `jms-artifact-resources`；② 拆分 `Claude 美国`（探 Anthropic）与 `AI 美国`（探 gstatic 204）两个美国 `fallback` 组，补齐 `keep-alive-interval/idle: 30`、`max-failed-times: 2` 与基础网络 `fake-ip-filter`；③ Worker 通过 `worker-entry.mjs` 直接内置同目录 `clash-base.yaml`，消除运行时对 GitHub Raw 的强依赖（保留 `POLICY_URL` 环境变量用于显式远程覆盖）。
 
 ## 托管
 
-`wrangler.jsonc` 声明独立 Worker `jms-sub-config`。通过 Wrangler Secrets 保存 `JMS_SUB_URL`、随机 `PROFILE_TOKEN`，然后部署。订阅路径为 `/clash/<PROFILE_TOKEN>.yaml`；无效令牌返回 404。请求 URL 的调用日志和跟踪记录关闭，错误日志不包含密钥或上游地址。
+`wrangler.jsonc` 声明独立 Worker `jms-sub-config`（入口 `worker-entry.mjs`，直接打包 `clash-base.yaml`）。通过 Wrangler Secrets 保存 `JMS_SUB_URL`、随机 `PROFILE_TOKEN`，然后部署。订阅路径为 `/clash/<PROFILE_TOKEN>.yaml`；无效令牌返回 404。请求 URL 的调用日志和跟踪记录关闭，错误日志不包含密钥或上游地址。
 
 若 Clash Verge 针对该订阅启用了 DNS 覆盖，需要关闭该订阅的 DNS 覆盖，让远程配置生效。原始 JMS 订阅可保留作回滚入口。
 

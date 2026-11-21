@@ -41,54 +41,72 @@ async function bandwidth(source) {
   }
 }
 
-export default {
-  async fetch(request, env) {
-    if (!['GET', 'HEAD'].includes(request.method) || !authorized(request, env.PROFILE_TOKEN)) {
-      return new Response('Not found', { status: 404 });
-    }
-    try {
-      const source = new URL(env.JMS_SUB_URL);
-      if (source.protocol !== 'https:' || source.hostname !== 'jmssub.net' || source.pathname !== '/members/getsub.php') {
-        throw new Error('Invalid upstream subscription');
+function parseBundledPolicy(content) {
+  const policy = parse(content);
+  if (!Array.isArray(policy?.['proxy-groups']) || !policy['proxy-groups'].length || !Array.isArray(policy.rules) || !policy.rules.length) {
+    throw new Error('Invalid hosted policy');
+  }
+  return policy;
+}
+
+export function createJmsWorker(bundledPolicy = null) {
+  return {
+    async fetch(request, env) {
+      if (!['GET', 'HEAD'].includes(request.method) || !authorized(request, env.PROFILE_TOKEN)) {
+        return new Response('Not found', { status: 404 });
       }
-      source.searchParams.set('noss', '1');
-      const [primary, template, quota] = await Promise.all([
-        subscription(source).catch(() => null),
-        hostedPolicy(env.POLICY_URL),
-        bandwidth(source),
-      ]);
-      let selected = primary;
-      let config;
-      let origin = 'primary';
       try {
-        config = buildConfig(primary?.upstream, template);
-      } catch {
-        const mirror = new URL(source);
-        mirror.hostname = 'jjsubmarines.com';
-        selected = await subscription(mirror);
-        config = buildConfig(selected.upstream, template);
-        origin = 'mirror';
+        const source = new URL(env.JMS_SUB_URL);
+        if (source.protocol !== 'https:' || source.hostname !== 'jmssub.net' || source.pathname !== '/members/getsub.php') {
+          throw new Error('Invalid upstream subscription');
+        }
+        source.searchParams.set('noss', '1');
+        const policyPromise = env.POLICY_URL
+          ? hostedPolicy(env.POLICY_URL, env.POLICY_CACHE)
+          : typeof bundledPolicy === 'string' && bundledPolicy.length
+            ? Promise.resolve(parseBundledPolicy(bundledPolicy))
+            : Promise.reject(new Error('Invalid hosted policy'));
+        const [primary, template, quota] = await Promise.all([
+          subscription(source).catch(() => null),
+          policyPromise,
+          bandwidth(source),
+        ]);
+        let selected = primary;
+        let config;
+        let origin = 'primary';
+        try {
+          config = buildConfig(primary?.upstream, template);
+        } catch {
+          const mirror = new URL(source);
+          mirror.hostname = 'jjsubmarines.com';
+          selected = await subscription(mirror);
+          config = buildConfig(selected.upstream, template);
+          origin = 'mirror';
+        }
+        const headers = {
+          'Content-Type': 'application/yaml; charset=utf-8',
+          'Content-Disposition': 'attachment; filename="JMS-Remote.yaml"',
+          'profile-title': 'JMS Remote',
+          'profile-update-interval': '6',
+          'Cache-Control': 'private, no-store',
+          'Referrer-Policy': 'no-referrer',
+          'X-Content-Type-Options': 'nosniff',
+          'X-Subscription-Source': origin,
+          'X-Policy-Source': env.POLICY_URL ? 'remote' : 'bundled',
+          'X-Usage-Source': quota ? 'bandwidth-api' : selected.usage ? 'upstream' : 'unavailable',
+        };
+        const expiry = /(?:^|;\s*)expire=(\d+)/.exec(selected.usage || '');
+        const usage = quota ? quota + (expiry ? `; expire=${expiry[1]}` : '') : selected.usage;
+        if (usage && usage.length < 1024) headers['subscription-userinfo'] = usage;
+        return new Response(request.method === 'HEAD' ? null : stringify(config, { lineWidth: 0 }), { headers });
+      } catch (error) {
+        const known = ['Invalid upstream subscription', 'Subscription resource unavailable', 'Invalid hosted policy', 'No JMS nodes', 'Missing verified node policy', 'No verified US nodes; keep the previous subscription'];
+        const reason = known.includes(error?.message) ? error.message : error?.name || 'Error';
+        console.error({ event: 'jms_config_unavailable', reason });
+        return new Response('Subscription configuration unavailable', { status: 503, headers: { 'Cache-Control': 'no-store', 'X-Config-Error': reason } });
       }
-      const headers = {
-        'Content-Type': 'application/yaml; charset=utf-8',
-        'Content-Disposition': 'attachment; filename="JMS-Remote.yaml"',
-        'profile-title': 'JMS Remote',
-        'profile-update-interval': '6',
-        'Cache-Control': 'private, no-store',
-        'Referrer-Policy': 'no-referrer',
-        'X-Content-Type-Options': 'nosniff',
-        'X-Subscription-Source': origin,
-        'X-Usage-Source': quota ? 'bandwidth-api' : selected.usage ? 'upstream' : 'unavailable',
-      };
-      const expiry = /(?:^|;\s*)expire=(\d+)/.exec(selected.usage || '');
-      const usage = quota ? quota + (expiry ? `; expire=${expiry[1]}` : '') : selected.usage;
-      if (usage && usage.length < 1024) headers['subscription-userinfo'] = usage;
-      return new Response(request.method === 'HEAD' ? null : stringify(config, { lineWidth: 0 }), { headers });
-    } catch (error) {
-      const known = ['Invalid upstream subscription', 'Subscription resource unavailable', 'Invalid hosted policy', 'No JMS nodes', 'Missing verified node policy', 'No verified US nodes; keep the previous subscription'];
-      const reason = known.includes(error?.message) ? error.message : error?.name || 'Error';
-      console.error({ event: 'jms_config_unavailable', reason });
-      return new Response('Subscription configuration unavailable', { status: 503, headers: { 'Cache-Control': 'no-store', 'X-Config-Error': reason } });
-    }
-  },
-};
+    },
+  };
+}
+
+export default createJmsWorker();

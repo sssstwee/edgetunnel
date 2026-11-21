@@ -79,3 +79,16 @@ test('failed, malformed and oversized voice sources retain the hosted template b
   fetch.mock.mockImplementation(async () => new Response(' '.repeat(262145)));
   assert.deepEqual(payload(await applyClashRouting(input)), ['203.0.113.1/32']);
 });
+
+test('remote .mrs openai-voice provider skips runtime voice JSON fetches', async (t) => {
+  const fetch = t.mock.method(globalThis, 'fetch', () => { throw new Error('must not fetch'); });
+  const input = source();
+  input['rule-providers']['openai-voice'] = {
+    type: 'http', behavior: 'ipcidr', format: 'mrs',
+    url: 'https://raw.githubusercontent.com/sssstwee/edgetunnel/main/resources/rules/openai-voice.mrs',
+    path: './ruleset/edgetunnel-openai-voice.mrs', interval: 86400, proxy: '默认代理',
+  };
+  const output = parse(await applyClashRouting(stringify(input)));
+  assert.equal(fetch.mock.callCount(), 0);
+  assert.equal(output['rule-providers']['openai-voice'].format, 'mrs');
+});

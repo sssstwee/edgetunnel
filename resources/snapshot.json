@@ -190,6 +190,15 @@
       "bytes": 24953
     },
     {
+      "path": "rules/cn.yaml",
+      "kind": "rule",
+      "behavior": "domain",
+      "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/f7119625e8e225d0e5a06b137465e0c10cb906f8/geo/geosite/cn.yaml",
+      "sourceCommit": "f7119625e8e225d0e5a06b137465e0c10cb906f8",
+      "sha256": "f03c301bc6ef21349da52b377e164aa1518f5549188575bc08b4e4436651b620",
+      "bytes": 2274663
+    },
+    {
       "path": "rules/line-ip.yaml",
       "kind": "rule",
       "behavior": "classical",
@@ -520,6 +529,24 @@
       "compiler": "Mihomo Meta v1.19.34 linux amd64 with go1.26.11 Wed Nov 11 06:48:49 UTC 2026",
       "sha256": "ad92420fecc12694f11af2ed86ddc5d233ec1350b1ae15e8d24959fda23bc200",
       "bytes": 8973
+    },
+    {
+      "path": "rules/cn.mrs",
+      "kind": "mrs",
+      "behavior": "domain",
+      "source": "rules/cn.yaml",
+      "compiler": "Mihomo Meta v1.19.33 darwin arm64 with go1.22.12 Wed Oct 21 16:48:26 UTC 2026",
+      "sha256": "0b8c7c4d9773471991dd65737fdb16f3bf1baf2512c8b764d4c235318f01b7c6",
+      "bytes": 532882
+    },
+    {
+      "path": "rules/openai-voice.mrs",
+      "kind": "mrs",
+      "behavior": "ipcidr",
+      "source": "data/chatgpt-voice.json",
+      "compiler": "Mihomo Meta v1.19.33 darwin arm64 with go1.22.12 Wed Oct 21 16:48:26 UTC 2026",
+      "sha256": "0887d5a9a1dcca981a0ddb081dfb180d787ecc79264a78b670c8e3414d5caef2",
+      "bytes": 1248
     }
   ],
   "geodata": {

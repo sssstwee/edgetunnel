@@ -136,6 +136,12 @@
           "path": "rules/google.yaml",
           "kind": "rule",
           "behavior": "domain"
+        },
+        {
+          "source": "geo/geosite/cn.yaml",
+          "path": "rules/cn.yaml",
+          "kind": "rule",
+          "behavior": "domain"
         }
       ]
     },
