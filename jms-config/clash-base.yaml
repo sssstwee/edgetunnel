@@ -1516,6 +1516,7 @@ rule-providers:
     - oauthaccountmanager.googleapis.com
     - ssl.gstatic.com
     - lh3.googleusercontent.com
+    - +.geminicli.com
   jms-meta-bootstrap:
     type: inline
     behavior: domain
@@ -1695,6 +1696,11 @@ rule-providers:
     - +.fal.media
     - +.civitai.com
     - +.openart.ai
+    - +.ampcode.com
+    - +.ampcode.app
+    - +.warp.dev
+    - +.t3.chat
+    - +.anysphere.co
 # Trusted domestic AI exceptions, then pinned critical AI, then general lists and app guards.
 rules:
 # A fake-ip without a live mapping (cached across a core restart) fails fast instead of timing out as a LAN address.
@@ -1741,8 +1747,8 @@ rules:
 - AND,((RULE-SET,jms-direct),(NOT,((RULE-SET,jms-proxy)))),DIRECT
 - PROCESS-NAME-REGEX,(?i)^(claude|codex|chatgpt|claude code|gemini|muse|musecode|muse-code|muse code|antigravity|cursor|windsurf|trae|magpie|magpie-bun|codex-code-mode-host|com\.apple\.virtualization\.virtualmachine)( helper.*| \(.*\))?$,AI 美国
 - PROCESS-NAME-REGEX,(?i)^(claude|codex|chatgpt|claude code|gemini|muse|musecode|muse-code|muse code|antigravity|cursor|windsurf|trae|magpie|magpie-bun|codex-code-mode-host|com\.apple\.virtualization\.virtualmachine)( helper.*| \(.*\))?$,REJECT
-- PROCESS-PATH-REGEX,(?i)(/Applications/(ChatGPT|Codex|Claude|Cursor|Antigravity|Windsurf|Trae|Magpie|Muse)\.app/|/\.local/share/claude/versions/|/Library/Application Support/Claude/claude-code/|/extensions/anthropic\.claude-code-|/Caskroom/claude-code/|/\.cache/magpie/bun/),AI 美国
-- PROCESS-PATH-REGEX,(?i)(/Applications/(ChatGPT|Codex|Claude|Cursor|Antigravity|Windsurf|Trae|Magpie|Muse)\.app/|/\.local/share/claude/versions/|/Library/Application Support/Claude/claude-code/|/extensions/anthropic\.claude-code-|/Caskroom/claude-code/|/\.cache/magpie/bun/),REJECT
+- PROCESS-PATH-REGEX,(?i)(/Applications/(ChatGPT|Codex|Claude|Cursor|Antigravity|Windsurf|Trae|Magpie|Muse|Amp|Warp|T3 Code \(Beta\)|Grok Bot)\.app/|/\.grok/|/\.local/share/claude/versions/|/Library/Application Support/Claude/claude-code/|/extensions/anthropic\.claude-code-|/Caskroom/claude-code/|/\.cache/magpie/bun/),AI 美国
+- PROCESS-PATH-REGEX,(?i)(/Applications/(ChatGPT|Codex|Claude|Cursor|Antigravity|Windsurf|Trae|Magpie|Muse|Amp|Warp|T3 Code \(Beta\)|Grok Bot)\.app/|/\.grok/|/\.local/share/claude/versions/|/Library/Application Support/Claude/claude-code/|/extensions/anthropic\.claude-code-|/Caskroom/claude-code/|/\.cache/magpie/bun/),REJECT
 - RULE-SET,jms-proxy,默认代理
 - RULE-SET,jms-proxy,REJECT
 # Pure-IP connections to mainland China addresses. Fake-ip domain traffic carries no IP and never matches.

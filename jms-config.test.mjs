@@ -355,3 +355,19 @@ test('sniffed domains replace poisoned destinations and stale fake-ips fail fast
   assert.equal(config.rules[0], 'IP-CIDR,198.18.0.0/16,REJECT,no-resolve');
   assert.ok(config.rules.indexOf('RULE-SET,jms-lancidr,DIRECT,no-resolve') > 0);
 });
+
+test('installed AI tools stay on the US AI pool by domain and by process path', () => {
+  const template = policy();
+  const shared = template['rule-providers']['jms-ai-shared'].payload;
+  for (const domain of ['+.ampcode.com', '+.ampcode.app', '+.warp.dev', '+.t3.chat', '+.anysphere.co']) assert.ok(shared.includes(domain), domain);
+  assert.ok(template['rule-providers']['jms-gemini-bootstrap'].payload.includes('+.geminicli.com'));
+  const paths = template.rules.filter(rule => rule.startsWith('PROCESS-PATH-REGEX,'));
+  assert.deepEqual(paths.map(rule => rule.split(',').at(-1)), ['AI 美国', 'REJECT']);
+  const pattern = new RegExp(paths[0].slice('PROCESS-PATH-REGEX,'.length, paths[0].lastIndexOf(',')).replace('(?i)', ''), 'i');
+  for (const path of ['/Applications/Amp.app/Contents/MacOS/Amp', '/Applications/Warp.app/Contents/MacOS/stable',
+    '/Applications/T3 Code (Beta).app/Contents/MacOS/T3 Code (Beta)', '/Applications/Grok Bot.app/Contents/MacOS/Grok Bot',
+    '/Users/me/.grok/downloads/grok-1.0.89-macos-aarch64']) assert.ok(pattern.test(path), path);
+  assert.equal(pattern.test('/Applications/WeChat.app/Contents/MacOS/WeChat'), false);
+  // Process guards stay after the domestic list, so these apps still reach domestic hosts directly.
+  assert.ok(template.rules.indexOf(paths[0]) > template.rules.findIndex(rule => rule.includes('(RULE-SET,jms-direct)')));
+});

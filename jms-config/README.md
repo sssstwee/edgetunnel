@@ -27,6 +27,8 @@ Worker 使用 JMS 官方 `noss=1` 参数请求上游，排除即将退役的 Sha
 
 域名/IP 规则复用 MetaCubeX/meta-rules-dat、Loyalsoldier/clash-rules、blackmatrix7/ios_rule_script 的域名条目，以及现有 EdgeTunnel 的 AI 引导和资源列表。2026-11-20 起，嗅探器开启 `override-destination`：应用若绕过内核 DNS、拿到被污染的 IP，仍按嗅探出的真实域名经节点远端解析连接（Apple 推送等固定 IP 服务在 `skip-domain` 中跳过）；规则首条拒绝没有映射的 fake-ip（`198.18.0.0/16`），使内核重启后残留的 fake-ip 立即失败重试，而不是被当作局域网地址直连超时。同日，13 个远程规则集改为读取本仓库 `resources/rules/` 每日同步的镜像，并使用 Mihomo 二进制格式（`.mrs`）以降低客户端内存和加载时间；`AI 美国` 改用 `https://api.anthropic.com/v1/models` 探活（HEAD 405 / GET 401 视为可达），不再只检测通用连通性。ChatGPT 语音 IP 更新自 [OpenAI 官方 JSON](https://openai.com/chatgpt-voice.json)（2026-11-12 发布，540 条）；后续新增且未列入的公网 IP 仍会走普通代理，不会按中国 IP 回落直连。GitHub 规则由 Mihomo 自动更新，模板更新在下次订阅刷新后生效。
 
+2026-11-21 起，按本机 AI 客户端二进制中的主机名复核两条订阅：Amp、Warp、T3 Chat、Anysphere 加入 `jms-ai-shared`，`geminicli.com` 加入 `jms-gemini-bootstrap`；进程兜底路径加入 Amp、Warp、T3 Code、Grok Bot 与 `~/.grok/` 下的 grok CLI。进程规则仍位于国内清单之后，这些应用访问国内地址照常直连。
+
 ## 托管
 
 `wrangler.jsonc` 声明独立 Worker `jms-sub-config`。通过 Wrangler Secrets 保存 `JMS_SUB_URL`、随机 `PROFILE_TOKEN`，然后部署。订阅路径为 `/clash/<PROFILE_TOKEN>.yaml`；无效令牌返回 404。请求 URL 的调用日志和跟踪记录关闭，错误日志不包含密钥或上游地址。
