@@ -3,12 +3,15 @@ import { parse, stringify } from 'yaml';
 import { buildConfig } from './policy.mjs';
 import { hostedPolicy, readText } from '../native-converter/converter.mjs';
 
-function authorized(request, token) {
+// Constant-time match of the request path against a secret-bearing path; short tokens never match.
+export function pathMatches(request, token, path) {
   if (typeof token !== 'string' || token.length < 32) return false;
   const actual = new TextEncoder().encode(new URL(request.url).pathname);
-  const expected = new TextEncoder().encode(`/clash/${token}.yaml`);
+  const expected = new TextEncoder().encode(path(token));
   return actual.length === expected.length && timingSafeEqual(actual, expected);
 }
+
+export const authorized = (request, token) => pathMatches(request, token, t => `/clash/${t}.yaml`);
 
 async function subscription(source) {
   const response = await fetch(source.href, {
