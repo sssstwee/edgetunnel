@@ -24,7 +24,7 @@ Worker `all-sub-config` 部署在 `sub.tastedistill.com`，订阅路径是 `/cla
 
 一个订阅只能带一份 `subscription-userinfo`，所以各线路的用量写在三个只用于显示的分组名里。它们是 `select` 分组，只含 `REJECT`，没有任何规则引用，排在代理页最后。EdgeTunnel 的请求额度也是用同样的方式显示的。
 
-- `📊 GCP 已用 2.65 GB / 260 GB（1.0%）`、`📊 JMS 已用 57.18 GB / 466 GB（12.3%）`：数据来自对两条线路订阅的 `HEAD` 请求返回的 `subscription-userinfo`。单位是 GiB，但和 Clash Verge 订阅卡片一样标作 GB。
+- `📊 GCP 已用 2.65 GiB / 260 GiB（1.0%）`、`📊 JMS 已用 61.39 GB / 500 GB（12.3%）`：数据来自对两条线路订阅的 `HEAD` 请求返回的 `subscription-userinfo`。每条线路按服务商的计费单位显示，与服务商后台一致：Google 按二进制 GiB 计费，上限是 260 GiB；JMS 按十进制 GB 计费，套餐是 500 GB。Clash Verge 的订阅卡片和代理集合由客户端自己换算，统一按二进制计算却标作 GB，所以 JMS 在那两处显示为 466GB。
 - `📊 CF 本账期剩余请求：99.89%（估算）`：原样沿用 EdgeTunnel 订阅里的同名分组，表示 Worker 调用剩余量。它在 2026-11-13 改成了百分比，这里不另行换算。
 - 订阅卡片显示 GCP 与 JMS 的合计用量。EdgeTunnel 按请求次数计量，不计入合计。
 
