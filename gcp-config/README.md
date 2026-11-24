@@ -7,7 +7,7 @@
 | 资源 | 规格 | 月费 |
 |---|---|---|
 | VM | `gcp-proxy-usw1`，e2-micro，标准预配，`us-west1-b` | $0（免费层） |
-| 启动盘 | 10 GB `pd-standard`，无快照计划 | $0（免费层） |
+| 启动盘 | 30 GB `pd-standard`，无快照计划。免费层每月 30 GB-月，结算账号下只有这一块盘，所以用满 30 GB | $0（免费层） |
 | 静态 IPv4 | `gcp-proxy-usw1-ip`，Standard 网络层 | $3.60–3.72 |
 | 出站流量 | Standard 层，每月前 200 GiB 免费，之后 $0.085/GiB | 0–$5.10 |
 
@@ -24,7 +24,10 @@ VM 上的 nftables 配额把出站流量限制在每月 **260 GiB**，最高月�
 - **节点顺序是 HY2 在前、Reality 在后**，两个美国 `fallback` 组也按这个顺序。原因是浙江电信到俄勒冈的最低往返约 185ms，TCP 重传常超过一成，QUIC 更能扛丢包。
 - **HY2 客户端设了 `down: 200 Mbps` / `up: 30 Mbps`**，启用 Brutal 拥塞控制。2026-11-24 中午实测 40 MB 下载的中位速度：BBR 50 Mbps，Brutal 100 为 57 Mbps，Brutal 200 为 77 Mbps。三者的 VM 出站都比有效载荷多约 23%–25%，所以 Brutal 没有明显多耗流量。设定值不能超过客户端线路的实际带宽，用 `HY2_DOWN_MBPS` / `HY2_UP_MBPS` 调整。按这个开销估算，260 GiB 出站上限约合 210 GiB 实际内容。
 - 两个代理都拒绝访问元数据服务器和私有网段，VM 也没有挂服务账号。
-- 内核启用 BBR + fq，UDP 缓冲区 16 MiB，1 GiB swap。unattended-upgrades 只安装 Debian 安全更新，Xray 和 Hysteria 不随系统更新。
+- 内核参数按约 190ms 往返、丢包较多的中美线路调整：BBR + fq；TCP/UDP 缓冲区上限 16 MiB，覆盖 200 Mbps 以上的带宽时延积；`tcp_slow_start_after_idle = 0`，复用的连接空闲后不重新慢启动；`tcp_notsent_lowat = 128 KiB`，限制排队延迟；`tcp_mtu_probing = 1`，应对路径上 ICMP 被过滤的情况。
+- 1 GiB swap，`swappiness = 10`。1 GB 内存里两个代理约占 100 MB，swap 只在内存紧张时使用。`setup.sh` 会把根分区扩到磁盘大小。
+- unattended-upgrades 只安装 Debian 安全更新，Xray 和 Hysteria 不随系统更新。
+- VM 只有 IPv4。客户端请求 IPv6 目标（例如 Telegram 的 IPv6 数据中心）时会立即失败，应用随后改用 IPv4。GCP 的 IPv6 只能走 Premium 网络层，不在 200 GiB 免费额度内，所以不开启。
 
 ### 出站配额
 

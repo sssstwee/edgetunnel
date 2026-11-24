@@ -12,18 +12,29 @@ HERE=$(cd "$(dirname "$0")" && pwd)
 export DEBIAN_FRONTEND=noninteractive
 
 apt-get -qq update
-apt-get -qq install -y --no-install-recommends nftables curl ca-certificates openssl python3 unattended-upgrades >/dev/null
+apt-get -qq install -y --no-install-recommends nftables curl ca-certificates openssl python3 unattended-upgrades cloud-guest-utils >/dev/null
 printf 'APT::Periodic::Update-Package-Lists "1";\nAPT::Periodic::Unattended-Upgrade "1";\n' > /etc/apt/apt.conf.d/20auto-upgrades
 
-# ---- Kernel: BBR for TCP, 16 MiB socket buffers for QUIC, swap only under pressure ----
+# ---- Kernel: tuned for a ~190 ms, lossy China–US path ----
+# BBR + fq for TCP; 16 MiB socket buffers cover the bandwidth-delay product of QUIC and REALITY at
+# 200+ Mbit/s; keep cwnd across idle gaps so reused connections don't restart slow start; cap unsent
+# data per socket to bound queueing delay; probe MTU in case ICMP is filtered on the way.
 cat > /etc/sysctl.d/90-gcp-proxy.conf <<'SYSCTL'
 net.core.default_qdisc = fq
 net.ipv4.tcp_congestion_control = bbr
 net.core.rmem_max = 16777216
 net.core.wmem_max = 16777216
+net.ipv4.tcp_rmem = 4096 131072 16777216
+net.ipv4.tcp_wmem = 4096 65536 16777216
+net.ipv4.tcp_slow_start_after_idle = 0
+net.ipv4.tcp_notsent_lowat = 131072
+net.ipv4.tcp_mtu_probing = 1
 vm.swappiness = 10
 SYSCTL
 sysctl -q --system
+
+# ---- Root filesystem follows the disk size (30 GB fills the free tier's 30 GB-months) ----
+growpart /dev/sda 1 >/dev/null 2>&1 && resize2fs /dev/sda1 >/dev/null 2>&1 || true
 
 # ---- 1 GiB swap: the VM has 1 GB RAM ----
 if ! swapon --show=NAME --noheadings | grep -qx /swapfile; then
