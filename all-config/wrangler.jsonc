@@ -1,0 +1,48 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "all-sub-config",
+  "main": "worker-entry.mjs",
+  "base_dir": "..",
+  "compatibility_date": "2026-11-09",
+  "compatibility_flags": [
+    "nodejs_compat",
+    "global_fetch_strictly_public"
+  ],
+  "rules": [
+    {
+      "type": "Text",
+      "globs": [
+        "**/*.yaml"
+      ],
+      "fallthrough": true
+    }
+  ],
+  "workers_dev": false,
+  "preview_urls": false,
+  "secrets": {
+    "required": [
+      "PROFILE_TOKEN",
+      "GCP_PROFILE_URL",
+      "JMS_PROFILE_URL",
+      "EDGETUNNEL_SUB_URL"
+    ]
+  },
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1,
+    "logs": {
+      "enabled": true,
+      "invocation_logs": false
+    },
+    "traces": {
+      "enabled": false
+    }
+  },
+  "routes": [
+    {
+      "pattern": "sub.tastedistill.com",
+      "custom_domain": true,
+      "zone_name": "tastedistill.com"
+    }
+  ]
+}
