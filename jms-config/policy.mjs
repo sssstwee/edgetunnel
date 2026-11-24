@@ -25,18 +25,9 @@ function labelNodes(proxies, labels) {
   return tagged.map(({ proxy, id }) => ({ proxy, id }));
 }
 
-export function buildConfig(upstream, template) {
-  if (!Array.isArray(upstream?.proxies) || !upstream.proxies.length) throw new Error('No JMS nodes');
-  const allowed = template['jms-us-nodes'];
-  const udp = template['jms-udp-nodes'];
-  if (!Array.isArray(allowed) || !allowed.length || !Array.isArray(udp)) throw new Error('Missing verified node policy');
-  const nodes = labelNodes(structuredClone(upstream.proxies), template['jms-node-names'] || {});
-  const proxies = nodes.map(({ proxy }) => proxy);
-  for (const { proxy, id } of nodes) {
-    proxy.udp = udp.includes(id);
-    if (proxy.type === 'vless' && proxy.udp) proxy['packet-encoding'] = 'xudp';
-  }
-  const us = allowed.flatMap(id => nodes.filter(node => node.id === id).map(node => node.proxy.name));
+// Node-agnostic half of the hosted policy: any line (JMS, GCP) supplies its proxies and the names
+// verified as US exits; the template's rules, DNS and groups stay the single shared source.
+export function renderUsPolicy(proxies, us, template) {
   if (!us.length) throw new Error('No verified US nodes; keep the previous subscription');
   const config = renderPolicy(proxies, template);
   for (const group of config['proxy-groups']) {
@@ -49,4 +40,19 @@ export function buildConfig(upstream, template) {
   delete config['jms-udp-nodes'];
   delete config['harmony-runtime'];
   return config;
+}
+
+export function buildConfig(upstream, template) {
+  if (!Array.isArray(upstream?.proxies) || !upstream.proxies.length) throw new Error('No JMS nodes');
+  const allowed = template['jms-us-nodes'];
+  const udp = template['jms-udp-nodes'];
+  if (!Array.isArray(allowed) || !allowed.length || !Array.isArray(udp)) throw new Error('Missing verified node policy');
+  const nodes = labelNodes(structuredClone(upstream.proxies), template['jms-node-names'] || {});
+  const proxies = nodes.map(({ proxy }) => proxy);
+  for (const { proxy, id } of nodes) {
+    proxy.udp = udp.includes(id);
+    if (proxy.type === 'vless' && proxy.udp) proxy['packet-encoding'] = 'xudp';
+  }
+  const us = allowed.flatMap(id => nodes.filter(node => node.id === id).map(node => node.proxy.name));
+  return renderUsPolicy(proxies, us, template);
 }
