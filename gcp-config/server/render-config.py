@@ -20,6 +20,10 @@ REALITY_TARGET = os.environ.get("REALITY_TARGET", "addons.mozilla.org")
 HY2_MASQUERADE = os.environ.get("HY2_MASQUERADE", "https://www.bing.com/")
 HOP_PORTS = os.environ.get("HOP_PORTS", "21000-21050")
 LABEL = os.environ.get("NODE_LABEL", "GCP 俄勒冈")
+# Client bandwidth turns on Hysteria's Brutal congestion control, which keeps its rate under the heavy
+# loss of the China–US path. Set it to what the client's line really carries: too high only adds loss.
+HY2_UP_MBPS = int(os.environ.get("HY2_UP_MBPS", "30"))
+HY2_DOWN_MBPS = int(os.environ.get("HY2_DOWN_MBPS", "200"))
 # Proxied requests must never reach the metadata server (instance credentials) or private ranges.
 PRIVATE = ["0.0.0.0/8", "10.0.0.0/8", "100.64.0.0/10", "127.0.0.0/8", "169.254.0.0/16", "172.16.0.0/12",
            "192.168.0.0/16", "224.0.0.0/4", "::1/128", "fc00::/7", "fe80::/10"]
@@ -98,15 +102,16 @@ def main(xray_group):
         "acl": {"inline": [f"reject({h})" for h in METADATA_HOSTS] + [f"reject({c})" for c in PRIVATE] + ["direct(all)"]},
     }, "hysteria")
     server = external_ip()
+    # HY2 first: fallback groups try nodes in this order, and QUIC copes better with the path's loss.
     nodes = [
+        {"name": f"{LABEL} · HY2", "type": "hysteria2", "server": server, "port": 443, "ports": HOP_PORTS,
+         "hop-interval": 30, "password": s["hy2_password"], "sni": HY2_SNI, "fingerprint": fingerprint,
+         "skip-cert-verify": False, "alpn": ["h3"], "up": f"{HY2_UP_MBPS} Mbps", "down": f"{HY2_DOWN_MBPS} Mbps"},
         {"name": f"{LABEL} · Reality", "type": "vless", "server": server, "port": 443, "uuid": s["vless_id"],
          "network": "tcp", "tls": True, "udp": True, "flow": "xtls-rprx-vision", "packet-encoding": "xudp",
          "servername": REALITY_TARGET, "client-fingerprint": "chrome",
          # The target negotiates X25519MLKEM768; without it Mihomo fails REALITY authentication.
          "reality-opts": {"public-key": s["reality_public"], "short-id": s["short_id"], "support-x25519mlkem768": True}},
-        {"name": f"{LABEL} · HY2", "type": "hysteria2", "server": server, "port": 443, "ports": HOP_PORTS,
-         "hop-interval": 30, "password": s["hy2_password"], "sni": HY2_SNI, "fingerprint": fingerprint,
-         "skip-cert-verify": False, "alpn": ["h3"]},
     ]
     write(STATE / "client.json", nodes, "root", 0o600)
 

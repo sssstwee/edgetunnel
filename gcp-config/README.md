@@ -21,6 +21,8 @@ VM 上的 nftables 配额把出站流量限制在每月 **260 GiB**，最高月�
 
 - **Xray VLESS + REALITY + Vision**，监听 TCP 443。伪装目标是 `addons.mozilla.org`：TLS 1.3，Fastly 托管，国内可直接访问。目标站协商 X25519MLKEM768，所以客户端必须设 `support-x25519mlkem768: true`，否则 REALITY 认证失败。
 - **Hysteria 2**，监听 UDP 443，使用自签证书，客户端用 SHA-256 指纹固定。UDP 21000–21050 由 `gcp-hy2-hop.service` 转发到 443，用于端口跳跃。未认证的探测会被反向代理到 Bing。
+- **节点顺序是 HY2 在前、Reality 在后**，两个美国 `fallback` 组也按这个顺序。原因是浙江电信到俄勒冈的最低往返约 185ms，TCP 重传常超过一成，QUIC 更能扛丢包。
+- **HY2 客户端设了 `down: 200 Mbps` / `up: 30 Mbps`**，启用 Brutal 拥塞控制。2026-11-24 中午实测 40 MB 下载的中位速度：BBR 50 Mbps，Brutal 100 为 57 Mbps，Brutal 200 为 77 Mbps。三者的 VM 出站都比有效载荷多约 23%–25%，所以 Brutal 没有明显多耗流量。设定值不能超过客户端线路的实际带宽，用 `HY2_DOWN_MBPS` / `HY2_UP_MBPS` 调整。按这个开销估算，260 GiB 出站上限约合 210 GiB 实际内容。
 - 两个代理都拒绝访问元数据服务器和私有网段，VM 也没有挂服务账号。
 - 内核启用 BBR + fq，UDP 缓冲区 16 MiB，1 GiB swap。unattended-upgrades 只安装 Debian 安全更新，Xray 和 Hysteria 不随系统更新。
 
