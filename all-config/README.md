@@ -20,6 +20,18 @@ Worker `all-sub-config` 部署在 `sub.tastedistill.com`，订阅路径是 `/cla
 - `自动选择`：`url-test`，从全部节点里选延迟最低的，平时多半会选中 JMS。
 - `默认代理`：`select`，第一项是 `自动选择`，其后是全部节点。
 
+## 用量显示
+
+一个订阅只能带一份 `subscription-userinfo`，所以各线路的用量写在三个只用于显示的分组名里。它们是 `select` 分组，只含 `REJECT`，没有任何规则引用，排在代理页最后。EdgeTunnel 的请求额度也是用同样的方式显示的。
+
+- `📊 GCP 已用 2.65 GB / 260 GB（1.0%）`、`📊 JMS 已用 57.18 GB / 466 GB（12.3%）`：数据来自对两条线路订阅的 `HEAD` 请求返回的 `subscription-userinfo`。单位是 GiB，但和 Clash Verge 订阅卡片一样标作 GB。
+- `📊 CF 本账期剩余请求：99.89%（估算）`：原样沿用 EdgeTunnel 订阅里的同名分组，表示 Worker 调用剩余量。它在 2026-11-13 改成了百分比，这里不另行换算。
+- 订阅卡片显示 GCP 与 JMS 的合计用量。EdgeTunnel 按请求次数计量，不计入合计。
+
+用量在 Worker 生成订阅时读取，因此刷新统一订阅后才会更新，默认每 6 小时一次。读取失败时只把该行显示为"暂不可用"，不影响订阅本身。Worker 访问同一个域名下的其他 Worker，需要开启 `global_fetch_strictly_public` 兼容开关。"代理 → 代理集合"里也能看到 GCP 和 JMS 的实时用量。
+
+## 规则
+
 规则、DNS 和规则集与 JMS Remote 完全一致，改规则只需修改 JMS 模板，然后重新部署 `jms-sub-config`、`gcp-sub-config` 和 `all-sub-config`。
 
 ## 断线时的表现

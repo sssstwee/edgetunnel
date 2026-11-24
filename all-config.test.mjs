@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import test from 'node:test';
 import { parse } from 'yaml';
-import { LINES, US_FILTER, buildUnifiedConfig, createUnifiedWorker } from './all-config/worker.mjs';
+import { LINES, US_FILTER, buildUnifiedConfig, combinedUserinfo, createUnifiedWorker, usageGroupName } from './all-config/worker.mjs';
 import { buildConfig } from './jms-config/policy.mjs';
 
 const template = fs.readFileSync(new URL('./jms-config/clash-base.yaml', import.meta.url), 'utf8');
@@ -16,6 +16,20 @@ const env = (extra = {}) => ({
   ...extra,
 });
 const profile = e => worker.fetch(new Request(`https://example.test/clash/${token}.yaml`), e);
+const GIB = 1024 ** 3;
+// Stand-in for the three line Workers: usage headers for GCP/JMS, the request-quota group for EdgeTunnel.
+function stubLines(t, { fail = [] } = {}) {
+  const calls = [];
+  t.mock.method(globalThis, 'fetch', async (url, init = {}) => {
+    const host = new URL(url).hostname;
+    calls.push({ host, method: init.method || 'GET' });
+    if (fail.includes(host)) throw new Error('unreachable');
+    if (host === 'gcp.example') return new Response(null, { headers: { 'subscription-userinfo': `upload=0; download=${3 * GIB}; total=${260 * GIB}` } });
+    if (host === 'jms.example') return new Response(null, { headers: { 'subscription-userinfo': `upload=0; download=${57 * GIB}; total=500000000000` } });
+    return new Response('proxies: []\nproxy-groups:\n- {name: "📊 CF 本账期剩余请求：99.91%（估算）", type: select, proxies: [REJECT]}\n');
+  });
+  return calls;
+}
 const group = (config, name) => config['proxy-groups'].find(g => g.name === name);
 
 test('every line becomes a provider, in GCP → JMS → EdgeTunnel priority', () => {
@@ -61,7 +75,33 @@ test('the unified profile routes exactly like JMS Remote', () => {
   assert.ok(Object.keys(unified).every(k => !k.startsWith('jms-')));
 });
 
-test('profile is token protected and fails closed without every line', async () => {
+test('each line shows its own usage as an inert group after the routing groups', async t => {
+  const calls = stubLines(t);
+  const response = await profile(env());
+  const groups = parse(await response.text())['proxy-groups'];
+  assert.deepEqual(groups.slice(-3).map(g => g.name), [
+    '📊 GCP 已用 3.00 GB / 260 GB（1.2%）',
+    '📊 JMS 已用 57.00 GB / 466 GB（12.2%）',
+    '📊 CF 本账期剩余请求：99.91%（估算）',
+  ]);
+  assert.ok(groups.slice(-3).every(g => g.type === 'select' && g.proxies.join() === 'REJECT'));
+  assert.equal(response.headers.get('subscription-userinfo'), `upload=0; download=${60 * GIB}; total=${260 * GIB + 500000000000}`);
+  assert.deepEqual(calls.map(c => `${c.method} ${c.host}`).sort(), ['GET vpn.example', 'HEAD gcp.example', 'HEAD jms.example']);
+});
+
+test('an unreachable line only marks its usage unavailable', async t => {
+  stubLines(t, { fail: ['jms.example', 'vpn.example'] });
+  const response = await profile(env());
+  assert.equal(response.status, 200);
+  const names = parse(await response.text())['proxy-groups'].slice(-3).map(g => g.name);
+  assert.deepEqual(names.slice(1), ['📊 JMS 用量：暂不可用', '📊 CF 剩余请求：暂不可用']);
+  assert.equal(response.headers.get('subscription-userinfo'), `upload=0; download=${3 * GIB}; total=${260 * GIB}`);
+  assert.equal(combinedUserinfo({}), null);
+  assert.equal(usageGroupName('GCP', { used: 300 * GIB, total: 260 * GIB }), '📊 GCP 已用 300 GB / 260 GB（100.0%）');
+});
+
+test('profile is token protected and fails closed without every line', async t => {
+  stubLines(t);
   assert.equal((await worker.fetch(new Request('https://example.test/clash/wrong.yaml'), env())).status, 404);
   const ok = await profile(env());
   assert.equal(ok.status, 200);

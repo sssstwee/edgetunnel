@@ -1,6 +1,7 @@
 import { parse, stringify } from 'yaml';
 import { AUTO_GROUP, DEFAULT_GROUP } from '../jms-config/policy.mjs';
 import { authorized } from '../jms-config/worker.mjs';
+import { readText } from '../native-converter/converter.mjs';
 
 // One profile for every line. The client fetches each line's own subscription as a proxy provider, so a
 // line that lapses (an unpaid renewal, a failing Worker) only loses its nodes: Mihomo keeps the last
@@ -8,10 +9,12 @@ import { authorized } from '../jms-config/worker.mjs';
 // Order is priority: GCP spends the monthly credit first, JMS takes over at the 260 GiB cap, and
 // EdgeTunnel (no UDP, exit IP set by ProxyIP) is the last resort.
 export const LINES = [
-  { name: 'gcp', secret: 'GCP_PROFILE_URL', prefix: '' },
-  { name: 'jms', secret: 'JMS_PROFILE_URL', prefix: 'JMS · ' },
-  { name: 'edgetunnel', secret: 'EDGETUNNEL_SUB_URL', prefix: 'CF · ' },
+  { name: 'gcp', secret: 'GCP_PROFILE_URL', prefix: '', label: 'GCP' },
+  { name: 'jms', secret: 'JMS_PROFILE_URL', prefix: 'JMS · ', label: 'JMS' },
+  { name: 'edgetunnel', secret: 'EDGETUNNEL_SUB_URL', prefix: 'CF · ', label: 'CF' },
 ];
+const USAGE_TIMEOUT_MS = 8000;
+const GIB = 1024 ** 3;
 // JMS names only verified US exits "美国…"; Japan and the Netherlands stay out of the US pools.
 export const US_FILTER = '美国|GCP';
 const UPDATE_SECONDS = 6 * 3600;
@@ -22,7 +25,63 @@ function lineUrl(env, line) {
   return url.href;
 }
 
-export function buildUnifiedConfig(template, env) {
+// ---- Per-line usage, shown where the Clash Verge proxy page shows groups ----
+// A profile carries one subscription-userinfo, so each line's usage becomes the name of an inert
+// select group (the same device EdgeTunnel uses for its request quota). Values are read when the
+// profile is fetched, so they are as fresh as the last profile refresh.
+
+function parseUserinfo(header) {
+  const values = Object.fromEntries([...(header || '').matchAll(/(upload|download|total)=(\d+)/g)].map(m => [m[1], Number(m[2])]));
+  return Number.isSafeInteger(values.total) && values.total > 0 && Number.isSafeInteger(values.download)
+    ? { used: (values.upload || 0) + values.download, total: values.total } : null;
+}
+
+// GiB labelled "GB", matching how Clash Verge prints the same quota on the subscription card.
+const gb = bytes => `${(bytes / GIB).toFixed(bytes < 100 * GIB ? 2 : 0)} GB`;
+
+export function usageGroupName(label, usage) {
+  if (!usage) return `📊 ${label} 用量：暂不可用`;
+  return `📊 ${label} 已用 ${gb(usage.used)} / ${gb(usage.total)}（${Math.min(100, usage.used / usage.total * 100).toFixed(1)}%）`;
+}
+
+async function lineUsage(line, url) {
+  try {
+    // EdgeTunnel reports its Worker request quota only as a group name inside the profile.
+    if (line.name === 'edgetunnel') {
+      const response = await fetch(url, { headers: { 'User-Agent': 'clash.meta' }, signal: AbortSignal.timeout(USAGE_TIMEOUT_MS) });
+      if (!response.ok) return null;
+      const name = parse(await readText(response, 512 * 1024))?.['proxy-groups']?.find(g => typeof g?.name === 'string' && g.name.startsWith('📊'))?.name;
+      return name ? { name: name.replace(/^📊\s*CF\s*/, '📊 CF ') } : null;
+    }
+    const response = await fetch(url, { method: 'HEAD', headers: { 'User-Agent': 'clash.meta' }, signal: AbortSignal.timeout(USAGE_TIMEOUT_MS) });
+    return response.ok ? parseUserinfo(response.headers.get('subscription-userinfo')) : null;
+  } catch {
+    return null; // Usage is informational; it must never block the profile.
+  }
+}
+
+export async function collectUsage(env) {
+  return Object.fromEntries(await Promise.all(LINES.map(async line => [line.name, await lineUsage(line, lineUrl(env, line))])));
+}
+
+export function usageGroups(usage) {
+  return LINES.map(line => ({
+    name: line.name === 'edgetunnel' ? usage.edgetunnel?.name || '📊 CF 剩余请求：暂不可用' : usageGroupName(line.label, usage[line.name]),
+    type: 'select',
+    proxies: ['REJECT'],
+  }));
+}
+
+// The card shows the metered lines (GCP + JMS) together; per-line figures live in the groups.
+export function combinedUserinfo(usage) {
+  const metered = [usage.gcp, usage.jms].filter(Boolean);
+  if (!metered.length) return null;
+  const used = metered.reduce((sum, u) => sum + u.used, 0);
+  const total = metered.reduce((sum, u) => sum + u.total, 0);
+  return `upload=0; download=${used}; total=${total}`;
+}
+
+export function buildUnifiedConfig(template, env, usage = null) {
   const use = LINES.map(line => line.name);
   const providers = Object.fromEntries(LINES.map(line => [line.name, {
     type: 'http', url: lineUrl(env, line), interval: UPDATE_SECONDS, path: `./proxies/unified-${line.name}.yaml`,
@@ -42,6 +101,7 @@ export function buildUnifiedConfig(template, env) {
       group.filter = US_FILTER;
     }
   }
+  if (usage) config['proxy-groups'].push(...usageGroups(usage));
   for (const key of ['jms-node-names', 'jms-us-nodes', 'jms-udp-nodes']) delete config[key];
   return config;
 }
@@ -61,9 +121,14 @@ export function createUnifiedWorker(bundledPolicy = null) {
         return new Response('Not found', { status: 404 });
       }
       try {
-        const config = buildUnifiedConfig(parseBundledPolicy(bundledPolicy), env);
+        const policy = parseBundledPolicy(bundledPolicy);
+        buildUnifiedConfig(policy, env); // Validate every line URL before spending subrequests on usage.
+        const usage = await collectUsage(env);
+        const config = buildUnifiedConfig(policy, env, usage);
+        const userinfo = combinedUserinfo(usage);
         return new Response(request.method === 'HEAD' ? null : stringify(config, { lineWidth: 0 }), {
           headers: {
+            ...(userinfo ? { 'subscription-userinfo': userinfo } : {}),
             'Content-Type': 'application/yaml; charset=utf-8',
             'Content-Disposition': 'attachment; filename="Unified-Remote.yaml"',
             'profile-title': 'Unified Remote',
