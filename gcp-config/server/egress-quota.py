@@ -42,7 +42,8 @@ def load_state():
         return None
     saved = json.loads(STATE_FILE.read_text(encoding="utf-8"))
     reserved = saved.get("reserved_bytes")
-    if type(reserved) is not int or not 0 <= reserved <= MONTHLY_LIMIT:
+    # Validated on its own: a reservation made under a higher cap stays valid after the cap is lowered.
+    if type(reserved) is not int or reserved < 0 or not isinstance(saved.get("month"), str):
         raise RuntimeError("Persistent quota state is invalid")
     return saved
 
@@ -98,11 +99,12 @@ def enforce():
     else:
         reserved = saved["reserved_bytes"]
         if live and live["bytes"] == reserved:
-            if reserved == MONTHLY_LIMIT or reserved - live.get("used", 0) > RENEW_BELOW:
+            if reserved == MONTHLY_LIMIT or (reserved < MONTHLY_LIMIT and reserved - live.get("used", 0) > RENEW_BELOW):
                 return
         # The live counter is exact; without one (after boot) the whole reserved block counts as spent.
         used = live.get("used", 0) if live else reserved
 
+    # Above a lowered cap this shrinks the grant to the cap; spent bytes stay counted, so it blocks at once.
     limit = min(MONTHLY_LIMIT, reserved + GRANT)
     save_grant(month, limit)
     install_quota(limit, min(used, limit))

@@ -139,7 +139,9 @@ ExecStop=/usr/sbin/nft destroy table inet gcp_hy2_hop
 WantedBy=multi-user.target
 UNIT
 systemctl daemon-reload
-systemctl enable --now gcp-hy2-hop.service
+# restart, not start: a RemainAfterExit unit that is already active ignores start and keeps the old range.
+systemctl enable gcp-hy2-hop.service >/dev/null 2>&1
+systemctl restart gcp-hy2-hop.service
 systemctl start gcp-egress-quota.service
 
 # ---- Official installers ----
