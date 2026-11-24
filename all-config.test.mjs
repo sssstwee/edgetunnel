@@ -80,8 +80,8 @@ test('each line shows its own usage as an inert group after the routing groups',
   const response = await profile(env());
   const groups = parse(await response.text())['proxy-groups'];
   assert.deepEqual(groups.slice(-3).map(g => g.name), [
-    '📊 GCP 已用 3.00 GB / 260 GB（1.2%）',
-    '📊 JMS 已用 57.00 GB / 466 GB（12.2%）',
+    '📊 GCP 已用 3.00 GiB / 260 GiB（1.2%）',
+    '📊 JMS 已用 61.20 GB / 500 GB（12.2%）',
     '📊 CF 本账期剩余请求：99.91%（估算）',
   ]);
   assert.ok(groups.slice(-3).every(g => g.type === 'select' && g.proxies.join() === 'REJECT'));
@@ -97,7 +97,8 @@ test('an unreachable line only marks its usage unavailable', async t => {
   assert.deepEqual(names.slice(1), ['📊 JMS 用量：暂不可用', '📊 CF 剩余请求：暂不可用']);
   assert.equal(response.headers.get('subscription-userinfo'), `upload=0; download=${3 * GIB}; total=${260 * GIB}`);
   assert.equal(combinedUserinfo({}), null);
-  assert.equal(usageGroupName('GCP', { used: 300 * GIB, total: 260 * GIB }), '📊 GCP 已用 300 GB / 260 GB（100.0%）');
+  assert.equal(usageGroupName('GCP', { used: 300 * GIB, total: 260 * GIB }, 'GiB'), '📊 GCP 已用 300 GiB / 260 GiB（100.0%）');
+  assert.equal(usageGroupName('JMS', { used: 500e9, total: 500e9 }, 'GB'), '📊 JMS 已用 500 GB / 500 GB（100.0%）');
 });
 
 test('profile is token protected and fails closed without every line', async t => {

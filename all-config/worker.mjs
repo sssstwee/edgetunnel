@@ -9,12 +9,13 @@ import { readText } from '../native-converter/converter.mjs';
 // Order is priority: GCP spends the monthly credit first, JMS takes over at the 260 GiB cap, and
 // EdgeTunnel (no UDP, exit IP set by ProxyIP) is the last resort.
 export const LINES = [
-  { name: 'gcp', secret: 'GCP_PROFILE_URL', prefix: '', label: 'GCP' },
-  { name: 'jms', secret: 'JMS_PROFILE_URL', prefix: 'JMS · ', label: 'JMS' },
+  // unit: how the vendor bills — Google in GiB (the 260 GiB cap), JMS in decimal GB (500 GB plan).
+  { name: 'gcp', secret: 'GCP_PROFILE_URL', prefix: '', label: 'GCP', unit: 'GiB' },
+  { name: 'jms', secret: 'JMS_PROFILE_URL', prefix: 'JMS · ', label: 'JMS', unit: 'GB' },
   { name: 'edgetunnel', secret: 'EDGETUNNEL_SUB_URL', prefix: 'CF · ', label: 'CF' },
 ];
 const USAGE_TIMEOUT_MS = 8000;
-const GIB = 1024 ** 3;
+const UNIT_BYTES = { GiB: 1024 ** 3, GB: 1000 ** 3 };
 // JMS names only verified US exits "美国…"; Japan and the Netherlands stay out of the US pools.
 export const US_FILTER = '美国|GCP';
 const UPDATE_SECONDS = 6 * 3600;
@@ -36,12 +37,16 @@ function parseUserinfo(header) {
     ? { used: (values.upload || 0) + values.download, total: values.total } : null;
 }
 
-// GiB labelled "GB", matching how Clash Verge prints the same quota on the subscription card.
-const gb = bytes => `${(bytes / GIB).toFixed(bytes < 100 * GIB ? 2 : 0)} GB`;
+// Each line is printed in its vendor's own unit, so the figures match the vendor's dashboard.
+// (Clash Verge's card and provider panel always print binary units labelled "GB": 500 GB shows as 466.)
+function amount(bytes, unit) {
+  const value = bytes / UNIT_BYTES[unit];
+  return `${value.toFixed(value < 100 ? 2 : 0)} ${unit}`;
+}
 
-export function usageGroupName(label, usage) {
+export function usageGroupName(label, usage, unit = 'GiB') {
   if (!usage) return `📊 ${label} 用量：暂不可用`;
-  return `📊 ${label} 已用 ${gb(usage.used)} / ${gb(usage.total)}（${Math.min(100, usage.used / usage.total * 100).toFixed(1)}%）`;
+  return `📊 ${label} 已用 ${amount(usage.used, unit)} / ${amount(usage.total, unit)}（${Math.min(100, usage.used / usage.total * 100).toFixed(1)}%）`;
 }
 
 async function lineUsage(line, url) {
@@ -66,7 +71,7 @@ export async function collectUsage(env) {
 
 export function usageGroups(usage) {
   return LINES.map(line => ({
-    name: line.name === 'edgetunnel' ? usage.edgetunnel?.name || '📊 CF 剩余请求：暂不可用' : usageGroupName(line.label, usage[line.name]),
+    name: line.name === 'edgetunnel' ? usage.edgetunnel?.name || '📊 CF 剩余请求：暂不可用' : usageGroupName(line.label, usage[line.name], line.unit),
     type: 'select',
     proxies: ['REJECT'],
   }));
