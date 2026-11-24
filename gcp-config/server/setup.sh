@@ -19,6 +19,8 @@ printf 'APT::Periodic::Update-Package-Lists "1";\nAPT::Periodic::Unattended-Upgr
 # BBR + fq for TCP; 16 MiB socket buffers cover the bandwidth-delay product of QUIC and REALITY at
 # 200+ Mbit/s; keep cwnd across idle gaps so reused connections don't restart slow start; cap unsent
 # data per socket to bound queueing delay; probe MTU in case ICMP is filtered on the way.
+# tcp_mem (4 KiB pages) lifts the kernel's ~82 MiB default for all TCP buffers to 96/128/192 MiB:
+# 8 concurrent REALITY downloads already used 38 MiB, and pressure would shrink every socket's buffer.
 cat > /etc/sysctl.d/90-gcp-proxy.conf <<'SYSCTL'
 net.core.default_qdisc = fq
 net.ipv4.tcp_congestion_control = bbr
@@ -26,6 +28,7 @@ net.core.rmem_max = 16777216
 net.core.wmem_max = 16777216
 net.ipv4.tcp_rmem = 4096 131072 16777216
 net.ipv4.tcp_wmem = 4096 65536 16777216
+net.ipv4.tcp_mem = 24576 32768 49152
 net.ipv4.tcp_slow_start_after_idle = 0
 net.ipv4.tcp_notsent_lowat = 131072
 net.ipv4.tcp_mtu_probing = 1

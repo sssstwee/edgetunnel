@@ -24,8 +24,8 @@ VM 上的 nftables 配额把出站流量限制在每月 **260 GiB**，最高月�
 - **节点顺序是 HY2 在前、Reality 在后**，两个美国 `fallback` 组也按这个顺序。原因是浙江电信到俄勒冈的最低往返约 185ms，TCP 重传常超过一成，QUIC 更能扛丢包。
 - **HY2 客户端设了 `down: 200 Mbps` / `up: 30 Mbps`**，启用 Brutal 拥塞控制。2026-11-24 中午实测 40 MB 下载的中位速度：BBR 50 Mbps，Brutal 100 为 57 Mbps，Brutal 200 为 77 Mbps。三者的 VM 出站都比有效载荷多约 23%–25%，所以 Brutal 没有明显多耗流量。设定值不能超过客户端线路的实际带宽，用 `HY2_DOWN_MBPS` / `HY2_UP_MBPS` 调整。按这个开销估算，260 GiB 出站上限约合 210 GiB 实际内容。
 - 两个代理都拒绝访问元数据服务器和私有网段，VM 也没有挂服务账号。
-- 内核参数按约 190ms 往返、丢包较多的中美线路调整：BBR + fq；TCP/UDP 缓冲区上限 16 MiB，覆盖 200 Mbps 以上的带宽时延积；`tcp_slow_start_after_idle = 0`，复用的连接空闲后不重新慢启动；`tcp_notsent_lowat = 128 KiB`，限制排队延迟；`tcp_mtu_probing = 1`，应对路径上 ICMP 被过滤的情况。
-- 1 GiB swap，`swappiness = 10`。1 GB 内存里两个代理约占 100 MB，swap 只在内存紧张时使用。`setup.sh` 会把根分区扩到磁盘大小。
+- 内核参数按约 190ms 往返、丢包较多的中美线路调整：BBR + fq；TCP/UDP 缓冲区上限 16 MiB，覆盖 200 Mbps 以上的带宽时延积；`tcp_slow_start_after_idle = 0`，复用的连接空闲后不重新慢启动；`tcp_notsent_lowat = 128 KiB`，限制排队延迟；`tcp_mtu_probing = 1`，应对路径上 ICMP 被过滤的情况；`tcp_mem` 把全部 TCP 缓冲区的总上限从约 82 MiB 提到 192 MiB，否则多路并发会触发内核收紧每条连接的缓冲区。Reality 也走 BBR：VM 发出的 TCP，包括发给客户端和发往目标网站的，都由 BBR 控制。客户端上传方向由 macOS 自己的拥塞控制决定。Xray 不支持 TCP Brutal；要用它得换成 sing-box 加多路复用，而在丢包线路上，单条 TCP 承载多路请求会互相阻塞，所以不采用。
+- 1 GiB swap，`swappiness = 10`。2026-11-24 压测时，Reality 8–16 路并发加 HY2 8 路并发，VM 可用内存最低仍有 542 MB；Xray 峰值 41 MB，Hysteria 峰值 61 MB，swap 没有增长。swap 在标准盘上很慢，只用来防止内存耗尽导致进程被杀，不能提升性能，所以不加大。`setup.sh` 会把根分区扩到磁盘大小。
 - unattended-upgrades 只安装 Debian 安全更新，Xray 和 Hysteria 不随系统更新。
 - VM 只有 IPv4。客户端请求 IPv6 目标（例如 Telegram 的 IPv6 数据中心）时会立即失败，应用随后改用 IPv4。GCP 的 IPv6 只能走 Premium 网络层，不在 200 GiB 免费额度内，所以不开启。
 
