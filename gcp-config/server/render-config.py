@@ -19,6 +19,8 @@ HY2_SNI = "gcp-proxy.invalid"
 REALITY_TARGET = os.environ.get("REALITY_TARGET", "addons.mozilla.org")
 HY2_MASQUERADE = os.environ.get("HY2_MASQUERADE", "https://www.bing.com/")
 HOP_PORTS = os.environ.get("HOP_PORTS", "21000-21050")
+# 60 s still moves off a port before per-port UDP throttling builds up, with half the reconnects of 30 s.
+HOP_INTERVAL = int(os.environ.get("HOP_INTERVAL", "60"))
 LABEL = os.environ.get("NODE_LABEL", "GCP 俄勒冈")
 # Client bandwidth turns on Hysteria's Brutal congestion control, which keeps its rate under the heavy
 # loss of the China–US path. Set it to what the client's line really carries: too high only adds loss.
@@ -98,6 +100,8 @@ def main(xray_group):
         "listen": ":443",
         "tls": {"cert": str(cert), "key": str(key)},
         "auth": {"type": "password", "password": s["hy2_password"]},
+        # Default is 30 s; 60 s rides out longer stalls on the lossy path before the server drops the session.
+        "quic": {"maxIdleTimeout": "60s"},
         "masquerade": {"type": "proxy", "proxy": {"url": HY2_MASQUERADE, "rewriteHost": True}},
         "acl": {"inline": [f"reject({h})" for h in METADATA_HOSTS] + [f"reject({c})" for c in PRIVATE] + ["direct(all)"]},
     }, "hysteria")
@@ -105,7 +109,7 @@ def main(xray_group):
     # HY2 first: fallback groups try nodes in this order, and QUIC copes better with the path's loss.
     nodes = [
         {"name": f"{LABEL} · HY2", "type": "hysteria2", "server": server, "port": 443, "ports": HOP_PORTS,
-         "hop-interval": 30, "password": s["hy2_password"], "sni": HY2_SNI, "fingerprint": fingerprint,
+         "hop-interval": HOP_INTERVAL, "password": s["hy2_password"], "sni": HY2_SNI, "fingerprint": fingerprint,
          "skip-cert-verify": False, "alpn": ["h3"], "up": f"{HY2_UP_MBPS} Mbps", "down": f"{HY2_DOWN_MBPS} Mbps"},
         {"name": f"{LABEL} · Reality", "type": "vless", "server": server, "port": 443, "uuid": s["vless_id"],
          "network": "tcp", "tls": True, "udp": True, "flow": "xtls-rprx-vision", "packet-encoding": "xudp",
