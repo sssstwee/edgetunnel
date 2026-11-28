@@ -65,13 +65,38 @@ test('default selector offers auto selection plus every node', () => {
   }
 });
 
-test('the unified profile routes exactly like JMS Remote', () => {
+test('Unified preserves the JMS policy apart from the Google routing and DNS exceptions', () => {
   const policy = parse(template);
   const jms = buildConfig({ proxies: [{ name: 'JMS-test@c17s3.portablesubmarines.com:443', server: 'c17s3.portablesubmarines.com', type: 'vless', port: 443 }] }, policy);
   const unified = buildUnifiedConfig(policy, env());
-  assert.deepEqual(unified.rules, jms.rules);
+  const provider = 'unified-google-core';
+  const googleRule = `RULE-SET,${provider},AI 美国`;
+  const googleReject = `RULE-SET,${provider},REJECT`;
+  const before = unified.rules.indexOf('RULE-SET,jms-cn-ai-extra,DIRECT');
+  assert.deepEqual(unified.rules.slice(before - 2, before), [googleRule, googleReject]);
+  assert.ok(unified.rules.indexOf('DOMAIN,play.googleapis.com,REJECT') < before - 2);
+  assert.ok(unified.rules.indexOf('RULE-SET,jms-claude-deps,Claude 美国') > before);
+  assert.deepEqual(unified.rules.filter(rule => rule !== googleRule && rule !== googleReject), jms.rules);
+  const dnsPolicy = unified.dns['nameserver-policy'];
+  const dnsKey = `rule-set:${provider}`;
+  assert.equal(Object.keys(dnsPolicy)[0], dnsKey);
+  assert.deepEqual(dnsPolicy[dnsKey], [
+    'https://1.1.1.1/dns-query#AI 美国', 'https://8.8.8.8/dns-query#AI 美国',
+  ]);
+  delete dnsPolicy[dnsKey];
   assert.deepEqual(unified.dns, jms.dns);
-  assert.deepEqual(unified['rule-providers'], jms['rule-providers']);
+  const providers = unified['rule-providers'];
+  assert.equal(providers[provider].type, 'inline');
+  assert.equal(providers[provider].behavior, 'domain');
+  for (const domain of ['accounts.google.com', 'oauth2.googleapis.com', 'cloudcode-pa.googleapis.com',
+    'businessaicode.googleapis.com', 'fonts.googleapis.com', 'dl.google.com', '+.googleapis.cn', '+.gstatic.cn']) {
+    assert.ok(providers[provider].payload.includes(domain), domain);
+  }
+  for (const domain of ['+.cn', '+.googleapis.com', 'play.googleapis.com', 'claude.ai', 'chatgpt.com', 'aiplatform.googleapis.com']) {
+    assert.ok(!providers[provider].payload.includes(domain), domain);
+  }
+  delete providers[provider];
+  assert.deepEqual(providers, jms['rule-providers']);
   assert.ok(Object.keys(unified).every(k => !k.startsWith('jms-')));
 });
 
@@ -107,7 +132,10 @@ test('profile is token protected and fails closed without every line', async t =
   const ok = await profile(env());
   assert.equal(ok.status, 200);
   assert.equal(ok.headers.get('profile-title'), 'Unified Remote');
-  assert.equal(Object.keys(parse(await ok.text())['proxy-providers']).length, 3);
+  const served = parse(await ok.text());
+  assert.equal(Object.keys(served['proxy-providers']).length, 3);
+  assert.ok(served.rules.includes('RULE-SET,unified-google-core,AI 美国'));
+  assert.ok(served['rule-providers']['unified-google-core'].payload.includes('+.googleapis.cn'));
   for (const extra of [{ JMS_PROFILE_URL: undefined }, { GCP_PROFILE_URL: 'http://plain.example/x' }]) {
     const response = await profile(env(extra));
     assert.equal(response.status, 503);

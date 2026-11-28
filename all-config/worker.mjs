@@ -2,6 +2,7 @@ import { parse, stringify } from 'yaml';
 import { AUTO_GROUP, DEFAULT_GROUP } from '../jms-config/policy.mjs';
 import { authorized } from '../jms-config/worker.mjs';
 import { readText } from '../native-converter/converter.mjs';
+import { applyUnifiedGoogleRouting } from './google-routing.mjs';
 
 // One profile for every line. The client fetches each line's own subscription as a proxy provider, so a
 // line that lapses (an unpaid renewal, a failing Worker) only loses its nodes: Mihomo keeps the last
@@ -106,6 +107,7 @@ export function buildUnifiedConfig(template, env, usage = null) {
       group.filter = US_FILTER;
     }
   }
+  applyUnifiedGoogleRouting(config);
   if (usage) config['proxy-groups'].push(...usageGroups(usage));
   for (const key of ['jms-node-names', 'jms-us-nodes', 'jms-udp-nodes']) delete config[key];
   return config;

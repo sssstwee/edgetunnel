@@ -32,7 +32,7 @@ Worker `all-sub-config` 部署在 `sub.tastedistill.com`，订阅路径是 `/cla
 
 ## 规则
 
-规则、DNS 和规则集与 JMS Remote 完全一致，改规则只需修改 JMS 模板，然后重新部署 `jms-sub-config`、`gcp-sub-config` 和 `all-sub-config`。
+基础规则、DNS 和规则集沿用 JMS 模板。统一订阅单独补充 Google 登录、Antigravity 和必要的 Google .cn 例外，规则和 DNS 都走现有 `AI 美国`，排在通用直连及共享依赖规则之前；保留 `play.googleapis.com` 阻断和现有故障转移，不保证节点故障时公网出口 IP 不变。共享的 Google OAuth 主机也按域名走 `AI 美国`，Claude 和 ChatGPT 自身的服务规则不变。此补丁只需重新部署 `all-sub-config`，不改三条独立订阅。
 
 ## 断线时的表现
 
