@@ -4,17 +4,17 @@
       "path": "rules/reject.yaml",
       "kind": "rule",
       "behavior": "domain",
-      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/12554b18317457aa28eb49c6a80c1a3875aaa6ba/reject.txt",
-      "sourceCommit": "12554b18317457aa28eb49c6a80c1a3875aaa6ba",
-      "sha256": "5ef5f16cdc8990355f810c92d7f12f6063653dcdb453de4afc98718b63514bcf",
-      "bytes": 5921833
+      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/86f01c258bf44514f9b9ae5528965b7bd8ff2b19/reject.txt",
+      "sourceCommit": "86f01c258bf44514f9b9ae5528965b7bd8ff2b19",
+      "sha256": "e03537e1302aee1ba09dbe7c283652dc85082b82aa2baf74de0f6d17c44a90d0",
+      "bytes": 5932627
     },
     {
       "path": "rules/icloud.yaml",
       "kind": "rule",
       "behavior": "domain",
-      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/12554b18317457aa28eb49c6a80c1a3875aaa6ba/icloud.txt",
-      "sourceCommit": "12554b18317457aa28eb49c6a80c1a3875aaa6ba",
+      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/86f01c258bf44514f9b9ae5528965b7bd8ff2b19/icloud.txt",
+      "sourceCommit": "86f01c258bf44514f9b9ae5528965b7bd8ff2b19",
       "sha256": "f68eeee69a44d20a0e0f893cada4c42cef336d04e92aaa90b88d384e89009ed8",
       "bytes": 1123
     },
@@ -22,8 +22,8 @@
       "path": "rules/apple.yaml",
       "kind": "rule",
       "behavior": "domain",
-      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/12554b18317457aa28eb49c6a80c1a3875aaa6ba/apple.txt",
-      "sourceCommit": "12554b18317457aa28eb49c6a80c1a3875aaa6ba",
+      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/86f01c258bf44514f9b9ae5528965b7bd8ff2b19/apple.txt",
+      "sourceCommit": "86f01c258bf44514f9b9ae5528965b7bd8ff2b19",
       "sha256": "a47d516880dcf65f51d3b40e6a71c33253e0774bdc4a7ec0a0d0a09a4dd522a2",
       "bytes": 5424
     },
@@ -31,17 +31,17 @@
       "path": "rules/proxy.yaml",
       "kind": "rule",
       "behavior": "domain",
-      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/12554b18317457aa28eb49c6a80c1a3875aaa6ba/proxy.txt",
-      "sourceCommit": "12554b18317457aa28eb49c6a80c1a3875aaa6ba",
-      "sha256": "3d243d593fecf3f7949569bce0a5417c546b8fc2cd0100f92f2ba41d85f6a771",
-      "bytes": 621693
+      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/86f01c258bf44514f9b9ae5528965b7bd8ff2b19/proxy.txt",
+      "sourceCommit": "86f01c258bf44514f9b9ae5528965b7bd8ff2b19",
+      "sha256": "04063818091129ce57c9fa53ab00e71d1aa5cd4f0c96674c05af23fa85e4381c",
+      "bytes": 621811
     },
     {
       "path": "rules/direct.yaml",
       "kind": "rule",
       "behavior": "domain",
-      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/12554b18317457aa28eb49c6a80c1a3875aaa6ba/direct.txt",
-      "sourceCommit": "12554b18317457aa28eb49c6a80c1a3875aaa6ba",
+      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/86f01c258bf44514f9b9ae5528965b7bd8ff2b19/direct.txt",
+      "sourceCommit": "86f01c258bf44514f9b9ae5528965b7bd8ff2b19",
       "sha256": "90575b69cf5f8acd8aa70ddeb9752fbbc170c81d525a920b023a7049e94967b6",
       "bytes": 2277951
     },
@@ -49,8 +49,8 @@
       "path": "rules/private.yaml",
       "kind": "rule",
       "behavior": "domain",
-      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/12554b18317457aa28eb49c6a80c1a3875aaa6ba/private.txt",
-      "sourceCommit": "12554b18317457aa28eb49c6a80c1a3875aaa6ba",
+      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/86f01c258bf44514f9b9ae5528965b7bd8ff2b19/private.txt",
+      "sourceCommit": "86f01c258bf44514f9b9ae5528965b7bd8ff2b19",
       "sha256": "49972ad557345dd1abe94a62892f06cbc5b4cef12bf8d7ac5beca454b5de9088",
       "bytes": 3543
     },
@@ -58,17 +58,17 @@
       "path": "rules/gfw.yaml",
       "kind": "rule",
       "behavior": "domain",
-      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/12554b18317457aa28eb49c6a80c1a3875aaa6ba/gfw.txt",
-      "sourceCommit": "12554b18317457aa28eb49c6a80c1a3875aaa6ba",
-      "sha256": "7ad989b7370ca5f0c1c58477f8c075dbd10f3e02e02513c5cc91c568ad3a5730",
-      "bytes": 96108
+      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/86f01c258bf44514f9b9ae5528965b7bd8ff2b19/gfw.txt",
+      "sourceCommit": "86f01c258bf44514f9b9ae5528965b7bd8ff2b19",
+      "sha256": "845c6624adea5361f273c0331f89dda6665716d6a8f51ff1e4386716c753ecf7",
+      "bytes": 96167
     },
     {
       "path": "rules/tld-not-cn.yaml",
       "kind": "rule",
       "behavior": "domain",
-      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/12554b18317457aa28eb49c6a80c1a3875aaa6ba/tld-not-cn.txt",
-      "sourceCommit": "12554b18317457aa28eb49c6a80c1a3875aaa6ba",
+      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/86f01c258bf44514f9b9ae5528965b7bd8ff2b19/tld-not-cn.txt",
+      "sourceCommit": "86f01c258bf44514f9b9ae5528965b7bd8ff2b19",
       "sha256": "67ada67716332c39e0afea361dd4b2ad66f55d0a92d3d1b90a7a1d4d47283f62",
       "bytes": 11820
     },
@@ -76,8 +76,8 @@
       "path": "rules/telegramcidr.yaml",
       "kind": "rule",
       "behavior": "ipcidr",
-      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/12554b18317457aa28eb49c6a80c1a3875aaa6ba/telegramcidr.txt",
-      "sourceCommit": "12554b18317457aa28eb49c6a80c1a3875aaa6ba",
+      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/86f01c258bf44514f9b9ae5528965b7bd8ff2b19/telegramcidr.txt",
+      "sourceCommit": "86f01c258bf44514f9b9ae5528965b7bd8ff2b19",
       "sha256": "328fca88c675763111c7f7585ec504e5c21ab9afb7a8ce6df33b7ac01b8a3ee0",
       "bytes": 274
     },
@@ -85,8 +85,8 @@
       "path": "rules/cncidr.yaml",
       "kind": "rule",
       "behavior": "ipcidr",
-      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/12554b18317457aa28eb49c6a80c1a3875aaa6ba/cncidr.txt",
-      "sourceCommit": "12554b18317457aa28eb49c6a80c1a3875aaa6ba",
+      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/86f01c258bf44514f9b9ae5528965b7bd8ff2b19/cncidr.txt",
+      "sourceCommit": "86f01c258bf44514f9b9ae5528965b7bd8ff2b19",
       "sha256": "faa8d11d2e83bcc779899b07251f024b141acdf628b2dba72f6f50cac4a0364a",
       "bytes": 213788
     },
@@ -94,8 +94,8 @@
       "path": "rules/lancidr.yaml",
       "kind": "rule",
       "behavior": "ipcidr",
-      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/12554b18317457aa28eb49c6a80c1a3875aaa6ba/lancidr.txt",
-      "sourceCommit": "12554b18317457aa28eb49c6a80c1a3875aaa6ba",
+      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/86f01c258bf44514f9b9ae5528965b7bd8ff2b19/lancidr.txt",
+      "sourceCommit": "86f01c258bf44514f9b9ae5528965b7bd8ff2b19",
       "sha256": "a5e833af11e66049c1b1e06dbb47aa3e02df2cea7fcdebf46b59fefb6087525a",
       "bytes": 532
     },
@@ -103,8 +103,8 @@
       "path": "rules/applications.yaml",
       "kind": "rule",
       "behavior": "classical",
-      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/12554b18317457aa28eb49c6a80c1a3875aaa6ba/applications.txt",
-      "sourceCommit": "12554b18317457aa28eb49c6a80c1a3875aaa6ba",
+      "url": "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/86f01c258bf44514f9b9ae5528965b7bd8ff2b19/applications.txt",
+      "sourceCommit": "86f01c258bf44514f9b9ae5528965b7bd8ff2b19",
       "sha256": "33bc8f07bacf74082fcb5f361eded1f6f9d3abcedcbe37ada2eb2ab4ae031732",
       "bytes": 2821
     },
@@ -112,8 +112,8 @@
       "path": "rules/line.yaml",
       "kind": "rule",
       "behavior": "domain",
-      "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/69f94483c308940c277035c66eb78ff529efd977/geo/geosite/line.yaml",
-      "sourceCommit": "69f94483c308940c277035c66eb78ff529efd977",
+      "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/59032b3daac1d1a2643a77d6189c2a882900d54a/geo/geosite/line.yaml",
+      "sourceCommit": "59032b3daac1d1a2643a77d6189c2a882900d54a",
       "sha256": "bc555ae0d41072e7ceb0eab7f4d9e0f2b31b046a34430932e083dbdcd445fe0f",
       "bytes": 445
     },
@@ -121,17 +121,17 @@
       "path": "rules/ai.yaml",
       "kind": "rule",
       "behavior": "domain",
-      "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/69f94483c308940c277035c66eb78ff529efd977/geo/geosite/category-ai-!cn.yaml",
-      "sourceCommit": "69f94483c308940c277035c66eb78ff529efd977",
-      "sha256": "76dfad99dee4f06b4f537739f1610b8ad10c6ce9eb86fb6c1a9502018d22dfb0",
+      "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/59032b3daac1d1a2643a77d6189c2a882900d54a/geo/geosite/category-ai-!cn.yaml",
+      "sourceCommit": "59032b3daac1d1a2643a77d6189c2a882900d54a",
+      "sha256": "5018e0f5e05a3ee9934525f3c1ad8d92479415e70f0e3139229990427d621859",
       "bytes": 5585
     },
     {
       "path": "rules/ai-cn.yaml",
       "kind": "rule",
       "behavior": "domain",
-      "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/69f94483c308940c277035c66eb78ff529efd977/geo/geosite/category-ai-cn.yaml",
-      "sourceCommit": "69f94483c308940c277035c66eb78ff529efd977",
+      "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/59032b3daac1d1a2643a77d6189c2a882900d54a/geo/geosite/category-ai-cn.yaml",
+      "sourceCommit": "59032b3daac1d1a2643a77d6189c2a882900d54a",
       "sha256": "3822ac52f831ecd2774b3ed63fb8d9b63a1e013ba9fc7931b24494f010a76d48",
       "bytes": 2727
     },
@@ -139,8 +139,8 @@
       "path": "rules/anthropic.yaml",
       "kind": "rule",
       "behavior": "domain",
-      "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/69f94483c308940c277035c66eb78ff529efd977/geo/geosite/anthropic.yaml",
-      "sourceCommit": "69f94483c308940c277035c66eb78ff529efd977",
+      "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/59032b3daac1d1a2643a77d6189c2a882900d54a/geo/geosite/anthropic.yaml",
+      "sourceCommit": "59032b3daac1d1a2643a77d6189c2a882900d54a",
       "sha256": "ff53ece5feaab75a13455c467ff405f036a774a4c95cc068316500ebf9d78496",
       "bytes": 525
     },
@@ -148,8 +148,8 @@
       "path": "rules/openai.yaml",
       "kind": "rule",
       "behavior": "domain",
-      "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/69f94483c308940c277035c66eb78ff529efd977/geo/geosite/openai.yaml",
-      "sourceCommit": "69f94483c308940c277035c66eb78ff529efd977",
+      "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/59032b3daac1d1a2643a77d6189c2a882900d54a/geo/geosite/openai.yaml",
+      "sourceCommit": "59032b3daac1d1a2643a77d6189c2a882900d54a",
       "sha256": "6aede2e962e4101b061a851f5615a5db3376a4c198b3b91177b36317e9faeffb",
       "bytes": 716
     },
@@ -157,8 +157,8 @@
       "path": "rules/gemini.yaml",
       "kind": "rule",
       "behavior": "domain",
-      "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/69f94483c308940c277035c66eb78ff529efd977/geo/geosite/google-gemini.yaml",
-      "sourceCommit": "69f94483c308940c277035c66eb78ff529efd977",
+      "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/59032b3daac1d1a2643a77d6189c2a882900d54a/geo/geosite/google-gemini.yaml",
+      "sourceCommit": "59032b3daac1d1a2643a77d6189c2a882900d54a",
       "sha256": "68f5782cdf07b791f8bdae332d8df0cc359a2fe17171e6a4022934708b66303a",
       "bytes": 1558
     },
@@ -166,8 +166,8 @@
       "path": "rules/twitter.yaml",
       "kind": "rule",
       "behavior": "domain",
-      "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/69f94483c308940c277035c66eb78ff529efd977/geo/geosite/twitter.yaml",
-      "sourceCommit": "69f94483c308940c277035c66eb78ff529efd977",
+      "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/59032b3daac1d1a2643a77d6189c2a882900d54a/geo/geosite/twitter.yaml",
+      "sourceCommit": "59032b3daac1d1a2643a77d6189c2a882900d54a",
       "sha256": "e21969caac51ecd0534345a8b19166d7a0c31cd595a8eef167e1d82f5ed1d414",
       "bytes": 523
     },
@@ -175,8 +175,8 @@
       "path": "rules/bing.yaml",
       "kind": "rule",
       "behavior": "domain",
-      "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/69f94483c308940c277035c66eb78ff529efd977/geo/geosite/bing.yaml",
-      "sourceCommit": "69f94483c308940c277035c66eb78ff529efd977",
+      "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/59032b3daac1d1a2643a77d6189c2a882900d54a/geo/geosite/bing.yaml",
+      "sourceCommit": "59032b3daac1d1a2643a77d6189c2a882900d54a",
       "sha256": "6b001003152c6ce33b2fe80667eb7ff1adc48549fb6a9678b583308567017715",
       "bytes": 1045
     },
@@ -184,17 +184,17 @@
       "path": "rules/google.yaml",
       "kind": "rule",
       "behavior": "domain",
-      "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/69f94483c308940c277035c66eb78ff529efd977/geo/geosite/google.yaml",
-      "sourceCommit": "69f94483c308940c277035c66eb78ff529efd977",
-      "sha256": "442e2e76efe7c7509730dfea58ea976629740c0c622ca2ed59426bab28655461",
+      "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/59032b3daac1d1a2643a77d6189c2a882900d54a/geo/geosite/google.yaml",
+      "sourceCommit": "59032b3daac1d1a2643a77d6189c2a882900d54a",
+      "sha256": "9dce87e94ef6b19cab659928367742bd21b0c08d029a8b2f678fa6fe0fba6123",
       "bytes": 24970
     },
     {
       "path": "rules/cn.yaml",
       "kind": "rule",
       "behavior": "domain",
-      "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/69f94483c308940c277035c66eb78ff529efd977/geo/geosite/cn.yaml",
-      "sourceCommit": "69f94483c308940c277035c66eb78ff529efd977",
+      "url": "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/59032b3daac1d1a2643a77d6189c2a882900d54a/geo/geosite/cn.yaml",
+      "sourceCommit": "59032b3daac1d1a2643a77d6189c2a882900d54a",
       "sha256": "f03c301bc6ef21349da52b377e164aa1518f5549188575bc08b4e4436651b620",
       "bytes": 2274663
     },
@@ -314,32 +314,32 @@
     {
       "path": "cidr/cf.txt",
       "kind": "cidr",
-      "url": "https://raw.githubusercontent.com/cmliu/cmliu/0eb990610834da0711e621a5a16e78010cdd0758/CF-CIDR.txt",
-      "sourceCommit": "0eb990610834da0711e621a5a16e78010cdd0758",
+      "url": "https://raw.githubusercontent.com/cmliu/cmliu/39c5a4cb9fe1647fa45a642d606ba53048ccecb4/CF-CIDR.txt",
+      "sourceCommit": "39c5a4cb9fe1647fa45a642d606ba53048ccecb4",
       "sha256": "cee116272a57b4acbee834f26d8e375bdeb601dcb2bf531dc88baae1e653b32c",
       "bytes": 1129
     },
     {
       "path": "cidr/ct.txt",
       "kind": "cidr",
-      "url": "https://raw.githubusercontent.com/cmliu/cmliu/0eb990610834da0711e621a5a16e78010cdd0758/CF-CIDR/ct.txt",
-      "sourceCommit": "0eb990610834da0711e621a5a16e78010cdd0758",
+      "url": "https://raw.githubusercontent.com/cmliu/cmliu/39c5a4cb9fe1647fa45a642d606ba53048ccecb4/CF-CIDR/ct.txt",
+      "sourceCommit": "39c5a4cb9fe1647fa45a642d606ba53048ccecb4",
       "sha256": "44be8d75b33ae48c37b265640427accb25cd7eb9fa31655649fe8d140184db3a",
       "bytes": 402
     },
     {
       "path": "cidr/cu.txt",
       "kind": "cidr",
-      "url": "https://raw.githubusercontent.com/cmliu/cmliu/0eb990610834da0711e621a5a16e78010cdd0758/CF-CIDR/cu.txt",
-      "sourceCommit": "0eb990610834da0711e621a5a16e78010cdd0758",
+      "url": "https://raw.githubusercontent.com/cmliu/cmliu/39c5a4cb9fe1647fa45a642d606ba53048ccecb4/CF-CIDR/cu.txt",
+      "sourceCommit": "39c5a4cb9fe1647fa45a642d606ba53048ccecb4",
       "sha256": "3a443d91bf60100d57766d604da583a8711c7eb3aa49a704b4c3427563eeee63",
       "bytes": 395
     },
     {
       "path": "cidr/cmcc.txt",
       "kind": "cidr",
-      "url": "https://raw.githubusercontent.com/cmliu/cmliu/0eb990610834da0711e621a5a16e78010cdd0758/CF-CIDR/cmcc.txt",
-      "sourceCommit": "0eb990610834da0711e621a5a16e78010cdd0758",
+      "url": "https://raw.githubusercontent.com/cmliu/cmliu/39c5a4cb9fe1647fa45a642d606ba53048ccecb4/CF-CIDR/cmcc.txt",
+      "sourceCommit": "39c5a4cb9fe1647fa45a642d606ba53048ccecb4",
       "sha256": "61dc01a2e1f1bfe8bd193c1590e52672b776a90fada34bca0de4a43cd55e02ae",
       "bytes": 603
     },
@@ -356,8 +356,8 @@
       "behavior": "domain",
       "source": "rules/reject.yaml",
       "compiler": "Mihomo Meta v1.19.34 linux amd64 with go1.26.11 Wed Nov 11 06:48:49 UTC 2026",
-      "sha256": "eb8906d81730487004935ed9d1388432a89a5a3d229aa57545f40711db132735",
-      "bytes": 1978972
+      "sha256": "ba1fef242562a55b90cbc8ddef451b13685dbf5338950e09934f66acdf6f7945",
+      "bytes": 1982564
     },
     {
       "path": "rules/icloud.mrs",
@@ -383,8 +383,8 @@
       "behavior": "domain",
       "source": "rules/proxy.yaml",
       "compiler": "Mihomo Meta v1.19.34 linux amd64 with go1.26.11 Wed Nov 11 06:48:49 UTC 2026",
-      "sha256": "435965e87b5d26def0a87dd7cfffe6670d754ff12ddb0d39e2e579caa151454f",
-      "bytes": 198971
+      "sha256": "c5829cdd584a23c0d6b2a401ee70215138ef435af6b72bba4863cd20be6d3604",
+      "bytes": 199064
     },
     {
       "path": "rules/direct.mrs",
@@ -410,8 +410,8 @@
       "behavior": "domain",
       "source": "rules/gfw.yaml",
       "compiler": "Mihomo Meta v1.19.34 linux amd64 with go1.26.11 Wed Nov 11 06:48:49 UTC 2026",
-      "sha256": "03e30e6bd527bbc08b8fb620e08b4c41e6903f010dd536c55917f58104b8e723",
-      "bytes": 35111
+      "sha256": "9d8815fdcd5a71f5be4ea9c8bd39efa2c8aeed7150938e3952bf3b6f20bfa417",
+      "bytes": 35107
     },
     {
       "path": "rules/tld-not-cn.mrs",
@@ -551,35 +551,35 @@
   ],
   "geodata": {
     "source": "https://github.com/MetaCubeX/meta-rules-dat/releases/tag/latest",
-    "publishedAt": "2026-11-26T04:16:13Z",
+    "publishedAt": "2026-11-27T04:25:27Z",
     "files": [
       {
         "name": "geoip.dat",
         "url": "https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip.dat",
         "sha256": "9dc8e7de8db8300ce27b606f4a30632265713d2f33bcc568c0d2c44c825c8687",
         "bytes": 16676025,
-        "upstreamAssetId": 794278433
+        "upstreamAssetId": 798952920
       },
       {
         "name": "geosite.dat",
         "url": "https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geosite.dat",
-        "sha256": "ae35a23f40a8e0486f0ed1723780ba6805a9f917a51ff30441eb2c41f688244c",
-        "bytes": 4357159,
-        "upstreamAssetId": 794278510
+        "sha256": "f187c87088838f757c880bcbd4bb172e45697d6a8d08158beb49c7500dc0da1e",
+        "bytes": 4357245,
+        "upstreamAssetId": 798952984
       },
       {
         "name": "geoip.metadb",
         "url": "https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip.metadb",
-        "sha256": "2eb4749bec1e1b9c269a7997ae63ee0f673cf4288349c9ee73a4e369d4d2915a",
+        "sha256": "137a8c42fbb2d91a499770c97b75ca615c86d2b477c021dfe7ee6a371ade31ca",
         "bytes": 8505514,
-        "upstreamAssetId": 794278452
+        "upstreamAssetId": 798952945
       },
       {
         "name": "GeoLite2-ASN.mmdb",
         "url": "https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/GeoLite2-ASN.mmdb",
-        "sha256": "ba7c4964c71b51d28dc23eefd5e4376801bf90472d26f766648aae003af9388e",
-        "bytes": 9072814,
-        "upstreamAssetId": 794278345
+        "sha256": "cb8dcc465b4a1e90940520c74ed87972ea962e390580912bfe4aa94bc82cf1d0",
+        "bytes": 9081677,
+        "upstreamAssetId": 798952802
       }
     ]
   }
